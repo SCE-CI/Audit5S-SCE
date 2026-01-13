@@ -1344,6 +1344,62 @@
         ═══════════════════════════════════════════════════════════════ */
         
         @media (max-width: 480px) {
+            body {
+                padding-top: 52px; /* Header plus petit sur mobile */
+                padding-bottom: 60px; /* Footer plus petit sur mobile */
+            }
+            
+            .header {
+                padding: 6px 10px;
+                padding-bottom: 10px;
+            }
+            
+            .header-logo {
+                height: 44px;
+            }
+            
+            .header-title {
+                font-size: 1.125rem;
+            }
+            
+            .header-date {
+                font-size: 0.75rem;
+            }
+            
+            .submit-container {
+                padding: 6px 12px;
+            }
+            
+            .bottom-bar {
+                gap: 8px;
+            }
+            
+            .score-display {
+                padding: 6px 10px;
+            }
+            
+            .score-display .score-value {
+                font-size: 1rem;
+            }
+            
+            .score-display .score-max {
+                font-size: 0.75rem;
+            }
+            
+            .score-display .score-percent {
+                font-size: 0.7rem;
+            }
+            
+            .submit-btn {
+                padding: 10px 12px;
+                font-size: 0.875rem;
+            }
+            
+            .menu-btn {
+                width: 40px;
+                height: 40px;
+            }
+            
             .container {
                 padding: var(--space-md);
             }
@@ -1547,6 +1603,15 @@
             100% { transform: rotate(-360deg); }
         }
         
+        .menu-item:hover .icon-sharepoint {
+            animation: sharepointFly 0.5s ease;
+        }
+        @keyframes sharepointFly {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(3px, -3px); }
+            100% { transform: translate(0, 0); }
+        }
+        
         .menu-item:hover .icon-clock .clock-hands {
             animation: clockSpin 0.6s ease-in-out;
             transform-origin: 12px 12px;
@@ -1585,6 +1650,15 @@
             0% { transform: rotate(0deg) scale(1); }
             50% { transform: rotate(-20deg) scale(1.2); }
             100% { transform: rotate(0deg) scale(1); }
+        }
+        
+        .menu-item:hover .icon-sharepoint {
+            animation: sharepointArrow 0.5s ease;
+        }
+        @keyframes sharepointArrow {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(3px, -3px); }
+            100% { transform: translate(0, 0); }
         }
         
         .menu-item:hover .icon-sun .sun-rays {
@@ -2208,10 +2282,27 @@
                     <label for="zone">Zone</label>
                     <select id="zone" required>
                         <option value="" disabled selected>Sélectionner</option>
-                        <option value="Assemblage">Assemblage</option>
-                        <option value="Process / Entrée">Process / Entrée</option>
-                        <option value="Outillage">Outillage</option>
-                        <option value="Extérieurs">Extérieurs</option>
+                        <optgroup label="Production">
+                            <option value="Assemblage">Assemblage</option>
+                            <option value="Process / Entrée">Process / Entrée</option>
+                            <option value="Outillage">Outillage</option>
+                            <option value="Extérieurs">Extérieurs</option>
+                        </optgroup>
+                        <optgroup label="Logistique (bientôt disponible)" disabled>
+                            <option value="Magasin / CQ">Magasin / CQ</option>
+                            <option value="Mezzanine">Mezzanine</option>
+                            <option value="Tente">Tente</option>
+                            <option value="Emballage / Expédition">Emballage / Expédition</option>
+                        </optgroup>
+                        <optgroup label="Administratif (bientôt disponible)" disabled>
+                            <option value="Bureaux (P0)">Bureaux (P0)</option>
+                            <option value="Bureaux (P1)">Bureaux (P1)</option>
+                            <option value="Salles de réunions">Salles de réunions</option>
+                            <option value="Espaces communs">Espaces communs</option>
+                        </optgroup>
+                        <optgroup label="Product Development (bientôt disponible)" disabled>
+                            <option value="Tests">Tests</option>
+                        </optgroup>
                     </select>
                 </div>
             </div>
@@ -3160,6 +3251,14 @@
                             </svg>
                             Réinitialiser l'audit
                         </button>
+                        <button type="button" class="menu-item" onclick="menuAction('sharepoint')">
+                            <svg class="icon-sharepoint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                            Ouvrir SharePoint 5S
+                        </button>
                     </div>
 
                     <div class="menu-section">
@@ -3939,6 +4038,11 @@
             const totalScore = Object.values(auditData.scores).reduce((a, b) => a + b, 0);
             const percent = Math.round((totalScore / MAX_SCORE) * 100);
             
+            // Récupérer le secteur depuis l'optgroup
+            const zoneSelect = document.getElementById('zone');
+            const selectedOption = zoneSelect.options[zoneSelect.selectedIndex];
+            const secteur = selectedOption.parentElement.label || '';
+            
             // Générer ID unique (pour identification interne)
             const auditId = `AUDIT_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}_${zone.toLowerCase().replace(/[^a-z]/g, '')}`;
             
@@ -3966,6 +4070,7 @@
                 date: now.toISOString().split('T')[0],
                 auditeur: auditeur,
                 auditeurSP: formatNameForExport(auditeur),
+                secteur: secteur,
                 zone: zone,
                 niveau: `Niveau ${level}`,
                 scores: scoresArray,
@@ -4012,7 +4117,7 @@
                 showToastWithAction(
                     `Audit exporté — ${pendingExport.percent}%${actionMsg}`,
                     'success',
-                    'Ouvrir SharePoint',
+                    'Ouvrir SharePoint 5S',
                     () => window.open(SHAREPOINT_URL, '_blank')
                 );
                 
@@ -4411,7 +4516,9 @@ Cordialement`);
                         true
                     );
                     break;
-
+                case 'sharepoint':
+                    window.open(SHAREPOINT_URL, '_blank');
+                    break;
                 case 'darkmode':
                     toggleDarkMode();
                     break;
