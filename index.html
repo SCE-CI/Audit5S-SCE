@@ -3408,27 +3408,100 @@
         const TOTAL_CRITERIA = 15;
         const MAX_SCORE = 60;
         
-        // Liste des auditeurs
+        // Liste des auditeurs avec emails
         const AUDITEURS = [
-            "Ancori Gaelle", "Aubrion Xavier", "Aulenbacher Marc", "Azem Idir", "Aziz Abdelhadi",
-            "Badoual Loïc", "Barthes Laurent", "Beulay Jean Luc", "Bilde Hugues", "Blot Philippe",
-            "Bontems Julian", "Bouchand Jean François", "Bourdon Michael", "Burkel Ludovic",
-            "Cardaire Louis", "Cerqueira Pascal", "Chauvot De Beauchene Lubin", "Chevalier Jerome",
-            "Claude Aurelien", "Courrier Aurélie", "De Miscault Pierre", "Delavault Guillaume",
-            "Demeester Alexia", "Denis Verbeyst Delphine", "Dupont Olivier", "Egrot Christophe",
-            "Etienne Germain", "Fablet Primael", "Friedrich-Lang Caty", "Geny Jean-Philippe",
-            "Goldstein David", "Goueffon Estelle", "Goy Lucile", "Guyot Joel", "Habert Loïc",
-            "Hacquin Thibaut", "Heintz Martine", "Hermann Adrien", "Humbertclaude Laurent",
-            "Jeanbille Tommy", "Jeanroy Cyrille", "Jouhari Yassine", "Laurent Marc", "Laziz Samia",
-            "Ledore Lyonel", "Leidner Adeline", "Maarouf Mohamed", "Machado Cezar", "Mainguy Mickael",
-            "Marandel Vianney", "Marchal Julien", "Marin Fabienne", "Marques Manuel", "Mathieu Anne",
-            "Mathieu Pierre", "Menolfi Jonathan", "Mersel Laura", "Morey Sauffroy Celine",
-            "Mourolin Mathieu", "Muller Eric", "Oudin Alexis", "Parenty Olivier", "Parisse Aurelien",
-            "Peultier Hugo", "Raffo Adrien", "Raoult Stephane", "Rimlinger Claire", "Rosienski Laurent",
-            "Ruse Romuald", "Simao José", "Sosnowski Corinne", "Spindler Stéphane", "Strauss Dorian",
-            "Suleyman Anna", "Thirion Alexandre", "Thomasset Guy", "Vautelin Sebastien",
-            "Viratelle Frédéric", "Vuillemin Yannick", "Weber Michael"
+            { nom: "Ancori Gaelle", email: "gaelle.ancori@sartorius.com" },
+            { nom: "Aubrion Xavier", email: "xavier.aubrion@sartorius.com" },
+            { nom: "Aulenbacher Marc", email: "marc.aulenbacher@sartorius.com" },
+            { nom: "Azem Idir", email: "idir.azem@sartorius.com" },
+            { nom: "Aziz Abdelhadi", email: "abdelhadi.aziz1@sartorius.com" },
+            { nom: "Badoual Loïc", email: "loic.badoual@sartorius.com" },
+            { nom: "Barthes Laurent", email: "laurent.barthes@sartorius.com" },
+            { nom: "Beulay Jean Luc", email: "jean-luc.beulay@sartorius.com" },
+            { nom: "Bilde Hugues", email: "hugues.bilde@sartorius.com" },
+            { nom: "Blot Philippe", email: "philippe.blot@sartorius.com" },
+            { nom: "Bontems Julian", email: "julian.bontems1@sartorius.com" },
+            { nom: "Bouchand Jean François", email: "jean-francois.bouchand@sartorius.com" },
+            { nom: "Bourdon Michael", email: "michael.bourdon@sartorius.com" },
+            { nom: "Burkel Ludovic", email: "ludovic.burkel@sartorius.com" },
+            { nom: "Cardaire Louis", email: "louis.cardaire@sartorius.com" },
+            { nom: "Cerqueira Pascal", email: "pascal.cerqueira@sartorius.com" },
+            { nom: "Chauvot De Beauchene Lubin", email: "lubin.chauvot@sartorius.com" },
+            { nom: "Chevalier Jerome", email: "jerome.chevalier@sartorius.com" },
+            { nom: "Claude Aurelien", email: "aurelien.claude@sartorius.com" },
+            { nom: "Courrier Aurélie", email: "aurelie.courrier@sartorius.com" },
+            { nom: "De Miscault Pierre", email: "pierre.demiscault@sartorius.com" },
+            { nom: "Delavault Guillaume", email: "guillaume.delavault1@sartorius.com" },
+            { nom: "Demeester Alexia", email: "alexia.demeester1@sartorius.com" },
+            { nom: "Denis Verbeyst Delphine", email: "delphine.denis@sartorius.com" },
+            { nom: "Dupont Olivier", email: "olivier.dupont@sartorius.com" },
+            { nom: "Egrot Christophe", email: "christophe.egrot@sartorius.com" },
+            { nom: "Etienne Germain", email: "germain.etienne@sartorius.com" },
+            { nom: "Fablet Primael", email: "primael.fablet@sartorius.com" },
+            { nom: "Friedrich-Lang Caty", email: "caty.friedrich-lang@sartorius.com" },
+            { nom: "Geny Jean-Philippe", email: "jean-philippe.geny1@sartorius.com" },
+            { nom: "Goldstein David", email: "david.goldstein@sartorius.com" },
+            { nom: "Goueffon Estelle", email: "estelle.goueffon@sartorius.com" },
+            { nom: "Goy Lucile", email: "lucile.goy1@sartorius.com" },
+            { nom: "Guyot Joel", email: "joel.guyot@sartorius.com" },
+            { nom: "Habert Loïc", email: "loic.habert@sartorius.com" },
+            { nom: "Hacquin Thibaut", email: "thibaut.hacquin@sartorius.com" },
+            { nom: "Heintz Martine", email: "martine.heintz@sartorius.com" },
+            { nom: "Hermann Adrien", email: "adrien.herrmann1@sartorius.com" },
+            { nom: "Humbertclaude Laurent", email: "l.humbertclaude@sartorius.com" },
+            { nom: "Jeanbille Tommy", email: "tommy.jeanbille@sartorius.com" },
+            { nom: "Jeanroy Cyrille", email: "cyrille.jeanroy@sartorius.com" },
+            { nom: "Jouhari Yassine", email: "yassine.jouhari@sartorius.com" },
+            { nom: "Laurent Marc", email: "marc.laurent@sartorius.com" },
+            { nom: "Laziz Samia", email: "samia.laziz1@sartorius.com" },
+            { nom: "Ledore Lyonel", email: "lyonel.ledore@sartorius.com" },
+            { nom: "Leidner Adeline", email: "adeline.leidner@sartorius.com" },
+            { nom: "Maarouf Mohamed", email: "mohamed.maarouf1@sartorius.com" },
+            { nom: "Machado Cezar", email: "cezar.machado@sartorius.com" },
+            { nom: "Mainguy Mickael", email: "mickael.mainguy@sartorius.com" },
+            { nom: "Marandel Vianney", email: "vianney.marandel@sartorius.com" },
+            { nom: "Marchal Julien", email: "julien.marchal@sartorius.com" },
+            { nom: "Marin Fabienne", email: "fabienne.marin@sartorius.com" },
+            { nom: "Marques Manuel", email: "manuel.marques@sartorius.com" },
+            { nom: "Mathieu Anne", email: "anne.mathieu@sartorius.com" },
+            { nom: "Mathieu Pierre", email: "pierre.mathieu1@sartorius.com" },
+            { nom: "Menolfi Jonathan", email: "jonathan.menolfi@sartorius.com" },
+            { nom: "Mersel Laura", email: "laura.mersel@sartorius.com" },
+            { nom: "Morey Sauffroy Celine", email: "celine.moreysauffroy@sartorius.com" },
+            { nom: "Mourolin Mathieu", email: "mathieu.mourolin1@sartorius.com" },
+            { nom: "Muller Eric", email: "eric.muller@sartorius.com" },
+            { nom: "Oudin Alexis", email: "alexis.oudin@sartorius.com" },
+            { nom: "Parenty Olivier", email: "olivier.parenty@sartorius.com" },
+            { nom: "Parisse Aurelien", email: "aurelien.parisse@sartorius.com" },
+            { nom: "Peultier Hugo", email: "hugo.peultier@sartorius.com" },
+            { nom: "Raffo Adrien", email: "adrien.raffo@sartorius.com" },
+            { nom: "Raoult Stephane", email: "stephane.raoult@sartorius.com" },
+            { nom: "Rimlinger Claire", email: "claire.rimlinger1@sartorius.com" },
+            { nom: "Rosienski Laurent", email: "laurent.rosienski@sartorius.com" },
+            { nom: "Ruse Romuald", email: "romuald.ruse@sartorius.com" },
+            { nom: "Simao José", email: "jose.simao@sartorius.com" },
+            { nom: "Sosnowski Corinne", email: "corinne.sosnowski@sartorius.com" },
+            { nom: "Spindler Stéphane", email: "stephane.spindler@sartorius.com" },
+            { nom: "Strauss Dorian", email: "dorian.strauss1@sartorius.com" },
+            { nom: "Suleyman Anna", email: "anna.suleyman@sartorius.com" },
+            { nom: "Thirion Alexandre", email: "alexandre.thirion@sartorius.com" },
+            { nom: "Thomasset Guy", email: "guy.thomasset@sartorius.com" },
+            { nom: "Vautelin Sebastien", email: "sebastien.vautelin@sartorius.com" },
+            { nom: "Viratelle Frédéric", email: "frederic.viratelle@sartorius.com" },
+            { nom: "Vuillemin Yannick", email: "yannick.vuillemin@sartorius.com" },
+            { nom: "Weber Michael", email: "michael.weber@sartorius.com" }
         ];
+        
+        // Fonction utilitaire pour obtenir l'email à partir du nom
+        function getEmailByName(name) {
+            const person = AUDITEURS.find(a => a.nom === name);
+            return person ? person.email : '';
+        }
+        
+        // Fonction utilitaire pour vérifier si un nom existe
+        function isValidName(name) {
+            return AUDITEURS.some(a => a.nom === name);
+        }
         
 
         // ═══════════════════════════════════════════════════════════════
@@ -3567,10 +3640,10 @@
                 }
                 
                 // Rechercher les correspondances (nom ou prénom)
-                const matches = AUDITEURS.filter(name => {
-                    const parts = name.toLowerCase().split(' ');
+                const matches = AUDITEURS.filter(person => {
+                    const parts = person.nom.toLowerCase().split(' ');
                     return parts.some(part => part.startsWith(query)) || 
-                           name.toLowerCase().includes(query);
+                           person.nom.toLowerCase().includes(query);
                 }).slice(0, 5);
                 
                 if (matches.length === 0) {
@@ -3579,9 +3652,9 @@
                 }
                 
                 // Afficher les suggestions
-                suggestions.innerHTML = matches.map((name, index) => {
-                    const highlighted = highlightMatch(name, query);
-                    return `<div class="autocomplete-item" data-index="${index}" data-name="${name}">${highlighted}</div>`;
+                suggestions.innerHTML = matches.map((person, index) => {
+                    const highlighted = highlightMatch(person.nom, query);
+                    return `<div class="autocomplete-item" data-index="${index}" data-name="${person.nom}">${highlighted}</div>`;
                 }).join('');
                 
                 suggestions.classList.add('visible');
@@ -3685,7 +3758,7 @@
         
         function validateNameField(input, isAuditeur) {
             const value = input.value.trim();
-            if (value && !AUDITEURS.includes(value)) {
+            if (value && !isValidName(value)) {
                 // Nom non valide - vider le champ et notifier
                 input.value = '';
                 showToast('Nom non reconnu — choisissez dans la liste', 'error');
@@ -4053,7 +4126,8 @@
                     type: data.type === 'ecart' ? 'Écart aux standards' : 'Élévation des standards',
                     action: data.action,
                     responsable: data.responsable,
-                    responsableSP: formatNameForExport(data.responsable)
+                    responsableSP: formatNameForExport(data.responsable),
+                    responsableMail: getEmailByName(data.responsable)
                 }));
             
             // Structure JSON finale
