@@ -271,6 +271,15 @@
             color: var(--gray-50);
         }
         
+        /* Les options doivent toujours être en noir */
+        .form-group select option {
+            color: var(--black);
+        }
+        
+        .form-group select option:disabled {
+            color: var(--gray-50);
+        }
+        
         /* Animation shake pour champs manquants */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -319,7 +328,7 @@
             border-radius: 0 0 var(--radius-sm) var(--radius-sm);
             max-height: 200px;
             overflow-y: auto;
-            z-index: 100;
+            z-index: 1000;
             display: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
@@ -548,7 +557,7 @@
         .s-body {
             padding: var(--space-sm);
             max-height: 1000px;
-            overflow: hidden;
+            overflow: visible;
             transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
             opacity: 1;
         }
@@ -558,6 +567,7 @@
             padding-top: 0;
             padding-bottom: 0;
             opacity: 0;
+            overflow: hidden;
         }
         
         /* ═══════════════════════════════════════════════════════════════
@@ -3795,7 +3805,7 @@
         
         function loadLastAuditeur() {
             const lastAuditeur = localStorage.getItem('audit5s_last_auditeur');
-            if (lastAuditeur && AUDITEURS.includes(lastAuditeur)) {
+            if (lastAuditeur && isValidName(lastAuditeur)) {
                 document.getElementById('auditeur').value = lastAuditeur;
                 updateFormState();
             }
@@ -4066,7 +4076,7 @@
                         invalidResponsable = { critere, reason: 'missing' };
                         break;
                     }
-                    if (!AUDITEURS.includes(data.responsable.trim())) {
+                    if (!isValidName(data.responsable.trim())) {
                         invalidResponsable = { critere, reason: 'invalid' };
                         break;
                     }
@@ -4320,7 +4330,7 @@ ${jsonCompact}
                     // Il y a une action, vérifier le responsable
                     const hasValidResponsable = data.responsable && 
                                                 data.responsable.trim() && 
-                                                AUDITEURS.includes(data.responsable.trim());
+                                                isValidName(data.responsable.trim());
                     
                     if (!hasValidResponsable) {
                         // Faire clignoter la pastille
