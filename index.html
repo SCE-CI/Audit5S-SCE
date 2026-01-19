@@ -3928,9 +3928,18 @@
             const badge = card.querySelector('.action-badge');
             if (!badge) return;
             const action = auditData.actions[criteriaId];
+            
+            const hasAction = action && action.action && action.action.trim();
+            const hasResponsable = action && action.responsable && action.responsable.trim();
+            
             // Jaune + check si action ET responsable remplis
-            const isComplete = action && action.action && action.responsable;
+            const isComplete = hasAction && hasResponsable;
+            // Incomplet si l'un est rempli mais pas l'autre
+            const isIncomplete = (hasAction && !hasResponsable) || (hasResponsable && !hasAction);
+            
             badge.classList.toggle('has-action', isComplete);
+            badge.classList.toggle('incomplete-action', isIncomplete);
+            
             // Retirer les indicateurs si action complète
             if (isComplete) {
                 badge.classList.remove('needs-action', 'suggest-elevation');
@@ -4067,25 +4076,32 @@
                 return;
             }
             
-            // Vérifier les responsables d'action (si action remplie, responsable doit être valide)
-            let invalidResponsable = null;
+            // Vérifier la cohérence action/responsable
+            let invalidAction = null;
             for (const [critere, data] of Object.entries(auditData.actions)) {
-                if (data.action && data.action.trim()) {
-                    // Il y a une action, vérifier le responsable
-                    if (!data.responsable || !data.responsable.trim()) {
-                        invalidResponsable = { critere, reason: 'missing' };
-                        break;
-                    }
-                    if (!isValidName(data.responsable.trim())) {
-                        invalidResponsable = { critere, reason: 'invalid' };
-                        break;
-                    }
+                const hasAction = data.action && data.action.trim();
+                const hasResponsable = data.responsable && data.responsable.trim();
+                
+                if (hasAction && !hasResponsable) {
+                    // Action sans responsable
+                    invalidAction = { critere, reason: 'missing_responsable' };
+                    break;
+                }
+                if (hasAction && !isValidName(data.responsable.trim())) {
+                    // Responsable invalide
+                    invalidAction = { critere, reason: 'invalid_responsable' };
+                    break;
+                }
+                if (hasResponsable && !hasAction) {
+                    // Responsable sans action
+                    invalidAction = { critere, reason: 'missing_action' };
+                    break;
                 }
             }
             
-            if (invalidResponsable) {
+            if (invalidAction) {
                 // Trouver et ouvrir la section concernée
-                const card = document.querySelector(`[data-criteria="${invalidResponsable.critere}"]`);
+                const card = document.querySelector(`[data-criteria="${invalidAction.critere}"]`);
                 if (card) {
                     const section = card.closest('.s-section');
                     if (section) section.classList.remove('collapsed');
@@ -4093,20 +4109,32 @@
                     const actionBlock = card.querySelector('.action-block');
                     if (actionBlock) actionBlock.classList.add('visible');
                     
-                    const respField = card.querySelector('.action-responsable');
-                    if (respField) {
-                        respField.focus();
-                        respField.classList.add('field-error');
-                        setTimeout(() => respField.classList.remove('field-error'), 2000);
+                    // Focus sur le champ manquant
+                    if (invalidAction.reason === 'missing_action') {
+                        const actionField = card.querySelector('.action-text');
+                        if (actionField) {
+                            actionField.focus();
+                            actionField.classList.add('field-error');
+                            setTimeout(() => actionField.classList.remove('field-error'), 2000);
+                        }
+                    } else {
+                        const respField = card.querySelector('.action-responsable');
+                        if (respField) {
+                            respField.focus();
+                            respField.classList.add('field-error');
+                            setTimeout(() => respField.classList.remove('field-error'), 2000);
+                        }
                     }
                     
                     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
                 
-                const message = invalidResponsable.reason === 'missing' 
-                    ? 'Responsable manquant pour une action' 
-                    : 'Responsable non reconnu — choisissez dans la liste';
-                showToast(message, 'error');
+                const messages = {
+                    'missing_responsable': 'Responsable manquant pour une action',
+                    'invalid_responsable': 'Responsable non reconnu — choisissez dans la liste',
+                    'missing_action': 'Action manquante pour un responsable'
+                };
+                showToast(messages[invalidAction.reason], 'error');
                 return;
             }
             
@@ -4260,7 +4288,7 @@ ${jsonCompact}
         }
         
         // Email destinataire
-        const EMAIL_DEST = 'guillaume.delavault1@sartorius.com';
+        const EMAIL_DEST = 'ci-sce@sartorius.com';
         
         function closeExportModal() {
             document.getElementById('export-modal').classList.remove('visible');
@@ -4326,21 +4354,21 @@ ${jsonCompact}
         
         function checkIncompleteActions() {
             for (const [critere, data] of Object.entries(auditData.actions)) {
-                if (data.action && data.action.trim()) {
-                    // Il y a une action, vérifier le responsable
-                    const hasValidResponsable = data.responsable && 
-                                                data.responsable.trim() && 
-                                                isValidName(data.responsable.trim());
-                    
-                    if (!hasValidResponsable) {
-                        // Faire clignoter la pastille
-                        const card = document.querySelector(`[data-criteria="${critere}"]`);
-                        if (card) {
-                            const badge = card.querySelector('.action-badge');
-                            if (badge) {
-                                badge.classList.add('incomplete-action');
-                                setTimeout(() => badge.classList.remove('incomplete-action'), 1500);
-                            }
+                const hasAction = data.action && data.action.trim();
+                const hasResponsable = data.responsable && data.responsable.trim();
+                const hasValidResponsable = hasResponsable && isValidName(data.responsable.trim());
+                
+                // Incomplet si : action sans responsable, ou responsable sans action
+                const isIncomplete = (hasAction && !hasValidResponsable) || (hasResponsable && !hasAction);
+                
+                if (isIncomplete) {
+                    // Faire clignoter la pastille
+                    const card = document.querySelector(`[data-criteria="${critere}"]`);
+                    if (card) {
+                        const badge = card.querySelector('.action-badge');
+                        if (badge) {
+                            badge.classList.add('incomplete-action');
+                            setTimeout(() => badge.classList.remove('incomplete-action'), 1500);
                         }
                     }
                 }
@@ -4441,7 +4469,7 @@ ${jsonCompact}
         }
         
         function reportProblem() {
-            const email = 'guillaume.delavault1@sartorius.com';
+            const email = 'ci-sce@sartorius.com';
             const subject = encodeURIComponent('[Audit 5S] Signalement');
             const body = encodeURIComponent(`Bonjour,
 
