@@ -3570,7 +3570,6 @@
         function isValidName(name) {
             return AUDITEURS.some(a => a.nom === name);
         }
-        
 
         // ═══════════════════════════════════════════════════════════════
         // INITIALISATION
@@ -3594,14 +3593,7 @@
             
             initInfoPopup();
             
-            // Listeners pour la modale de confirmation
-            document.getElementById('confirm-btn').addEventListener('click', function() {
-                if (confirmCallback) {
-                    confirmCallback();
-                }
-                closeConfirmModal();
-            });
-            
+            // Listener pour fermer la modale en cliquant sur l'overlay
             document.getElementById('confirm-modal').addEventListener('click', function(e) {
                 if (e.target === this) {
                     closeConfirmModal();
@@ -4736,8 +4728,6 @@ Cordialement`);
         // MODALE DE CONFIRMATION
         // ═══════════════════════════════════════════════════════════════
         
-        let confirmCallback = null;
-        
         function showConfirmModal(title, text, type, btnText, callback, isDanger = false) {
             document.getElementById('confirm-title').textContent = title;
             document.getElementById('confirm-text').innerHTML = text;
@@ -4745,17 +4735,25 @@ Cordialement`);
             const icon = document.getElementById('confirm-icon');
             icon.className = 'confirm-modal-icon ' + type;
             
-            const confirmBtn = document.getElementById('confirm-btn');
-            confirmBtn.textContent = btnText;
-            confirmBtn.className = 'confirm-modal-btn ' + (isDanger ? 'danger' : 'confirm');
+            const oldBtn = document.getElementById('confirm-btn');
+            oldBtn.textContent = btnText;
+            oldBtn.className = 'confirm-modal-btn ' + (isDanger ? 'danger' : 'confirm');
             
-            confirmCallback = callback;
+            // Cloner le bouton pour supprimer tous les anciens listeners
+            const newBtn = oldBtn.cloneNode(true);
+            oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+            
+            // Attacher le nouveau listener
+            newBtn.addEventListener('click', function() {
+                callback();
+                closeConfirmModal();
+            });
+            
             document.getElementById('confirm-modal').classList.add('visible');
         }
         
         function closeConfirmModal() {
             document.getElementById('confirm-modal').classList.remove('visible');
-            confirmCallback = null;
         }
         
         // ═══════════════════════════════════════════════════════════════
@@ -4960,6 +4958,12 @@ Cordialement`);
             auditData.scores = draft.scores || {};
             auditData.actions = draft.actions || {};
             
+            // Réinitialiser visuellement les scores
+            document.querySelectorAll('.criteria-card').forEach(card => {
+                card.classList.remove('scored');
+                card.querySelectorAll('.score-btn').forEach(btn => btn.classList.remove('selected'));
+            });
+            
             // Restaurer les boutons de score
             Object.entries(auditData.scores).forEach(([criteria, score]) => {
                 const card = document.querySelector(`[data-criteria="${criteria}"]`);
@@ -4970,13 +4974,23 @@ Cordialement`);
                 }
             });
             
+            // Réinitialiser visuellement les actions
+            document.querySelectorAll('.action-block').forEach(block => {
+                block.classList.remove('visible');
+                const textField = block.querySelector('.action-text');
+                const respField = block.querySelector('.action-responsable');
+                if (textField) textField.value = '';
+                if (respField) respField.value = '';
+            });
+            document.querySelectorAll('.action-badge').forEach(badge => {
+                badge.classList.remove('has-action', 'incomplete-action');
+            });
+            
             // Restaurer les actions
             Object.entries(auditData.actions).forEach(([criteria, actionData]) => {
                 const card = document.querySelector(`[data-criteria="${criteria}"]`);
                 if (card) {
-                    const badge = card.querySelector('.action-badge');
                     const block = card.querySelector('.action-block');
-                    if (badge) badge.classList.add('has-action');
                     if (block) {
                         block.classList.add('visible');
                         const typeBtn = block.querySelector(`[data-type="${actionData.type}"]`);
@@ -4989,8 +5003,6 @@ Cordialement`);
                         if (textField) textField.value = actionData.action || '';
                         if (respField) respField.value = actionData.responsable || '';
                     }
-                    
-                    // Mettre à jour la pastille
                     updateActionBadge(card, criteria);
                 }
             });
