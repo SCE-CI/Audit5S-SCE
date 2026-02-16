@@ -1318,6 +1318,13 @@
             background: var(--traffic-red);
         }
         
+        .toast.info {
+            background: var(--white);
+            color: var(--black);
+            border: 1px solid var(--gray-30);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
         .toast-btn {
             padding: 8px 16px;
             background: var(--sartorius-yellow);
@@ -1449,10 +1456,10 @@
         
         #draft-indicator {
             display: block;
-            font-size: var(--font-size-xs);
+            font-size: 11px;
             color: var(--gray-40);
             margin-bottom: 4px;
-            font-style: italic;
+            opacity: 0.7;
         }
         
         #draft-indicator:empty {
@@ -1628,6 +1635,15 @@
             transform-origin: 12px 12px;
         }
         @keyframes clockSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-360deg); }
+        }
+        
+        .menu-item:hover .icon-history polyline {
+            animation: historyRewind 0.6s ease-in-out;
+            transform-origin: 12px 12px;
+        }
+        @keyframes historyRewind {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(-360deg); }
         }
@@ -1943,6 +1959,48 @@
         .export-option-desc {
             font-size: var(--font-size-sm);
             color: var(--gray-60);
+        }
+        
+        /* Bouton principal (SharePoint) */
+        .export-option.primary {
+            background: var(--sartorius-yellow);
+            border-color: var(--sartorius-yellow);
+        }
+        
+        .export-option.primary:hover {
+            background: #e6d600;
+            border-color: #e6d600;
+        }
+        
+        .export-option.primary .export-option-icon {
+            background: var(--white);
+        }
+        
+        .export-option.primary .export-option-icon svg {
+            stroke: var(--black);
+        }
+        
+        /* Bouton secondaire (Mail) */
+        .export-option.secondary {
+            background: var(--white);
+            border-color: var(--gray-30);
+        }
+        
+        .export-option.secondary:hover {
+            background: var(--gray-5);
+            border-color: var(--gray-40);
+        }
+        
+        .export-option.secondary .export-option-icon {
+            background: var(--gray-20);
+        }
+        
+        .export-option.secondary .export-option-icon svg {
+            stroke: var(--gray-60);
+        }
+        
+        .export-option.secondary .export-option-title {
+            color: var(--gray-70);
         }
         
         .export-modal-footer {
@@ -3225,17 +3283,6 @@
                 <div class="menu-popup" id="menu-popup">
                     <div class="menu-section">
                         <div class="menu-section-title">Audit en cours</div>
-                        <button type="button" class="menu-item" onclick="menuAction('save')">
-                            <svg class="icon-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                                <g class="save-arrow">
-                                    <polyline points="12 11 12 17"></polyline>
-                                    <polyline points="9 14 12 17 15 14"></polyline>
-                                </g>
-                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                            </svg>
-                            Reprendre plus tard
-                        </button>
                         <button type="button" class="menu-item" onclick="menuAction('load')">
                             <svg class="icon-load" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4"></path>
@@ -3252,6 +3299,17 @@
                                 <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
                             </svg>
                             Réinitialiser l'audit
+                        </button>
+                    </div>
+                    
+                    <div class="menu-section">
+                        <div class="menu-section-title">Historique</div>
+                        <button type="button" class="menu-item" onclick="menuAction('lastexport')">
+                            <svg class="icon-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Dernier audit exporté
                         </button>
                         <button type="button" class="menu-item" onclick="menuAction('sharepoint')">
                             <svg class="icon-sharepoint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -3365,7 +3423,7 @@
             <div class="export-modal-body">
                 <div class="export-summary" id="export-summary"></div>
                 <div class="export-options">
-                    <button type="button" class="export-option" id="export-sharepoint">
+                    <button type="button" class="export-option primary" id="export-sharepoint">
                         <div class="export-option-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -3378,7 +3436,7 @@
                             <span class="export-option-desc">Télécharge le JSON et ouvre le dossier</span>
                         </div>
                     </button>
-                    <button type="button" class="export-option" id="export-mail">
+                    <button type="button" class="export-option secondary" id="export-mail">
                         <div class="export-option-icon icon-mail">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
@@ -3532,10 +3590,28 @@
             document.getElementById('zone').addEventListener('change', updateFormState);
             document.getElementById('auditeur').addEventListener('input', updateFormState);
             document.getElementById('submit-btn').addEventListener('click', submitAudit);
+            document.getElementById('comment-global').addEventListener('input', scheduleAutoSave);
             
             initInfoPopup();
             
+            // Listeners pour la modale de confirmation
+            document.getElementById('confirm-btn').addEventListener('click', function() {
+                if (confirmCallback) {
+                    confirmCallback();
+                }
+                closeConfirmModal();
+            });
+            
+            document.getElementById('confirm-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeConfirmModal();
+                }
+            });
+            
             updateFormState();
+            
+            // Vérifier s'il y a un brouillon à proposer
+            checkExistingDraft();
         });
         
         // ═══════════════════════════════════════════════════════════════
@@ -3918,6 +3994,7 @@
                             auditData.actions[criteriaId].action = actionField.value.trim();
                             auditData.actions[criteriaId].responsable = responsableField.value.trim();
                             updateActionBadge(card, criteriaId);
+                            scheduleAutoSave();
                         });
                     }
                 });
@@ -4025,6 +4102,9 @@
                 submitBtn.classList.add('ready');
                 submitText.textContent = 'Enregistrer';
             }
+            
+            // Auto-save silencieux
+            scheduleAutoSave();
         }
         
         // ═══════════════════════════════════════════════════════════════
@@ -4213,6 +4293,13 @@
                 // Télécharger le JSON
                 downloadJSON(pendingExport.jsonData, pendingExport.filename);
                 
+                // Sauvegarder comme dernier export
+                saveLastExport(pendingExport.jsonData, pendingExport.filename);
+                
+                // Supprimer le brouillon
+                localStorage.removeItem('audit5s_draft');
+                document.getElementById('draft-indicator').textContent = '';
+                
                 // Fermer la popup
                 closeExportModal();
                 
@@ -4263,6 +4350,13 @@ ${jsonCompact}
                 
                 // Ouvrir le client mail
                 window.location.href = mailto;
+                
+                // Sauvegarder comme dernier export
+                saveLastExport(pendingExport.jsonData, pendingExport.filename);
+                
+                // Supprimer le brouillon
+                localStorage.removeItem('audit5s_draft');
+                document.getElementById('draft-indicator').textContent = '';
                 
                 // Fermer la popup
                 closeExportModal();
@@ -4595,9 +4689,6 @@ Cordialement`);
             closeMenu();
             
             switch(action) {
-                case 'save':
-                    saveDraft();
-                    break;
                 case 'load':
                     showConfirmModal(
                         'Charger le brouillon',
@@ -4619,6 +4710,9 @@ Cordialement`);
                         },
                         true
                     );
+                    break;
+                case 'lastexport':
+                    showLastExport();
                     break;
                 case 'sharepoint':
                     window.open(SHAREPOINT_URL, '_blank');
@@ -4664,24 +4758,14 @@ Cordialement`);
             confirmCallback = null;
         }
         
-        document.getElementById('confirm-btn').addEventListener('click', function() {
-            if (confirmCallback) {
-                confirmCallback();
-            }
-            closeConfirmModal();
-        });
-        
-        document.getElementById('confirm-modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeConfirmModal();
-            }
-        });
-        
         // ═══════════════════════════════════════════════════════════════
         // BROUILLON - SAUVEGARDE / CHARGEMENT
         // ═══════════════════════════════════════════════════════════════
         
-        function saveDraft() {
+        // Variable pour le debounce de l'auto-save
+        let autoSaveTimeout = null;
+        
+        function saveDraft(silent = false) {
             const now = new Date();
             const midnight = new Date(now);
             midnight.setHours(23, 59, 59, 999);
@@ -4699,8 +4783,155 @@ Cordialement`);
             
             localStorage.setItem('audit5s_draft', JSON.stringify(draft));
             updateDraftIndicator(now);
-            showToast('Brouillon enregistré jusqu\'à la fin de la journée', 'success');
+            
+            if (!silent) {
+                showToast('Brouillon enregistré jusqu\'à la fin de la journée', 'success');
+            }
         }
+        
+        // Auto-save avec debounce (2 secondes après la dernière modification)
+        function scheduleAutoSave() {
+            if (autoSaveTimeout) {
+                clearTimeout(autoSaveTimeout);
+            }
+            autoSaveTimeout = setTimeout(() => {
+                saveDraft(true); // silent = true
+            }, 2000);
+        }
+        
+        // ═══════════════════════════════════════════════════════════════
+        // DERNIER AUDIT EXPORTÉ
+        // ═══════════════════════════════════════════════════════════════
+        
+        function saveLastExport(jsonData, filename) {
+            const lastExport = {
+                data: jsonData,
+                filename: filename,
+                exportedAt: new Date().toISOString()
+            };
+            localStorage.setItem('audit5s_lastexport', JSON.stringify(lastExport));
+        }
+        
+        function showLastExport() {
+            const saved = localStorage.getItem('audit5s_lastexport');
+            if (!saved) {
+                showToast('Aucun audit exporté', 'info');
+                return;
+            }
+            
+            const lastExport = JSON.parse(saved);
+            const exportDate = new Date(lastExport.exportedAt);
+            const dateStr = exportDate.toLocaleDateString('fr-FR', { 
+                day: '2-digit', 
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            showConfirmModal(
+                'Dernier audit exporté',
+                `<strong>${lastExport.filename}</strong><br>Exporté le ${dateStr}<br><br>Les données actuelles seront remplacées.`,
+                'warning',
+                'Charger',
+                function() {
+                    loadFromExport(lastExport.data);
+                }
+            );
+        }
+        
+        function loadFromExport(data) {
+            // Restaurer les valeurs depuis le JSON exporté
+            document.getElementById('zone').value = data.zone || '';
+            document.getElementById('auditeur').value = data.auditeur || '';
+            document.getElementById('comment-global').value = data.commentaire || '';
+            document.getElementById('level-input').value = parseInt(data.niveau?.replace('Niveau ', '')) || 1;
+            
+            auditData.level = parseInt(data.niveau?.replace('Niveau ', '')) || 1;
+            
+            // Reconstituer les scores depuis le tableau
+            const CRITERIA_ORDER = [
+                'seiri_1', 'seiri_2', 'seiri_3',
+                'seiton_1', 'seiton_2', 'seiton_3',
+                'seiso_1', 'seiso_2', 'seiso_3',
+                'seiketsu_1', 'seiketsu_2', 'seiketsu_3',
+                'shitsuke_1', 'shitsuke_2', 'shitsuke_3'
+            ];
+            
+            auditData.scores = {};
+            if (data.scores && Array.isArray(data.scores)) {
+                data.scores.forEach((score, index) => {
+                    if (CRITERIA_ORDER[index]) {
+                        auditData.scores[CRITERIA_ORDER[index]] = score;
+                    }
+                });
+            }
+            
+            // Reconstituer les actions
+            auditData.actions = {};
+            if (data.actions && Array.isArray(data.actions)) {
+                data.actions.forEach(actionData => {
+                    auditData.actions[actionData.critere] = {
+                        type: actionData.type === 'Écart aux standards' ? 'ecart' : 'elevation',
+                        action: actionData.action,
+                        responsable: actionData.responsable
+                    };
+                });
+            }
+            
+            // Restaurer visuellement les boutons de score
+            document.querySelectorAll('.criteria-card').forEach(card => {
+                card.classList.remove('scored');
+                card.querySelectorAll('.score-btn').forEach(btn => btn.classList.remove('selected'));
+            });
+            
+            Object.entries(auditData.scores).forEach(([criteria, score]) => {
+                const card = document.querySelector(`[data-criteria="${criteria}"]`);
+                if (card) {
+                    card.classList.add('scored');
+                    const btn = card.querySelector(`[data-score="${score}"]`);
+                    if (btn) btn.classList.add('selected');
+                }
+            });
+            
+            // Restaurer visuellement les actions
+            document.querySelectorAll('.action-block').forEach(block => {
+                block.classList.remove('visible');
+                block.querySelector('.action-text').value = '';
+                block.querySelector('.action-responsable').value = '';
+            });
+            document.querySelectorAll('.action-badge').forEach(badge => {
+                badge.classList.remove('has-action');
+            });
+            
+            Object.entries(auditData.actions).forEach(([criteria, actionData]) => {
+                const card = document.querySelector(`[data-criteria="${criteria}"]`);
+                if (card) {
+                    const block = card.querySelector('.action-block');
+                    if (block) {
+                        block.classList.add('visible');
+                        const typeBtn = block.querySelector(`[data-type="${actionData.type}"]`);
+                        if (typeBtn) {
+                            block.querySelectorAll('.action-type-btn').forEach(b => b.classList.remove('selected'));
+                            typeBtn.classList.add('selected');
+                        }
+                        const textField = block.querySelector('.action-text');
+                        const respField = block.querySelector('.action-responsable');
+                        if (textField) textField.value = actionData.action || '';
+                        if (respField) respField.value = actionData.responsable || '';
+                    }
+                    updateActionBadge(card, criteria);
+                }
+            });
+            
+            updateLevelLabels(auditData.level);
+            updateFormState();
+            showToast('Audit chargé', 'success');
+        }
+        
+        // ═══════════════════════════════════════════════════════════════
+        // BROUILLON
+        // ═══════════════════════════════════════════════════════════════
         
         function loadDraft() {
             const saved = localStorage.getItem('audit5s_draft');
@@ -4755,9 +4986,12 @@ Cordialement`);
                         }
                         const textField = block.querySelector('.action-text');
                         const respField = block.querySelector('.action-responsable');
-                        if (textField) textField.value = actionData.text || '';
+                        if (textField) textField.value = actionData.action || '';
                         if (respField) respField.value = actionData.responsable || '';
                     }
+                    
+                    // Mettre à jour la pastille
+                    updateActionBadge(card, criteria);
                 }
             });
             
@@ -4777,18 +5011,11 @@ Cordialement`);
             }
             
             const timeStr = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-            const today = new Date();
-            const isToday = date.toDateString() === today.toDateString();
             
             if (isLoaded) {
-                if (isToday) {
-                    indicator.textContent = `Brouillon de ${timeStr} chargé`;
-                } else {
-                    const dateStr = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-                    indicator.textContent = `Brouillon du ${dateStr} à ${timeStr} chargé`;
-                }
+                indicator.textContent = `Brouillon chargé`;
             } else {
-                indicator.textContent = `Brouillon sauvegardé à ${timeStr}`;
+                indicator.textContent = `Sauvegardé ${timeStr}`;
             }
         }
         
@@ -4799,10 +5026,50 @@ Cordialement`);
                 const draft = JSON.parse(saved);
                 if (draft.expiresAt && new Date() > new Date(draft.expiresAt)) {
                     localStorage.removeItem('audit5s_draft');
+                    return;
                 }
+                
+                // Brouillon valide trouvé - proposer de le charger
+                const savedDate = new Date(draft.savedAt);
+                const timeStr = savedDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                const today = new Date();
+                const isToday = savedDate.toDateString() === today.toDateString();
+                
+                let message;
+                if (isToday) {
+                    message = `Brouillon de ${timeStr} disponible`;
+                } else {
+                    const dateStr = savedDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+                    message = `Brouillon du ${dateStr} disponible`;
+                }
+                
+                // Afficher après un court délai pour laisser la page se charger
+                setTimeout(() => {
+                    showToastWithAction(message, 'info', 'Reprendre', loadDraft);
+                    
+                    // Fermer le toast si l'utilisateur commence à interagir
+                    const dismissToast = () => {
+                        document.getElementById('toast').classList.remove('visible');
+                        // Retirer les listeners après fermeture
+                        document.removeEventListener('click', onInteraction);
+                        document.removeEventListener('input', onInteraction);
+                    };
+                    
+                    const onInteraction = (e) => {
+                        // Ne pas fermer si on clique sur le toast lui-même
+                        if (!e.target.closest('.toast')) {
+                            dismissToast();
+                        }
+                    };
+                    
+                    // Ajouter les listeners avec un petit délai
+                    setTimeout(() => {
+                        document.addEventListener('click', onInteraction);
+                        document.addEventListener('input', onInteraction);
+                    }, 100);
+                }, 500);
             }
         }
-        checkExistingDraft();
         
         // ═══════════════════════════════════════════════════════════════
         // MODE SOMBRE
