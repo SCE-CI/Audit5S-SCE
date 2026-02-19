@@ -4233,7 +4233,7 @@
                 .filter(([, data]) => data.action && data.responsable)
                 .map(([critere, data]) => ({
                     critere: critere,
-                    type: data.type === 'ecart' ? 'Écart aux standards' : 'Élévation des standards',
+                    type: data.type === 'ecart' ? 'Ecart aux standards' : 'Elévation des standards',
                     action: data.action,
                     responsable: data.responsable,
                     responsableSP: formatNameForExport(data.responsable),
@@ -4870,7 +4870,7 @@ Cordialement`);
             if (data.actions && Array.isArray(data.actions)) {
                 data.actions.forEach(actionData => {
                     auditData.actions[actionData.critere] = {
-                        type: actionData.type === 'Écart aux standards' ? 'ecart' : 'elevation',
+                        type: actionData.type === 'Ecart aux standards' ? 'ecart' : 'elevation',
                         action: actionData.action,
                         responsable: actionData.responsable
                     };
