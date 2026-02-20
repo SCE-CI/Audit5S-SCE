@@ -220,7 +220,7 @@
             gap: var(--space-md);
         }
         
-        @media (max-width: 480px) {
+        @media (max-width: 400px) {
             .form-row {
                 grid-template-columns: 1fr;
             }
@@ -386,20 +386,26 @@
         ═══════════════════════════════════════════════════════════════ */
         
         .level-slider-container {
-            margin-top: var(--space-md);
             display: flex;
-            align-items: center;
-            gap: var(--space-md);
+            flex-direction: column;
+            gap: var(--space-xs);
         }
         
         .level-slider-container .form-label {
-            margin-bottom: 0;
-            white-space: nowrap;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--gray-80);
+        }
+        
+        .level-slider-wrapper {
+            padding: var(--space-sm) 0;
+            display: flex;
+            align-items: center;
+            min-height: 52px;
         }
         
         .level-slider {
             flex: 1;
-            max-width: 200px;
             position: relative;
         }
         
@@ -790,6 +796,564 @@
         
         .action-badge.suggest-elevation:hover {
             background: #F57C00;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════
+           APERÇU PLANNING
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .planning-preview-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+        
+        .planning-preview-container .form-label {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--gray-80);
+        }
+        
+        .planning-preview {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background: var(--white);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid var(--gray-30);
+            min-height: 52px;
+        }
+        
+        .planning-preview:active {
+            transform: scale(0.98);
+        }
+        
+        .planning-preview .preview-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .planning-preview:hover .preview-icon {
+            transform: scale(1.08);
+        }
+        
+        @keyframes iconBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .planning-preview:hover .preview-icon {
+            animation: iconBounce 0.4s ease;
+        }
+        
+        .planning-preview .preview-icon .day-num {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--black);
+        }
+        
+        .planning-preview .preview-icon .day-name {
+            background: var(--sartorius-yellow);
+            color: var(--black);
+            font-size: 7px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 0;
+            text-align: center;
+        }
+        
+        .planning-preview.n2 .preview-icon .day-name {
+            background: var(--teal);
+            color: var(--white);
+        }
+        
+        .planning-preview.n3 .preview-icon .day-name {
+            background: var(--gray-60);
+            color: var(--white);
+        }
+        
+        .planning-preview .preview-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .planning-preview .preview-title {
+            display: none;
+        }
+        
+        .planning-preview .preview-zone {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--black);
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .planning-preview .preview-details {
+            font-size: 11px;
+            color: var(--gray-60);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+        
+        .planning-preview .preview-arrow {
+            color: var(--gray-40);
+            font-size: 18px;
+            font-weight: 300;
+            flex-shrink: 0;
+        }
+        
+        .planning-preview.disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+        
+        .planning-preview.disabled:hover .preview-icon {
+            animation: none;
+            transform: none;
+        }
+        
+        .planning-preview.disabled:active {
+            transform: none;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════
+           MODAL PLANNING
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .planning-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .planning-modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .planning-modal-content {
+            background: var(--gray-5);
+            width: 100%;
+            max-width: 500px;
+            max-height: 85vh;
+            border-radius: 20px 20px 0 0;
+            overflow: hidden;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .planning-modal-overlay.visible .planning-modal-content {
+            transform: translateY(0);
+        }
+        
+        .planning-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-20);
+        }
+        
+        .planning-modal-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .planning-header-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--gray-70);
+        }
+        
+        .planning-modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--gray-5);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .planning-modal-close:hover {
+            background: var(--gray-10);
+        }
+        
+        .planning-level-toggle {
+            display: flex;
+            background: var(--gray-10);
+            border-radius: 8px;
+            padding: 4px;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+        
+        .planning-level-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-60);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .planning-level-btn:hover {
+            color: var(--gray-80);
+        }
+        
+        .planning-level-btn.active {
+            background: var(--white);
+            color: var(--black);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .planning-level-btn.n1.active {
+            background: var(--sartorius-yellow);
+        }
+        
+        .planning-level-btn.n2.active {
+            background: var(--teal);
+            color: var(--white);
+        }
+        
+        .planning-level-btn.n3 {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .planning-modal-body {
+            padding: 16px;
+            overflow-y: auto;
+            max-height: calc(85vh - 60px);
+        }
+        
+        .planning-content-wrapper {
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .planning-content-wrapper .planning-spacer {
+            flex: 1;
+        }
+        
+        .planning-month-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            background: var(--white);
+            padding: 10px 16px;
+            border-radius: 10px;
+        }
+        
+        .planning-month-nav button {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--gray-5);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .planning-month-nav button:hover {
+            background: var(--sartorius-yellow);
+        }
+        
+        .planning-month-nav .current-month {
+            font-size: 15px;
+            font-weight: 700;
+            min-width: 130px;
+            text-align: center;
+        }
+        
+        .planning-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            margin-top: 16px;
+        }
+        
+        .planning-section-header .planning-label {
+            margin: 0;
+        }
+        
+        .planning-month-nav-inline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .planning-month-nav-inline button {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: var(--gray-10);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .planning-month-nav-inline button:hover {
+            background: var(--gray-20);
+        }
+        
+        .planning-month-nav-inline span {
+            font-size: 13px;
+            font-weight: 600;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .planning-info-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+        }
+        
+        .planning-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .planning-info-row:not(:last-child) {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--gray-10);
+        }
+        
+        .planning-info-row .key {
+            font-size: 11px;
+            color: var(--gray-60);
+        }
+        
+        .planning-info-row .value {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .planning-auditor-banner {
+            background: var(--sartorius-yellow);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+        }
+        
+        .planning-auditor-banner small {
+            font-size: 10px;
+            color: var(--gray-70);
+        }
+        
+        .planning-auditor-banner strong {
+            display: block;
+            font-size: 15px;
+        }
+        
+        .planning-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--gray-60);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            margin-top: 16px;
+        }
+        
+        .planning-label:first-child {
+            margin-top: 0;
+        }
+        
+        .planning-schedule {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .planning-schedule-header {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            background: var(--gray-5);
+            border-bottom: 1px solid var(--gray-20);
+        }
+        
+        .planning-schedule-header span {
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-60);
+        }
+        
+        .planning-schedule-header span.current {
+            background: var(--sartorius-yellow);
+            color: var(--black);
+        }
+        
+        .planning-schedule-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+        
+        .planning-schedule-cell {
+            padding: 12px 6px;
+            text-align: center;
+            border-right: 1px solid var(--gray-10);
+            font-size: 12px;
+        }
+        
+        .planning-schedule-cell:last-child {
+            border-right: none;
+        }
+        
+        .planning-schedule-cell .zone {
+            font-weight: 600;
+            color: var(--black);
+            margin-bottom: 2px;
+            font-size: 11px;
+        }
+        
+        .planning-schedule-cell .date {
+            font-size: 10px;
+            color: var(--gray-60);
+        }
+        
+        .planning-schedule-cell .who {
+            font-size: 9px;
+            color: var(--teal);
+            margin-top: 2px;
+        }
+        
+        .planning-schedule-cell.current {
+            background: var(--sartorius-yellow);
+        }
+        
+        .planning-schedule-cell.past {
+            opacity: 0.4;
+        }
+        
+        .planning-rotation {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            background: var(--white);
+            padding: 12px;
+            border-radius: 10px;
+        }
+        
+        .planning-rotation-item {
+            background: var(--gray-5);
+            border-radius: 6px;
+            padding: 10px 4px;
+            text-align: center;
+        }
+        
+        .planning-rotation-item.current {
+            background: var(--sartorius-yellow);
+        }
+        
+        .planning-rotation-item .m {
+            font-size: 9px;
+            color: var(--gray-60);
+        }
+        
+        .planning-rotation-item.current .m {
+            color: var(--gray-70);
+        }
+        
+        .planning-rotation-item .c {
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        
+        .planning-team-list {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 8px;
+        }
+        
+        .planning-team-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 8px;
+        }
+        
+        .planning-team-item.highlight {
+            background: var(--sartorius-yellow);
+        }
+        
+        .planning-team-item .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 9px;
+            color: var(--white);
+            background: var(--teal);
+        }
+        
+        .planning-team-item .name {
+            flex: 1;
+            font-size: 12px;
+        }
+        
+        .planning-team-item .zone-tag {
+            font-size: 10px;
+            color: var(--gray-60);
         }
         
         /* Clignotement rouge pour action incomplète */
@@ -2367,15 +2931,35 @@
                 </div>
             </div>
             
-            <!-- Niveau d'audit - Slider -->
-            <div class="level-slider-container">
-                <label class="form-label">Niveau</label>
-                <div class="level-slider">
-                    <input type="range" id="level-input" min="1" max="3" value="1" step="1">
-                    <div class="level-labels">
-                        <span data-level="1">1</span>
-                        <span data-level="2">2</span>
-                        <span data-level="3">3</span>
+            <!-- Niveau d'audit + Aperçu Planning -->
+            <div class="form-row">
+                <div class="level-slider-container">
+                    <label class="form-label">Niveau</label>
+                    <div class="level-slider-wrapper">
+                        <div class="level-slider">
+                            <input type="range" id="level-input" min="1" max="3" value="1" step="1">
+                            <div class="level-labels">
+                                <span data-level="1">1</span>
+                                <span data-level="2">2</span>
+                                <span data-level="3">3</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="planning-preview-container">
+                    <label class="form-label">Planning</label>
+                    <div class="planning-preview n1" id="planning-preview" onclick="openPlanningModal()">
+                        <div class="preview-icon">
+                            <div class="day-num">--</div>
+                            <div class="day-name">---</div>
+                        </div>
+                        <div class="preview-content">
+                            <div class="preview-title">Cette semaine</div>
+                            <div class="preview-zone">---</div>
+                            <div class="preview-details">---</div>
+                        </div>
+                        <div class="preview-arrow">›</div>
                     </div>
                 </div>
             </div>
@@ -3459,6 +4043,27 @@
         </div>
     </div>
     
+    <!-- Modal Planning -->
+    <div class="planning-modal-overlay" id="planning-modal" onclick="closePlanningModal(event)">
+        <div class="planning-modal-content" onclick="event.stopPropagation()">
+            <div class="planning-modal-header">
+                <h3>
+                    <svg class="planning-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Planning Audits
+                </h3>
+                <button class="planning-modal-close" onclick="closePlanningModal()">✕</button>
+            </div>
+            <div class="planning-modal-body" id="planning-modal-body">
+                <!-- Contenu généré par JS -->
+            </div>
+        </div>
+    </div>
+    
     <!-- Toast notification -->
     <div class="toast" id="toast"></div>
     
@@ -3667,6 +4272,7 @@
                 auditData.level = level;
                 updateLevelLabels(level);
                 updateFormState();
+                updatePlanningPreview();
             });
         }
         
@@ -4233,7 +4839,7 @@
                 .filter(([, data]) => data.action && data.responsable)
                 .map(([critere, data]) => ({
                     critere: critere,
-                    type: data.type === 'ecart' ? 'Ecart aux standards' : 'Elévation des standards',
+                    type: data.type === 'ecart' ? 'Écart aux standards' : 'Élévation des standards',
                     action: data.action,
                     responsable: data.responsable,
                     responsableSP: formatNameForExport(data.responsable),
@@ -4870,7 +5476,7 @@ Cordialement`);
             if (data.actions && Array.isArray(data.actions)) {
                 data.actions.forEach(actionData => {
                     auditData.actions[actionData.critere] = {
-                        type: actionData.type === 'Ecart aux standards' ? 'ecart' : 'elevation',
+                        type: actionData.type === 'Écart aux standards' ? 'ecart' : 'elevation',
                         action: actionData.action,
                         responsable: actionData.responsable
                     };
@@ -5149,6 +5755,378 @@ Cordialement`);
             document.getElementById('info-popup-body').innerHTML = aboutContent;
             document.getElementById('info-popup').classList.add('visible');
         }
+        
+        // ═══════════════════════════════════════════════════════════════
+        // PLANNING AUDITS
+        // ═══════════════════════════════════════════════════════════════
+        
+        const planningZones = ['Extérieurs', 'Assemblage', 'Process / Entrée', 'Outillage'];
+        
+        const planningZoneResponsables = {
+            'Assemblage': { nom: 'Vautelin Sébastien', code: 'SVA' },
+            'Process / Entrée': { nom: 'Mourolin Mathieu', code: 'MMO' },
+            'Outillage': { nom: 'Ruse Romuald', code: 'RRU' },
+            'Extérieurs': { nom: 'Delavault Guillaume', code: 'GDE' }
+        };
+        
+        const planningRotationN1 = [
+            { nom: 'Ruse Romuald', code: 'RRU' },
+            { nom: 'Vautelin Sébastien', code: 'SVA' },
+            { nom: 'Hacquin Thibaut', code: 'THA' },
+            { nom: 'Delavault Guillaume', code: 'GDE' },
+            { nom: 'Mourolin Mathieu', code: 'MMO' },
+            { nom: 'Peultier Hugo', code: 'HPE' },
+            { nom: 'Vautelin Sébastien', code: 'SVA' },
+            { nom: 'Ruse Romuald', code: 'RRU' },
+            { nom: 'Hacquin Thibaut', code: 'THA' },
+            { nom: 'Delavault Guillaume', code: 'GDE' },
+            { nom: 'Mourolin Mathieu', code: 'MMO' },
+            { nom: 'Peultier Hugo', code: 'HPE' }
+        ];
+        
+        const planningMoisNoms = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                      'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+        
+        const planningMoisCourts = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 
+                       'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+        
+        let planningDisplayMonth = new Date().getMonth();
+        let planningDisplayYear = new Date().getFullYear();
+        let planningModalLevel = 1;
+        
+        function getPlanningWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+        
+        function getPlanningZoneForWeek(weekNum, offset = 0) {
+            const index = ((weekNum - 1) + offset) % 4;
+            return planningZones[index];
+        }
+        
+        function getPlanningFirst4Weeks(year, month, dayOfWeek) {
+            const weeks = [];
+            const firstDay = new Date(year, month, 1);
+            
+            let date = new Date(firstDay);
+            while (date.getDay() !== dayOfWeek) {
+                date.setDate(date.getDate() + 1);
+            }
+            
+            if (date.getDate() > 7) {
+                date.setDate(date.getDate() - 7);
+            }
+            
+            for (let i = 0; i < 4; i++) {
+                weeks.push({
+                    weekNum: getPlanningWeekNumber(date),
+                    date: new Date(date),
+                    isCurrentMonth: date.getMonth() === month
+                });
+                date.setDate(date.getDate() + 7);
+            }
+            
+            return weeks;
+        }
+        
+        function isPlanningPast(date) {
+            const today = new Date();
+            const d1 = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const d2 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            return d1 < d2;
+        }
+        
+        function isPlanningCurrentWeek(date) {
+            const today = new Date();
+            return getPlanningWeekNumber(date) === getPlanningWeekNumber(today) && 
+                   date.getFullYear() === today.getFullYear();
+        }
+        
+        function getDayOfCurrentWeek(dayOfWeek) {
+            const today = new Date();
+            const currentDay = today.getDay();
+            const diff = dayOfWeek - currentDay;
+            const date = new Date(today);
+            date.setDate(today.getDate() + diff);
+            return date;
+        }
+        
+        function updatePlanningPreview() {
+            const niveau = auditData.level || 1;
+            const preview = document.getElementById('planning-preview');
+            const today = new Date();
+            const currentWeekNum = getPlanningWeekNumber(today);
+            
+            preview.className = 'planning-preview';
+            
+            if (niveau === 1) {
+                const zone = getPlanningZoneForWeek(currentWeekNum, 0);
+                const auditeur = planningRotationN1[today.getMonth()];
+                const mercredi = getDayOfCurrentWeek(3);
+                
+                preview.classList.add('n1');
+                preview.innerHTML = `
+                    <div class="preview-icon">
+                        <div class="day-num">${mercredi.getDate()}</div>
+                        <div class="day-name">Mercredi</div>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-title">Cette semaine (Sem ${currentWeekNum})</div>
+                        <div class="preview-zone">${zone}</div>
+                        <div class="preview-details">08h45 • ${auditeur.nom}</div>
+                    </div>
+                    <div class="preview-arrow">›</div>
+                `;
+            } else if (niveau === 2) {
+                const zone = getPlanningZoneForWeek(currentWeekNum, 2);
+                const resp = planningZoneResponsables[zone];
+                const jeudi = getDayOfCurrentWeek(4);
+                
+                preview.classList.add('n2');
+                preview.innerHTML = `
+                    <div class="preview-icon">
+                        <div class="day-num">${jeudi.getDate()}</div>
+                        <div class="day-name">Jeudi</div>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-zone">${zone}</div>
+                        <div class="preview-details">09h30 • HBI + ${resp.code}</div>
+                    </div>
+                    <div class="preview-arrow">›</div>
+                `;
+            } else {
+                preview.classList.add('n3', 'disabled');
+                preview.innerHTML = `
+                    <div class="preview-icon">
+                        <div class="day-num">—</div>
+                        <div class="day-name">N3</div>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-title">Niveau 3</div>
+                        <div class="preview-zone" style="color: var(--gray-60);">Planification en cours</div>
+                        <div class="preview-details">1x / trimestre</div>
+                    </div>
+                    <div class="preview-arrow">›</div>
+                `;
+            }
+        }
+        
+        function openPlanningModal() {
+            const niveau = auditData.level || 1;
+            if (niveau === 3) return;
+            
+            planningModalLevel = niveau;
+            planningDisplayMonth = new Date().getMonth();
+            planningDisplayYear = new Date().getFullYear();
+            
+            renderPlanningModal();
+            document.getElementById('planning-modal').classList.add('visible');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closePlanningModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('planning-modal').classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+        
+        function changePlanningLevel(level) {
+            if (level === 3) return;
+            planningModalLevel = level;
+            renderPlanningModal();
+        }
+        
+        function changePlanningMonth(delta) {
+            planningDisplayMonth += delta;
+            if (planningDisplayMonth > 11) { planningDisplayMonth = 0; planningDisplayYear++; }
+            else if (planningDisplayMonth < 0) { planningDisplayMonth = 11; planningDisplayYear--; }
+            renderPlanningModal();
+        }
+        
+        function renderPlanningModal() {
+            const body = document.getElementById('planning-modal-body');
+            
+            // Toggle de niveau
+            let toggleHtml = `
+                <div class="planning-level-toggle">
+                    <button class="planning-level-btn n1${planningModalLevel === 1 ? ' active' : ''}" onclick="changePlanningLevel(1)">Niveau 1</button>
+                    <button class="planning-level-btn n2${planningModalLevel === 2 ? ' active' : ''}" onclick="changePlanningLevel(2)">Niveau 2</button>
+                    <button class="planning-level-btn n3" disabled>Niveau 3</button>
+                </div>
+            `;
+            
+            let contentHtml = '';
+            if (planningModalLevel === 1) {
+                contentHtml = renderPlanningContentN1();
+            } else if (planningModalLevel === 2) {
+                contentHtml = renderPlanningContentN2();
+            }
+            
+            body.innerHTML = toggleHtml + contentHtml;
+        }
+        
+        function renderPlanningContentN1() {
+            const weeks = getPlanningFirst4Weeks(planningDisplayYear, planningDisplayMonth, 3);
+            const auditeur = planningRotationN1[planningDisplayMonth];
+            
+            let scheduleHtml = renderPlanningScheduleHtml(weeks, 0, 'Mer', false);
+            let rotationHtml = renderPlanningRotationHtml();
+            
+            return `
+                <div class="planning-content-wrapper">
+                    <div class="planning-info-card">
+                        <div class="planning-info-row">
+                            <span class="key">Fréquence</span>
+                            <span class="value">1 zone / semaine</span>
+                        </div>
+                        <div class="planning-info-row">
+                            <span class="key">Créneau</span>
+                            <span class="value">Mercredi 08h45</span>
+                        </div>
+                    </div>
+                    
+                    <div class="planning-auditor-banner">
+                        <small>Auditeur du mois</small>
+                        <strong>${auditeur.nom}</strong>
+                    </div>
+                    
+                    <div class="planning-section-header">
+                        <span class="planning-label">Planning du mois</span>
+                        <div class="planning-month-nav-inline">
+                            <button onclick="changePlanningMonth(-1)">◀</button>
+                            <span>${planningMoisNoms[planningDisplayMonth]} ${planningDisplayYear}</span>
+                            <button onclick="changePlanningMonth(1)">▶</button>
+                        </div>
+                    </div>
+                    ${scheduleHtml}
+                    
+                    <div class="planning-label">Rotation des auditeurs</div>
+                    ${rotationHtml}
+                    
+                    <div class="planning-spacer"></div>
+                </div>
+            `;
+        }
+        
+        function renderPlanningContentN2() {
+            const weeks = getPlanningFirst4Weeks(planningDisplayYear, planningDisplayMonth, 4);
+            const today = new Date();
+            const currentWeekNum = getPlanningWeekNumber(today);
+            const currentZone = getPlanningZoneForWeek(currentWeekNum, 2);
+            
+            let scheduleHtml = renderPlanningScheduleHtml(weeks, 2, 'Jeu', true);
+            
+            let teamHtml = '<div class="planning-team-list">';
+            planningZones.forEach(zone => {
+                const resp = planningZoneResponsables[zone];
+                const isHighlight = zone === currentZone && planningDisplayMonth === today.getMonth() && planningDisplayYear === today.getFullYear();
+                teamHtml += `
+                    <div class="planning-team-item${isHighlight ? ' highlight' : ''}">
+                        <div class="avatar">${resp.code}</div>
+                        <span class="name">${resp.nom}</span>
+                        <span class="zone-tag">${zone}</span>
+                    </div>
+                `;
+            });
+            teamHtml += '</div>';
+            
+            return `
+                <div class="planning-content-wrapper">
+                    <div class="planning-info-card">
+                        <div class="planning-info-row">
+                            <span class="key">Fréquence</span>
+                            <span class="value">1 zone / semaine</span>
+                        </div>
+                        <div class="planning-info-row">
+                            <span class="key">Créneau</span>
+                            <span class="value">Jeudi 09h30</span>
+                        </div>
+                        <div class="planning-info-row">
+                            <span class="key">Auditeur principal</span>
+                            <span class="value">Bilde Hugues</span>
+                        </div>
+                    </div>
+                    
+                    <div class="planning-section-header">
+                        <span class="planning-label">Planning du mois</span>
+                        <div class="planning-month-nav-inline">
+                            <button onclick="changePlanningMonth(-1)">◀</button>
+                            <span>${planningMoisNoms[planningDisplayMonth]} ${planningDisplayYear}</span>
+                            <button onclick="changePlanningMonth(1)">▶</button>
+                        </div>
+                    </div>
+                    ${scheduleHtml}
+                    
+                    <div class="planning-label">Responsables de zone</div>
+                    ${teamHtml}
+                    
+                    <div class="planning-spacer"></div>
+                </div>
+            `;
+        }
+        
+        function renderPlanningScheduleHtml(weeks, offset, dayLabel, showWho) {
+            const today = new Date();
+            
+            let headerHtml = '<div class="planning-schedule-header">';
+            weeks.forEach(w => {
+                const isCurr = isPlanningCurrentWeek(w.date);
+                headerHtml += `<span${isCurr ? ' class="current"' : ''}>Sem ${w.weekNum}</span>`;
+            });
+            headerHtml += '</div>';
+            
+            let rowHtml = '<div class="planning-schedule-row">';
+            weeks.forEach(w => {
+                const zone = getPlanningZoneForWeek(w.weekNum, offset);
+                const date = w.date;
+                const past = isPlanningPast(date);
+                const current = isPlanningCurrentWeek(date);
+                
+                let cellClass = 'planning-schedule-cell';
+                if (current) cellClass += ' current';
+                else if (past) cellClass += ' past';
+                
+                let whoHtml = '';
+                if (showWho) {
+                    const resp = planningZoneResponsables[zone];
+                    whoHtml = `<div class="who">HBI + ${resp.code}</div>`;
+                }
+                
+                rowHtml += `
+                    <div class="${cellClass}">
+                        <div class="zone">${zone}</div>
+                        <div class="date">${dayLabel} ${date.getDate()}/${date.getMonth()+1}</div>
+                        ${whoHtml}
+                    </div>
+                `;
+            });
+            rowHtml += '</div>';
+            
+            return `<div class="planning-schedule">${headerHtml}${rowHtml}</div>`;
+        }
+        
+        function renderPlanningRotationHtml() {
+            let html = '<div class="planning-rotation">';
+            planningRotationN1.forEach((auditeur, index) => {
+                const isCurrent = index === planningDisplayMonth;
+                html += `
+                    <div class="planning-rotation-item${isCurrent ? ' current' : ''}">
+                        <div class="m">${planningMoisCourts[index]}</div>
+                        <div class="c">${auditeur.code}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            return html;
+        }
+        
+        // Initialiser l'aperçu au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePlanningPreview();
+        });
     </script>
 </body>
 </html>
