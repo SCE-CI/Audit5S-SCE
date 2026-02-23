@@ -1484,6 +1484,145 @@
         }
         
         /* ═══════════════════════════════════════════════════════════════
+           BOUTON PHOTO ACTION
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .action-photo-input {
+            display: none;
+        }
+        
+        .action-photo-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            min-width: 36px;
+            height: 28px;
+            padding: 0 6px;
+            font-family: inherit;
+            font-size: 10px;
+            color: var(--gray-50);
+            background: var(--white);
+            border: 1px solid var(--gray-30);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+        
+        .action-photo-btn:hover {
+            border-color: var(--teal);
+            color: var(--teal);
+        }
+        
+        .action-photo-btn.has-photo {
+            border-color: var(--teal);
+            color: var(--teal);
+            background: rgba(0, 185, 190, 0.1);
+        }
+        
+        .action-photo-btn .photo-count {
+            font-weight: 600;
+        }
+        
+        .action-photo-preview {
+            display: none;
+            margin-top: var(--space-sm);
+            padding-top: 6px;
+            padding-left: 6px;
+        }
+        
+        .action-photo-preview.visible {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+        
+        .action-photo-thumb {
+            position: relative;
+            width: 72px;
+            height: 72px;
+            border-radius: var(--radius-sm);
+            overflow: visible;
+            flex-shrink: 0;
+        }
+        
+        .action-photo-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-30);
+        }
+        
+        .action-photo-remove {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 20px;
+            height: 20px;
+            background: var(--traffic-red);
+            color: var(--white);
+            border: 2px solid var(--white);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        
+        .action-photo-remove:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Modal zoom photo */
+        .photo-zoom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 400;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-md);
+        }
+        
+        .photo-zoom-modal.visible {
+            display: flex;
+        }
+        
+        .photo-zoom-modal img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: var(--radius-md);
+        }
+        
+        .photo-zoom-close {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            width: 40px;
+            height: 40px;
+            background: var(--white);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--black);
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════
            BOUTONS DE SCORE - Échelle 0-4 (Traffic Light System)
         ═══════════════════════════════════════════════════════════════ */
         
@@ -3027,7 +3166,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
                 
@@ -3079,7 +3228,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
                 
@@ -3131,7 +3290,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
             </div>
@@ -3199,7 +3368,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
                 
@@ -3251,7 +3430,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
                 
@@ -3303,7 +3492,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
             </div>
@@ -3371,7 +3570,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
                 
@@ -3423,7 +3632,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
                 
@@ -3475,7 +3694,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
             </div>
@@ -3543,7 +3772,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
                 
@@ -3595,7 +3834,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
                 
@@ -3647,7 +3896,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
             </div>
@@ -3715,7 +3974,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
                 
@@ -3767,7 +4036,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
                 
@@ -3819,7 +4098,17 @@
                             <div class="action-field">
                                 <div class="autocomplete-wrapper"><input type="text" class="action-responsable" placeholder="Responsable" autocomplete="off"><div class="autocomplete-suggestions responsable-suggestions"></div></div>
                             </div>
+                            <input type="file" class="action-photo-input" accept="image/*" capture="environment">
+                            <button type="button" class="action-photo-btn" title="Ajouter une photo (max 3)">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="photo-count">0/3</span>
+                            </button>
                         </div>
+                        <div class="action-photo-preview"></div>
                     </div>
                 </div>
             </div>
@@ -3960,6 +4249,12 @@
         </div>
     </div>
     <div class="menu-overlay" id="menu-overlay"></div>
+    
+    <!-- Modal zoom photo -->
+    <div class="photo-zoom-modal" id="photo-zoom-modal">
+        <button type="button" class="photo-zoom-close" onclick="closePhotoZoom()">×</button>
+        <img id="photo-zoom-img" src="" alt="Photo agrandie">
+    </div>
     
     <!-- Modale de confirmation -->
     <div class="confirm-modal-overlay" id="confirm-modal">
@@ -4188,6 +4483,7 @@
             initLevelSlider();
             initCollapsibleSections();
             initScoreButtons();
+            initActionPhotos();
             initAutocomplete();
             initExportModal();
             
@@ -4637,6 +4933,354 @@
         }
         
         // ═══════════════════════════════════════════════════════════════
+        // GESTION DES PHOTOS D'ACTION
+        // ═══════════════════════════════════════════════════════════════
+        
+        const PHOTO_MAX_SIZE = 600; // pixels
+        const PHOTO_QUALITY = 0.7; // 70%
+        const PHOTO_MAX_BYTES = 100 * 1024; // 100KB
+        
+        const MAX_PHOTOS_PER_ACTION = 3;
+        
+        function initActionPhotos() {
+            document.querySelectorAll('.action-block').forEach(block => {
+                const card = block.closest('.criteria-card');
+                const criteriaId = card.dataset.criteria;
+                const photoBtn = block.querySelector('.action-photo-btn');
+                const photoInput = block.querySelector('.action-photo-input');
+                const photoPreview = block.querySelector('.action-photo-preview');
+                
+                // Clic sur bouton photo → déclenche input file
+                photoBtn.addEventListener('click', function() {
+                    // Vérifier si on a déjà 3 photos
+                    const currentPhotos = auditData.actions[criteriaId]?.photos || [];
+                    if (currentPhotos.length >= MAX_PHOTOS_PER_ACTION) {
+                        showToast(`Maximum ${MAX_PHOTOS_PER_ACTION} photos par action`, 'info');
+                        return;
+                    }
+                    photoInput.click();
+                });
+                
+                // Sélection de fichier
+                photoInput.addEventListener('change', async function(e) {
+                    if (this.files && this.files[0]) {
+                        const file = this.files[0];
+                        
+                        // Vérifier le type
+                        if (!file.type.startsWith('image/')) {
+                            showToast('Fichier non valide — image requise', 'error');
+                            return;
+                        }
+                        
+                        // Compresser l'image
+                        try {
+                            const compressedData = await compressImage(file);
+                            
+                            // Initialiser l'action si nécessaire
+                            if (!auditData.actions[criteriaId]) {
+                                auditData.actions[criteriaId] = {};
+                            }
+                            if (!auditData.actions[criteriaId].photos) {
+                                auditData.actions[criteriaId].photos = [];
+                            }
+                            
+                            // Ajouter la photo
+                            auditData.actions[criteriaId].photos.push(compressedData.dataUrl);
+                            
+                            // Mettre à jour l'affichage
+                            renderPhotoPreviews(criteriaId, photoPreview, photoBtn);
+                            
+                            scheduleAutoSave();
+                            showToast('Photo ajoutée', 'success');
+                        } catch (err) {
+                            console.error('Erreur compression:', err);
+                            showToast('Erreur lors du traitement de l\'image', 'error');
+                        }
+                        
+                        // Reset input pour permettre de resélectionner la même image
+                        this.value = '';
+                    }
+                });
+            });
+        }
+        
+        function renderPhotoPreviews(criteriaId, container, photoBtn) {
+            const photos = auditData.actions[criteriaId]?.photos || [];
+            const count = photos.length;
+            
+            // Mettre à jour le compteur
+            const countSpan = photoBtn.querySelector('.photo-count');
+            if (countSpan) {
+                countSpan.textContent = `${count}/${MAX_PHOTOS_PER_ACTION}`;
+            }
+            
+            // Vider le conteneur
+            container.innerHTML = '';
+            
+            if (count === 0) {
+                container.classList.remove('visible');
+                photoBtn.classList.remove('has-photo');
+                return;
+            }
+            
+            container.classList.add('visible');
+            photoBtn.classList.add('has-photo');
+            
+            photos.forEach((photoData, index) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'action-photo-thumb';
+                thumb.innerHTML = `
+                    <img src="${photoData}" alt="Photo ${index + 1}">
+                    <button type="button" class="action-photo-remove" data-index="${index}">×</button>
+                `;
+                
+                // Zoom au clic sur l'image
+                thumb.querySelector('img').addEventListener('click', function() {
+                    openPhotoZoom(this.src);
+                });
+                
+                // Supprimer au clic sur ×
+                thumb.querySelector('.action-photo-remove').addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    removePhoto(criteriaId, index, container, photoBtn);
+                });
+                
+                container.appendChild(thumb);
+            });
+        }
+        
+        function removePhoto(criteriaId, index, container, photoBtn) {
+            if (auditData.actions[criteriaId]?.photos) {
+                auditData.actions[criteriaId].photos.splice(index, 1);
+                
+                // Si plus de photos et pas d'action/responsable, nettoyer
+                const action = auditData.actions[criteriaId];
+                if (action.photos.length === 0) {
+                    delete action.photos;
+                    if (!action.action && !action.responsable && !action.type) {
+                        delete auditData.actions[criteriaId];
+                    }
+                }
+                
+                renderPhotoPreviews(criteriaId, container, photoBtn);
+                scheduleAutoSave();
+                showToast('Photo supprimée', 'info');
+            }
+        }
+        
+        function compressImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        // Calculer les dimensions
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > PHOTO_MAX_SIZE || height > PHOTO_MAX_SIZE) {
+                            if (width > height) {
+                                height = Math.round(height * PHOTO_MAX_SIZE / width);
+                                width = PHOTO_MAX_SIZE;
+                            } else {
+                                width = Math.round(width * PHOTO_MAX_SIZE / height);
+                                height = PHOTO_MAX_SIZE;
+                            }
+                        }
+                        
+                        // Créer canvas et dessiner
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Compresser avec qualité décroissante si nécessaire
+                        let quality = PHOTO_QUALITY;
+                        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        let size = Math.round((dataUrl.length - 'data:image/jpeg;base64,'.length) * 0.75);
+                        
+                        // Réduire la qualité si > 100KB
+                        while (size > PHOTO_MAX_BYTES && quality > 0.3) {
+                            quality -= 0.1;
+                            dataUrl = canvas.toDataURL('image/jpeg', quality);
+                            size = Math.round((dataUrl.length - 'data:image/jpeg;base64,'.length) * 0.75);
+                        }
+                        
+                        resolve({
+                            dataUrl: dataUrl,
+                            width: width,
+                            height: height,
+                            size: size
+                        });
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+        
+        function openPhotoZoom(src) {
+            const modal = document.getElementById('photo-zoom-modal');
+            const img = document.getElementById('photo-zoom-img');
+            img.src = src;
+            modal.classList.add('visible');
+        }
+        
+        function closePhotoZoom() {
+            document.getElementById('photo-zoom-modal').classList.remove('visible');
+        }
+        
+        // Fermer le zoom au clic sur l'overlay
+        document.getElementById('photo-zoom-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePhotoZoom();
+            }
+        });
+        
+        // ═══════════════════════════════════════════════════════════════
+        // GÉNÉRATION DU MAIL HTML POUR LES ACTIONS
+        // ═══════════════════════════════════════════════════════════════
+        
+        function generateActionMailHtml(action, auditContext) {
+            const isEcart = action.type === 'ecart';
+            const typeLabel = isEcart ? 'Écart aux standards' : 'Élévation des standards';
+            const typeColor = isEcart ? '#E60046' : '#00AA46';
+            const criteriaLabel = getCriteriaLabel(action.critere);
+            
+            let photosHtml = '';
+            if (action.photos && action.photos.length > 0) {
+                const photoImgs = action.photos.map((photo, i) => `
+                    <img src="${photo}" alt="Photo ${i + 1}" style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #DADADA; margin-bottom: 10px;">
+                `).join('');
+                
+                photosHtml = `
+                    <tr>
+                        <td style="padding: 20px;">
+                            <p style="margin: 0 0 10px 0; font-weight: bold; color: #575757;">Photo${action.photos.length > 1 ? 's' : ''} :</p>
+                            ${photoImgs}
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Action 5S - ${typeLabel}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #F5F5F5;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F5F5; padding: 20px 0;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <!-- Header jaune Sartorius -->
+                    <tr>
+                        <td style="background-color: #FFED00; padding: 20px; text-align: center;">
+                            <h1 style="margin: 0; color: #000000; font-size: 24px; font-weight: bold;">Action 5S</h1>
+                            <p style="margin: 5px 0 0 0; color: #3C3C3C; font-size: 14px;">${auditContext.zone} • Niveau ${auditContext.niveau}</p>
+                        </td>
+                    </tr>
+                    <!-- Badge type -->
+                    <tr>
+                        <td style="padding: 20px 20px 0 20px;">
+                            <span style="display: inline-block; padding: 6px 12px; background-color: ${typeColor}; color: #FFFFFF; border-radius: 4px; font-size: 12px; font-weight: bold; text-transform: uppercase;">
+                                ${typeLabel}
+                            </span>
+                        </td>
+                    </tr>
+                    <!-- Contenu -->
+                    <tr>
+                        <td style="padding: 20px;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="padding-bottom: 15px; border-bottom: 1px solid #EDEDED;">
+                                        <p style="margin: 0 0 5px 0; font-size: 12px; color: #878787; text-transform: uppercase;">Critère</p>
+                                        <p style="margin: 0; font-size: 16px; color: #000000; font-weight: 500;">${criteriaLabel}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 15px 0; border-bottom: 1px solid #EDEDED;">
+                                        <p style="margin: 0 0 5px 0; font-size: 12px; color: #878787; text-transform: uppercase;">Action demandée</p>
+                                        <p style="margin: 0; font-size: 16px; color: #000000;">${action.action}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 15px 0;">
+                                        <p style="margin: 0 0 5px 0; font-size: 12px; color: #878787; text-transform: uppercase;">Responsable</p>
+                                        <p style="margin: 0; font-size: 16px; color: #000000; font-weight: 500;">${action.responsable}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    ${photosHtml}
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #F5F5F5; padding: 15px 20px; border-top: 1px solid #EDEDED;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="font-size: 12px; color: #878787;">
+                                        Audit du ${auditContext.date}<br>
+                                        Auditeur : ${auditContext.auditeur}
+                                    </td>
+                                    <td align="right" style="font-size: 12px; color: #878787;">
+                                        Score : ${auditContext.score}/60 (${auditContext.percent}%)
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Bouton répondre -->
+                    <tr>
+                        <td style="padding: 20px; text-align: center; background-color: #FFFFFF;">
+                            <p style="margin: 0 0 10px 0; font-size: 13px; color: #878787;">Répondez à ce mail pour confirmer la clôture de l'action</p>
+                        </td>
+                    </tr>
+                </table>
+                <!-- Signature Sartorius -->
+                <p style="margin-top: 15px; font-size: 11px; color: #9D9D9D; text-align: center;">
+                    Sartorius Chromatography Equipment • Amélioration Continue
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+        }
+        
+        function getCriteriaLabel(criteriaId) {
+            const labels = {
+                'seiri_1': '1S.1 - Obsolètes identifiés et éliminés',
+                'seiri_2': '1S.2 - Pas d\'objets inutiles',
+                'seiri_3': '1S.3 - Affichages à jour',
+                'seiton_1': '2S.1 - Emplacement identifié',
+                'seiton_2': '2S.2 - Tout rangé à sa place',
+                'seiton_3': '2S.3 - Fréquence d\'utilisation',
+                'seiso_1': '3S.1 - Sols, murs, vitres propres',
+                'seiso_2': '3S.2 - Équipements propres',
+                'seiso_3': '3S.3 - Matériel de nettoyage',
+                'seiketsu_1': '4S.1 - Standards affichés',
+                'seiketsu_2': '4S.2 - Zone polyvalente',
+                'seiketsu_3': '4S.3 - Environnement sûr',
+                'shitsuke_1': '5S.1 - Standards Sartorius',
+                'shitsuke_2': '5S.2 - Écarts traités',
+                'shitsuke_3': '5S.3 - Planning respecté'
+            };
+            return labels[criteriaId] || criteriaId;
+        }
+        
+        // ═══════════════════════════════════════════════════════════════
         // MISE À JOUR DE L'ÉTAT
         // ═══════════════════════════════════════════════════════════════
         
@@ -4834,17 +5478,49 @@
             // Scores en tableau ordonné (pour colonnes G à U)
             const scoresArray = CRITERIA_ORDER.map(criteria => auditData.scores[criteria] || 0);
             
+            // Contexte pour la génération des mails
+            const auditContext = {
+                zone: zone,
+                niveau: level,
+                date: now.toLocaleDateString('fr-FR'),
+                auditeur: auditeur,
+                score: totalScore,
+                percent: percent
+            };
+            
             // Actions en tableau (pour feuille Action)
             const actionsArray = Object.entries(auditData.actions)
                 .filter(([, data]) => data.action && data.responsable)
-                .map(([critere, data]) => ({
-                    critere: critere,
-                    type: data.type === 'ecart' ? 'Écart aux standards' : 'Élévation des standards',
-                    action: data.action,
-                    responsable: data.responsable,
-                    responsableSP: formatNameForExport(data.responsable),
-                    responsableMail: getEmailByName(data.responsable)
-                }));
+                .map(([critere, data]) => {
+                    const actionObj = {
+                        critere: critere,
+                        type: data.type === 'ecart' ? 'Écart aux standards' : 'Élévation des standards',
+                        action: data.action,
+                        responsable: data.responsable,
+                        responsableSP: formatNameForExport(data.responsable),
+                        responsableMail: getEmailByName(data.responsable)
+                    };
+                    
+                    // Ajouter les photos si présentes
+                    if (data.photos && data.photos.length > 0) {
+                        actionObj.photos = data.photos;
+                        // HTML pré-généré pour Power Automate
+                        actionObj.photosHtml = data.photos.map(p => 
+                            `<img src="${p}" style="max-width: 100%; border-radius: 6px; margin-bottom: 10px; border: 1px solid #e5e5e5;">`
+                        ).join('');
+                    }
+                    
+                    // Générer le mail HTML complet
+                    actionObj.mailHtml = generateActionMailHtml({
+                        critere: critere,
+                        type: data.type,
+                        action: data.action,
+                        responsable: data.responsable,
+                        photos: data.photos
+                    }, auditContext);
+                    
+                    return actionObj;
+                });
             
             // Structure JSON finale
             const jsonData = {
@@ -4868,6 +5544,15 @@
                 zone: zone,
                 nbActions: actionsArray.length
             };
+            
+            // Vérifier si l'audit contient des photos
+            const hasPhotos = actionsArray.some(a => a.photos && a.photos.length > 0);
+            const mailOption = document.getElementById('export-mail');
+            if (hasPhotos) {
+                mailOption.style.display = 'none';
+            } else {
+                mailOption.style.display = '';
+            }
             
             // Afficher le résumé dans la popup
             const summary = document.getElementById('export-summary');
@@ -5101,6 +5786,19 @@ ${jsonCompact}
                 const responsableField = block.querySelector('.action-responsable');
                 if (actionField) actionField.value = '';
                 if (responsableField) responsableField.value = '';
+                
+                // Réinitialiser les photos
+                const photoPreview = block.querySelector('.action-photo-preview');
+                const photoBtn = block.querySelector('.action-photo-btn');
+                const photoInput = block.querySelector('.action-photo-input');
+                const photoCount = photoBtn?.querySelector('.photo-count');
+                if (photoPreview) {
+                    photoPreview.innerHTML = '';
+                    photoPreview.classList.remove('visible');
+                }
+                if (photoBtn) photoBtn.classList.remove('has-photo');
+                if (photoInput) photoInput.value = '';
+                if (photoCount) photoCount.textContent = '0/3';
             });
             
             document.querySelectorAll('.s-section').forEach((section, index) => {
@@ -5587,6 +6285,17 @@ Cordialement`);
                 const respField = block.querySelector('.action-responsable');
                 if (textField) textField.value = '';
                 if (respField) respField.value = '';
+                
+                // Réinitialiser les photos
+                const photoPreview = block.querySelector('.action-photo-preview');
+                const photoBtn = block.querySelector('.action-photo-btn');
+                const photoCount = photoBtn?.querySelector('.photo-count');
+                if (photoPreview) {
+                    photoPreview.innerHTML = '';
+                    photoPreview.classList.remove('visible');
+                }
+                if (photoBtn) photoBtn.classList.remove('has-photo');
+                if (photoCount) photoCount.textContent = '0/3';
             });
             document.querySelectorAll('.action-badge').forEach(badge => {
                 badge.classList.remove('has-action', 'incomplete-action');
@@ -5608,6 +6317,13 @@ Cordialement`);
                         const respField = block.querySelector('.action-responsable');
                         if (textField) textField.value = actionData.action || '';
                         if (respField) respField.value = actionData.responsable || '';
+                        
+                        // Restaurer les photos si présentes
+                        if (actionData.photos && actionData.photos.length > 0) {
+                            const photoPreview = block.querySelector('.action-photo-preview');
+                            const photoBtn = block.querySelector('.action-photo-btn');
+                            renderPhotoPreviews(criteria, photoPreview, photoBtn);
+                        }
                     }
                     updateActionBadge(card, criteria);
                 }
