@@ -6083,11 +6083,19 @@ Cordialement`);
                 expiresAt: midnight.toISOString()
             };
             
-            localStorage.setItem('audit5s_draft', JSON.stringify(draft));
-            updateDraftIndicator(now);
-            
-            if (!silent) {
-                showToast('Brouillon enregistré jusqu\'à la fin de la journée', 'success');
+            try {
+                localStorage.setItem('audit5s_draft', JSON.stringify(draft));
+                updateDraftIndicator(now);
+                
+                if (!silent) {
+                    showToast('Brouillon enregistré jusqu\'à la fin de la journée', 'success');
+                }
+            } catch (e) {
+                // Quota localStorage dépassé (probablement à cause des photos)
+                console.warn('Erreur sauvegarde brouillon:', e);
+                if (!silent) {
+                    showToast('Brouillon trop volumineux (photos)', 'error');
+                }
             }
         }
         
@@ -6111,7 +6119,12 @@ Cordialement`);
                 filename: filename,
                 exportedAt: new Date().toISOString()
             };
-            localStorage.setItem('audit5s_lastexport', JSON.stringify(lastExport));
+            try {
+                localStorage.setItem('audit5s_lastexport', JSON.stringify(lastExport));
+            } catch (e) {
+                console.warn('Erreur sauvegarde dernier export:', e);
+                // On ne bloque pas l'export, juste un warning
+            }
         }
         
         function showLastExport() {
@@ -6178,6 +6191,10 @@ Cordialement`);
                         action: actionData.action,
                         responsable: actionData.responsable
                     };
+                    // Restaurer les photos si présentes
+                    if (actionData.photos && actionData.photos.length > 0) {
+                        auditData.actions[actionData.critere].photos = actionData.photos;
+                    }
                 });
             }
             
@@ -6201,6 +6218,16 @@ Cordialement`);
                 block.classList.remove('visible');
                 block.querySelector('.action-text').value = '';
                 block.querySelector('.action-responsable').value = '';
+                // Réinitialiser les photos
+                const photoPreview = block.querySelector('.action-photo-preview');
+                const photoBtn = block.querySelector('.action-photo-btn');
+                const photoCount = photoBtn?.querySelector('.photo-count');
+                if (photoPreview) {
+                    photoPreview.innerHTML = '';
+                    photoPreview.classList.remove('visible');
+                }
+                if (photoBtn) photoBtn.classList.remove('has-photo');
+                if (photoCount) photoCount.textContent = '0/3';
             });
             document.querySelectorAll('.action-badge').forEach(badge => {
                 badge.classList.remove('has-action');
@@ -6221,6 +6248,13 @@ Cordialement`);
                         const respField = block.querySelector('.action-responsable');
                         if (textField) textField.value = actionData.action || '';
                         if (respField) respField.value = actionData.responsable || '';
+                        
+                        // Restaurer les photos si présentes
+                        if (actionData.photos && actionData.photos.length > 0) {
+                            const photoPreview = block.querySelector('.action-photo-preview');
+                            const photoBtn = block.querySelector('.action-photo-btn');
+                            renderPhotoPreviews(criteria, photoPreview, photoBtn);
+                        }
                     }
                     updateActionBadge(card, criteria);
                 }
