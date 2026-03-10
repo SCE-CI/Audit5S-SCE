@@ -2797,6 +2797,12 @@
             color: var(--gray-70);
         }
         
+        .export-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
         .export-modal-footer {
             padding: var(--space-md) var(--space-lg);
             border-top: 1px solid var(--gray-10);
@@ -4487,7 +4493,20 @@
             <div class="export-modal-body">
                 <div class="export-summary" id="export-summary"></div>
                 <div class="export-options">
-                    <button type="button" class="export-option primary" id="export-sharepoint">
+                    <button type="button" class="export-option primary" id="export-download">
+                        <div class="export-option-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </div>
+                        <div class="export-option-text">
+                            <span class="export-option-title">Télécharger</span>
+                            <span class="export-option-desc">À déposer manuellement sur SharePoint</span>
+                        </div>
+                    </button>
+                    <button type="button" class="export-option secondary disabled" id="export-sharepoint" disabled>
                         <div class="export-option-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -4497,7 +4516,7 @@
                         </div>
                         <div class="export-option-text">
                             <span class="export-option-title">Enregistrer sur SharePoint</span>
-                            <span class="export-option-desc">Sauvegarde automatique dans le dossier 5S</span>
+                            <span class="export-option-desc">Bientôt disponible</span>
                         </div>
                     </button>
                     <div id="export-result"></div>
@@ -5896,7 +5915,41 @@
         const SHAREPOINT_URL = 'https://sartorius.sharepoint.com/:f:/r/sites/OP_SCEContImprovement/5S/Audits%205S?csf=1&web=1&e=hxVf7O';
         
         function initExportModal() {
-            // Bouton SharePoint (upload automatique)
+            // Bouton Télécharger (principal pour l'instant)
+            document.getElementById('export-download').addEventListener('click', function() {
+                if (!pendingExport) return;
+                
+                // Télécharger le JSON
+                downloadJSON(pendingExport.jsonData, pendingExport.filename);
+                
+                // Sauvegarder comme dernier export
+                saveLastExport(pendingExport.jsonData, pendingExport.filename);
+                
+                // Supprimer le brouillon
+                localStorage.removeItem('audit5s_draft');
+                document.getElementById('draft-indicator').textContent = '';
+                
+                // Fermer la popup
+                closeExportModal();
+                
+                // Message de succès avec bouton SharePoint
+                const actionMsg = pendingExport.nbActions > 0 ? ` — ${pendingExport.nbActions} action${pendingExport.nbActions > 1 ? 's' : ''}` : '';
+                showToastWithAction(
+                    `Audit exporté — ${pendingExport.percent}%${actionMsg}`,
+                    'success',
+                    'Ouvrir SharePoint 5S',
+                    () => window.open(SHAREPOINT_URL, '_blank')
+                );
+                
+                // Reset après délai
+                setTimeout(() => {
+                    resetForm();
+                }, 5000);
+            });
+            
+            // Bouton SharePoint (désactivé pour l'instant)
+            // TODO: Réactiver quand l'authentification SPA sera configurée
+            /*
             document.getElementById('export-sharepoint').addEventListener('click', async function() {
                 if (!pendingExport) return;
                 
@@ -5983,6 +6036,7 @@
                     });
                 }
             });
+            */
             
             // Bouton Envoyer par mail
             document.getElementById('export-mail').addEventListener('click', function() {
