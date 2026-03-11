@@ -4827,15 +4827,36 @@
         async function uploadToSharePoint(jsonData, filename) {
             const accessToken = await getAccessToken();
             
-            // Construire l'URL Graph API pour upload
-            // Format: /sites/{hostname}:{site-path}:/drive/root:/{folder-path}/{filename}:/content
+            // Étape 1: Récupérer le siteId via la résolution de chemin
+            const siteResolveUrl = `https://graph.microsoft.com/v1.0/sites/${sharepointConfig.siteUrl}:${sharepointConfig.sitePath}`;
+            console.log('SharePoint: Résolution du site...', siteResolveUrl);
+            
+            const siteResponse = await fetch(siteResolveUrl, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            
+            if (!siteResponse.ok) {
+                const errorData = await siteResponse.json().catch(() => ({}));
+                console.error('SharePoint site resolution error:', errorData);
+                throw new Error(errorData.error?.message || `Erreur résolution site: HTTP ${siteResponse.status}`);
+            }
+            
+            const siteData = await siteResponse.json();
+            const siteId = siteData.id;
+            console.log('SharePoint: Site ID =', siteId);
+            
+            // Étape 2: Upload du fichier avec le siteId
+            // Format: /sites/{siteId}/drive/root:/{folder-path}/{filename}:/content
             const fullFilename = filename + '.json';
             const filePath = `/${sharepointConfig.folderPath}/${fullFilename}`;
-            const graphUrl = `https://graph.microsoft.com/v1.0/sites/${sharepointConfig.siteUrl}:${sharepointConfig.sitePath}:/drive/root:${encodeURI(filePath)}:/content`;
+            const uploadUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drive/root:${encodeURI(filePath)}:/content`;
             
-            console.log('SharePoint upload URL:', graphUrl);
+            console.log('SharePoint upload URL:', uploadUrl);
             
-            const response = await fetch(graphUrl, {
+            const response = await fetch(uploadUrl, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
