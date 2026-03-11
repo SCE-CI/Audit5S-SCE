@@ -4715,6 +4715,8 @@
             scopes: ['Files.ReadWrite', 'Sites.ReadWrite.All']
         };
         
+        let pendingExport = null;
+        
         const sharepointConfig = {
             siteUrl: 'sartorius.sharepoint.com',
             sitePath: '/sites/OP_SCEContImprovement',
@@ -4769,31 +4771,45 @@
                 await msalInstance.initialize();
                 
                 // Gérer le retour de la popup/redirect d'auth
+                let pendingUploadAfterRedirect = false;
                 try {
                     const response = await msalInstance.handleRedirectPromise();
                     if (response) {
                         msalAccount = response.account;
                         msalConnected = true;
+                        console.log('MSAL: Retour redirect réussi, account:', msalAccount.username);
                         
                         // Vérifier si on revient d'un redirect mobile avec un upload en attente
-                        if (sessionStorage.getItem('pendingSharePointUpload') === 'true') {
+                        const hasPending = sessionStorage.getItem('pendingSharePointUpload');
+                        const savedData = sessionStorage.getItem('pendingExportData');
+                        console.log('MSAL: pendingSharePointUpload =', hasPending, ', pendingExportData length =', savedData?.length);
+                        
+                        if (hasPending === 'true') {
                             sessionStorage.removeItem('pendingSharePointUpload');
                             
                             // Restaurer les données d'export sauvegardées
-                            const savedExportData = sessionStorage.getItem('pendingExportData');
-                            if (savedExportData) {
+                            if (savedData) {
                                 sessionStorage.removeItem('pendingExportData');
-                                pendingExport = JSON.parse(savedExportData);
-                                
-                                // Lancer l'upload automatiquement après un court délai
-                                setTimeout(() => {
-                                    resumeSharePointUpload();
-                                }, 800);
+                                pendingExport = JSON.parse(savedData);
+                                pendingUploadAfterRedirect = true;
+                                console.log('MSAL: pendingExport restauré:', pendingExport.filename);
                             }
                         }
                     }
                 } catch (error) {
                     console.error('MSAL: Erreur redirect', error);
+                }
+                
+                // Si on a un upload en attente, le lancer après que la page soit complètement prête
+                if (pendingUploadAfterRedirect && pendingExport) {
+                    // Attendre que le DOM soit complètement prêt
+                    if (document.readyState === 'complete') {
+                        setTimeout(() => resumeSharePointUpload(), 500);
+                    } else {
+                        window.addEventListener('load', () => {
+                            setTimeout(() => resumeSharePointUpload(), 500);
+                        });
+                    }
                 }
                 
                 // Vérifier si déjà connecté
@@ -4856,7 +4872,10 @@
                     // Sauvegarder l'état ET les données pour reprendre après le redirect
                     sessionStorage.setItem('pendingSharePointUpload', 'true');
                     if (pendingExport) {
+                        console.log('Mobile redirect: sauvegarde pendingExport', pendingExport.filename);
                         sessionStorage.setItem('pendingExportData', JSON.stringify(pendingExport));
+                    } else {
+                        console.error('Mobile redirect: ERREUR - pendingExport est null!');
                     }
                     await msalInstance.loginRedirect(loginRequest);
                     // Cette ligne ne sera jamais atteinte car on redirige
@@ -4969,7 +4988,11 @@
         
         // Reprendre l'upload après un redirect mobile (appelé automatiquement)
         async function resumeSharePointUpload() {
-            if (!pendingExport) return;
+            console.log('resumeSharePointUpload called, pendingExport:', pendingExport);
+            if (!pendingExport) {
+                console.error('resumeSharePointUpload: pas de données pendingExport');
+                return;
+            }
             
             // Afficher un toast de progression
             showToast('Connexion réussie — Upload en cours...', 'success');
@@ -6105,9 +6128,6 @@
             // Ouvrir la popup d'export
             document.getElementById('export-modal').classList.add('visible');
         }
-        
-        // Données en attente d'export
-        let pendingExport = null;
         
         // URL du dossier SharePoint
         const SHAREPOINT_URL = 'https://sartorius.sharepoint.com/:f:/r/sites/OP_SCEContImprovement/5S/Audits%205S?csf=1&web=1&e=hxVf7O';
