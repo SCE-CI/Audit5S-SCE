@@ -4685,19 +4685,22 @@
                 clientId: 'd97a32d2-865c-480b-96c2-1cfdcea3636c',
                 authority: 'https://login.microsoftonline.com/sartorius.com',
                 // Le redirectUri doit correspondre EXACTEMENT à celui configuré dans Azure AD
-                // Pour GitHub Pages: https://username.github.io/repo-name/
-                redirectUri: window.location.origin + window.location.pathname,
-                navigateToLoginRequestUrl: true
+                redirectUri: 'https://sce-ci.github.io/Audit5S-SCE/',
+                navigateToLoginRequestUrl: false,
+                postLogoutRedirectUri: 'https://sce-ci.github.io/Audit5S-SCE/'
             },
             cache: {
                 cacheLocation: 'sessionStorage',
-                storeAuthStateInCookie: false
+                storeAuthStateInCookie: true // Aide pour les popups cross-origin
             },
             system: {
                 allowNativeBroker: false,
                 windowHashTimeout: 60000,
                 iframeHashTimeout: 6000,
-                loadFrameTimeout: 0
+                loadFrameTimeout: 0,
+                loggerOptions: {
+                    logLevel: 3 // Info
+                }
             }
         };
         
@@ -4714,8 +4717,19 @@
         let msalInstance = null;
         let msalAccount = null;
         
+        // Détecter si on est dans une popup d'auth (et la fermer)
+        function isInPopup() {
+            return window.opener && window.opener !== window;
+        }
+        
         // Initialiser MSAL
         async function initMsal() {
+            // Si on est dans une popup, ne pas initialiser l'app complète
+            if (isInPopup()) {
+                console.log('MSAL: Détecté dans popup, fermeture...');
+                return;
+            }
+            
             try {
                 msalInstance = new msal.PublicClientApplication(msalConfig);
                 
