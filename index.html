@@ -4711,7 +4711,7 @@
         const sharepointConfig = {
             siteUrl: 'sartorius.sharepoint.com',
             sitePath: '/sites/OP_SCEContImprovement',
-            folderPath: '/5S/Audits 5S'
+            folderPath: '5S/Audits 5S'  // Sans le / initial
         };
         
         let msalInstance = null;
@@ -4828,9 +4828,12 @@
             const accessToken = await getAccessToken();
             
             // Construire l'URL Graph API pour upload
-            // Format: /sites/{site-id}/drive/root:/{path}/{filename}:/content
-            const encodedFilename = encodeURIComponent(filename + '.json');
-            const graphUrl = `https://graph.microsoft.com/v1.0/sites/${sharepointConfig.siteUrl}:${sharepointConfig.sitePath}:/drive/root:${sharepointConfig.folderPath}/${encodedFilename}:/content`;
+            // Format: /sites/{hostname}:{site-path}:/drive/root:/{folder-path}/{filename}:/content
+            const fullFilename = filename + '.json';
+            const filePath = `/${sharepointConfig.folderPath}/${fullFilename}`;
+            const graphUrl = `https://graph.microsoft.com/v1.0/sites/${sharepointConfig.siteUrl}:${sharepointConfig.sitePath}:/drive/root:${encodeURI(filePath)}:/content`;
+            
+            console.log('SharePoint upload URL:', graphUrl);
             
             const response = await fetch(graphUrl, {
                 method: 'PUT',
