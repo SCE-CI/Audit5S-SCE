@@ -4711,7 +4711,8 @@
         const sharepointConfig = {
             siteUrl: 'sartorius.sharepoint.com',
             sitePath: '/sites/OP_SCEContImprovement',
-            folderPath: '5S/Audits 5S'  // Sans le / initial
+            libraryName: '5S',           // Nom de la bibliothèque cible
+            folderPath: 'Audits 5S'      // Dossier dans cette bibliothèque
         };
         
         let msalInstance = null;
@@ -4848,11 +4849,40 @@
             const siteId = siteData.id;
             console.log('SharePoint: Site ID =', siteId);
             
-            // Étape 2: Upload du fichier avec le siteId
-            // Format: /sites/{siteId}/drive/root:/{folder-path}/{filename}:/content
+            // Étape 2: Récupérer le driveId de la bibliothèque "5S"
+            const drivesUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives`;
+            console.log('SharePoint: Récupération des bibliothèques...', drivesUrl);
+            
+            const drivesResponse = await fetch(drivesUrl, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            
+            if (!drivesResponse.ok) {
+                const errorData = await drivesResponse.json().catch(() => ({}));
+                console.error('SharePoint drives list error:', errorData);
+                throw new Error(errorData.error?.message || `Erreur liste drives: HTTP ${drivesResponse.status}`);
+            }
+            
+            const drivesData = await drivesResponse.json();
+            console.log('SharePoint: Bibliothèques disponibles:', drivesData.value.map(d => d.name));
+            
+            // Trouver la bibliothèque par son nom
+            const targetDrive = drivesData.value.find(d => d.name === sharepointConfig.libraryName);
+            if (!targetDrive) {
+                throw new Error(`Bibliothèque "${sharepointConfig.libraryName}" non trouvée. Disponibles: ${drivesData.value.map(d => d.name).join(', ')}`);
+            }
+            
+            const driveId = targetDrive.id;
+            console.log('SharePoint: Drive ID pour "' + sharepointConfig.libraryName + '" =', driveId);
+            
+            // Étape 3: Upload du fichier dans la bonne bibliothèque
+            // Format: /drives/{driveId}/root:/{folder-path}/{filename}:/content
             const fullFilename = filename + '.json';
             const filePath = `/${sharepointConfig.folderPath}/${fullFilename}`;
-            const uploadUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drive/root:${encodeURI(filePath)}:/content`;
+            const uploadUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/root:${encodeURI(filePath)}:/content`;
             
             console.log('SharePoint upload URL:', uploadUrl);
             
