@@ -4773,13 +4773,23 @@
                     const response = await msalInstance.handleRedirectPromise();
                     if (response) {
                         msalAccount = response.account;
+                        msalConnected = true;
                         
                         // Vérifier si on revient d'un redirect mobile avec un upload en attente
                         if (sessionStorage.getItem('pendingSharePointUpload') === 'true') {
                             sessionStorage.removeItem('pendingSharePointUpload');
-                            setTimeout(() => {
-                                showToast('Connecté à Microsoft — Réessayez l\'export', 'success');
-                            }, 500);
+                            
+                            // Restaurer les données d'export sauvegardées
+                            const savedExportData = sessionStorage.getItem('pendingExportData');
+                            if (savedExportData) {
+                                sessionStorage.removeItem('pendingExportData');
+                                pendingExport = JSON.parse(savedExportData);
+                                
+                                // Lancer l'upload automatiquement après un court délai
+                                setTimeout(() => {
+                                    resumeSharePointUpload();
+                                }, 800);
+                            }
                         }
                     }
                 } catch (error) {
@@ -4843,8 +4853,11 @@
                 // Si échec silencieux, authentifier l'utilisateur
                 if (isMobileDevice()) {
                     // Sur mobile, utiliser redirect (les popups ne fonctionnent pas bien)
-                    // Sauvegarder l'état pour reprendre après le redirect
+                    // Sauvegarder l'état ET les données pour reprendre après le redirect
                     sessionStorage.setItem('pendingSharePointUpload', 'true');
+                    if (pendingExport) {
+                        sessionStorage.setItem('pendingExportData', JSON.stringify(pendingExport));
+                    }
                     await msalInstance.loginRedirect(loginRequest);
                     // Cette ligne ne sera jamais atteinte car on redirige
                     return null;
@@ -4952,6 +4965,59 @@
                 name: result.name,
                 id: result.id
             };
+        }
+        
+        // Reprendre l'upload après un redirect mobile (appelé automatiquement)
+        async function resumeSharePointUpload() {
+            if (!pendingExport) return;
+            
+            // Afficher un toast de progression
+            showToast('Connexion réussie — Upload en cours...', 'success');
+            
+            try {
+                const result = await uploadToSharePoint(pendingExport.jsonData, pendingExport.filename);
+                
+                // Sauvegarder comme dernier export
+                saveLastExport(pendingExport.jsonData, pendingExport.filename);
+                
+                // Supprimer le brouillon
+                localStorage.removeItem('audit5s_draft');
+                
+                // Message de succès avec lien (toast plus long sur mobile)
+                const actionMsg = pendingExport.nbActions > 0 ? ` — ${pendingExport.nbActions} action${pendingExport.nbActions > 1 ? 's' : ''}` : '';
+                showToastWithAction(
+                    `✓ Audit sauvegardé — ${pendingExport.percent}%${actionMsg}`,
+                    'success',
+                    'Ouvrir le dossier',
+                    () => window.open(result.folderUrl, '_blank')
+                );
+                
+                // Reset le formulaire
+                pendingExport = null;
+                resetForm();
+                
+            } catch (error) {
+                console.error('Erreur upload SharePoint après redirect:', error);
+                
+                // Fallback : proposer le téléchargement
+                showToastWithAction(
+                    'Erreur SharePoint — Téléchargement disponible',
+                    'error',
+                    'Télécharger',
+                    () => {
+                        downloadJSON(pendingExport.jsonData, pendingExport.filename);
+                        saveLastExport(pendingExport.jsonData, pendingExport.filename);
+                        localStorage.removeItem('audit5s_draft');
+                        showToastWithAction(
+                            'Fichier téléchargé',
+                            'success',
+                            'Ouvrir SharePoint',
+                            () => window.open(SHAREPOINT_URL, '_blank')
+                        );
+                        resetForm();
+                    }
+                );
+            }
         }
 
         // ═══════════════════════════════════════════════════════════════
