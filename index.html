@@ -2803,6 +2803,38 @@
             pointer-events: none;
         }
         
+        /* État "connexion requise" - bouton cliquable pour se connecter */
+        .export-option.needs-auth {
+            background: var(--gray-5);
+            border-color: var(--gray-30);
+        }
+        
+        .export-option.needs-auth .export-option-icon {
+            background: var(--gray-20);
+        }
+        
+        .export-option.needs-auth .export-option-icon svg {
+            stroke: var(--gray-60);
+        }
+        
+        .export-option.needs-auth .export-option-title {
+            color: var(--gray-70);
+        }
+        
+        .export-option.needs-auth:hover {
+            background: var(--gray-10);
+            border-color: var(--gray-40);
+        }
+        
+        /* Indicateur de statut connexion */
+        .export-option-desc.connected {
+            color: var(--traffic-green);
+        }
+        
+        .export-option-desc.connecting {
+            color: var(--gray-50);
+        }
+        
         .export-modal-footer {
             padding: var(--space-md) var(--space-lg);
             border-top: 1px solid var(--gray-10);
@@ -4503,35 +4535,10 @@
                         </div>
                         <div class="export-option-text">
                             <span class="export-option-title">Enregistrer sur SharePoint</span>
-                            <span class="export-option-desc">Sauvegarde automatique dans le dossier 5S</span>
+                            <span class="export-option-desc" id="export-sharepoint-status">Sauvegarde automatique dans le dossier 5S</span>
                         </div>
                     </button>
                     <div id="export-result"></div>
-                    <button type="button" class="export-option secondary" id="export-download">
-                        <div class="export-option-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="7 10 12 15 17 10"></polyline>
-                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                        </div>
-                        <div class="export-option-text">
-                            <span class="export-option-title">Télécharger</span>
-                            <span class="export-option-desc">À déposer manuellement sur SharePoint</span>
-                        </div>
-                    </button>
-                    <button type="button" class="export-option secondary" id="export-mail">
-                        <div class="export-option-icon icon-mail">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                <polyline points="22,6 12,13 2,6"></polyline>
-                            </svg>
-                        </div>
-                        <div class="export-option-text">
-                            <span class="export-option-title">Envoyer par mail</span>
-                            <span class="export-option-desc">Ouvre votre messagerie avec les données</span>
-                        </div>
-                    </button>
                 </div>
             </div>
             <div class="export-modal-footer">
@@ -4717,24 +4724,48 @@
         
         let msalInstance = null;
         let msalAccount = null;
+        let msalConnected = false;  // État de connexion validé (token OK)
         
         // Détecter si on est dans une popup d'auth (et la fermer)
         function isInPopup() {
             return window.opener && window.opener !== window;
         }
         
+        // Mettre à jour l'affichage du statut de connexion
+        function updateMsalStatusDisplay() {
+            const statusEl = document.getElementById('export-sharepoint-status');
+            const btn = document.getElementById('export-sharepoint');
+            if (!statusEl || !btn) return;
+            
+            if (msalConnected && msalAccount) {
+                // Connecté - extraire le prénom du mail
+                const email = msalAccount.username || '';
+                const name = email.split('@')[0].split('.')[0];
+                const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+                
+                statusEl.textContent = `✓ Connecté (${displayName})`;
+                statusEl.className = 'export-option-desc connected';
+                btn.classList.remove('needs-auth');
+            } else if (msalAccount) {
+                // Compte en cache mais pas encore validé
+                statusEl.textContent = 'Vérification de la connexion...';
+                statusEl.className = 'export-option-desc connecting';
+                btn.classList.add('needs-auth');
+            } else {
+                // Non connecté
+                statusEl.textContent = 'Cliquez pour vous connecter à Microsoft';
+                statusEl.className = 'export-option-desc';
+                btn.classList.add('needs-auth');
+            }
+        }
+        
         // Initialiser MSAL
         async function initMsal() {
             // Si on est dans une popup, ne pas initialiser l'app complète
-            if (isInPopup()) {
-                console.log('MSAL: Détecté dans popup, fermeture...');
-                return;
-            }
+            if (isInPopup()) return;
             
             try {
                 msalInstance = new msal.PublicClientApplication(msalConfig);
-                
-                // IMPORTANT: Attendre l'initialisation complète
                 await msalInstance.initialize();
                 
                 // Gérer le retour de la popup/redirect d'auth
@@ -4742,32 +4773,45 @@
                     const response = await msalInstance.handleRedirectPromise();
                     if (response) {
                         msalAccount = response.account;
-                        console.log('MSAL: Authentification réussie via redirect');
                         
                         // Vérifier si on revient d'un redirect mobile avec un upload en attente
                         if (sessionStorage.getItem('pendingSharePointUpload') === 'true') {
                             sessionStorage.removeItem('pendingSharePointUpload');
-                            // Afficher un message pour indiquer que l'utilisateur peut réessayer
                             setTimeout(() => {
                                 showToast('Connecté à Microsoft — Réessayez l\'export', 'success');
                             }, 500);
                         }
                     }
                 } catch (error) {
-                    console.error('MSAL: Erreur handleRedirectPromise', error);
+                    console.error('MSAL: Erreur redirect', error);
                 }
                 
                 // Vérifier si déjà connecté
                 const accounts = msalInstance.getAllAccounts();
                 if (accounts.length > 0) {
                     msalAccount = accounts[0];
-                    console.log('MSAL: Compte en cache trouvé', msalAccount.username);
+                    tryProactiveAuth();
                 }
-                
-                console.log('MSAL: Initialisé avec redirectUri =', msalConfig.auth.redirectUri);
             } catch (error) {
                 console.error('MSAL: Erreur initialisation', error);
             }
+        }
+        
+        // Connexion silencieuse proactive au chargement
+        async function tryProactiveAuth() {
+            if (!msalInstance || !msalAccount) return;
+            
+            try {
+                const tokenRequest = {
+                    scopes: loginRequest.scopes,
+                    account: msalAccount
+                };
+                await msalInstance.acquireTokenSilent(tokenRequest);
+                msalConnected = true;
+            } catch (error) {
+                msalConnected = false;
+            }
+            updateMsalStatusDisplay();
         }
         
         // Détecte si on est sur mobile
@@ -4790,13 +4834,13 @@
                 // Essayer d'abord silencieusement
                 if (msalAccount) {
                     const response = await msalInstance.acquireTokenSilent(tokenRequest);
+                    msalConnected = true;
+                    updateMsalStatusDisplay();
                     return response.accessToken;
                 }
                 throw new Error('Pas de compte en cache');
             } catch (silentError) {
                 // Si échec silencieux, authentifier l'utilisateur
-                console.log('MSAL: Token silencieux échoué, authentification requise...');
-                
                 if (isMobileDevice()) {
                     // Sur mobile, utiliser redirect (les popups ne fonctionnent pas bien)
                     // Sauvegarder l'état pour reprendre après le redirect
@@ -4809,6 +4853,8 @@
                     try {
                         const response = await msalInstance.loginPopup(loginRequest);
                         msalAccount = response.account;
+                        msalConnected = true;
+                        updateMsalStatusDisplay();
                         
                         // Maintenant acquérir le token avec le compte
                         const tokenResponse = await msalInstance.acquireTokenSilent({
@@ -4830,7 +4876,6 @@
             
             // Étape 1: Récupérer le siteId via la résolution de chemin
             const siteResolveUrl = `https://graph.microsoft.com/v1.0/sites/${sharepointConfig.siteUrl}:${sharepointConfig.sitePath}`;
-            console.log('SharePoint: Résolution du site...', siteResolveUrl);
             
             const siteResponse = await fetch(siteResolveUrl, {
                 method: 'GET',
@@ -4841,17 +4886,15 @@
             
             if (!siteResponse.ok) {
                 const errorData = await siteResponse.json().catch(() => ({}));
-                console.error('SharePoint site resolution error:', errorData);
+                console.error('SharePoint: Erreur résolution site', errorData);
                 throw new Error(errorData.error?.message || `Erreur résolution site: HTTP ${siteResponse.status}`);
             }
             
             const siteData = await siteResponse.json();
             const siteId = siteData.id;
-            console.log('SharePoint: Site ID =', siteId);
             
             // Étape 2: Récupérer le driveId de la bibliothèque "5S"
             const drivesUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives`;
-            console.log('SharePoint: Récupération des bibliothèques...', drivesUrl);
             
             const drivesResponse = await fetch(drivesUrl, {
                 method: 'GET',
@@ -4862,29 +4905,24 @@
             
             if (!drivesResponse.ok) {
                 const errorData = await drivesResponse.json().catch(() => ({}));
-                console.error('SharePoint drives list error:', errorData);
+                console.error('SharePoint: Erreur liste bibliothèques', errorData);
                 throw new Error(errorData.error?.message || `Erreur liste drives: HTTP ${drivesResponse.status}`);
             }
             
             const drivesData = await drivesResponse.json();
-            console.log('SharePoint: Bibliothèques disponibles:', drivesData.value.map(d => d.name));
             
             // Trouver la bibliothèque par son nom
             const targetDrive = drivesData.value.find(d => d.name === sharepointConfig.libraryName);
             if (!targetDrive) {
-                throw new Error(`Bibliothèque "${sharepointConfig.libraryName}" non trouvée. Disponibles: ${drivesData.value.map(d => d.name).join(', ')}`);
+                throw new Error(`Bibliothèque "${sharepointConfig.libraryName}" non trouvée`);
             }
             
             const driveId = targetDrive.id;
-            console.log('SharePoint: Drive ID pour "' + sharepointConfig.libraryName + '" =', driveId);
             
             // Étape 3: Upload du fichier dans la bonne bibliothèque
-            // Format: /drives/{driveId}/root:/{folder-path}/{filename}:/content
             const fullFilename = filename + '.json';
             const filePath = `/${sharepointConfig.folderPath}/${fullFilename}`;
             const uploadUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/root:${encodeURI(filePath)}:/content`;
-            
-            console.log('SharePoint upload URL:', uploadUrl);
             
             const response = await fetch(uploadUrl, {
                 method: 'PUT',
@@ -4897,14 +4935,12 @@
             
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                console.error('SharePoint upload error:', errorData);
+                console.error('SharePoint: Erreur upload', errorData);
                 throw new Error(errorData.error?.message || `Erreur HTTP ${response.status}`);
             }
             
             const result = await response.json();
-            console.log('SharePoint upload SUCCESS - Full response:', result);
-            console.log('SharePoint file webUrl:', result.webUrl);
-            console.log('SharePoint file parentReference:', result.parentReference);
+            console.log('SharePoint: Upload réussi →', result.webUrl);
             
             // Construire l'URL du dossier parent à partir du webUrl du fichier
             const fileWebUrl = result.webUrl;
@@ -5993,18 +6029,12 @@
                 nbActions: actionsArray.length
             };
             
-            // Vérifier si l'audit contient des photos
-            const hasPhotos = actionsArray.some(a => a.photos && a.photos.length > 0);
-            const mailOption = document.getElementById('export-mail');
-            if (hasPhotos) {
-                mailOption.style.display = 'none';
-            } else {
-                mailOption.style.display = '';
-            }
-            
             // Afficher le résumé dans la popup
             const summary = document.getElementById('export-summary');
             summary.innerHTML = `<strong>${filename}</strong>Score : ${totalScore}/60 (${percent}%)${actionsArray.length > 0 ? ` • ${actionsArray.length} action${actionsArray.length > 1 ? 's' : ''}` : ''}`;
+            
+            // Mettre à jour le statut de connexion Microsoft
+            updateMsalStatusDisplay();
             
             // Ouvrir la popup d'export
             document.getElementById('export-modal').classList.add('visible');
@@ -6103,90 +6133,6 @@
                         }, 3000);
                     });
                 }
-            });
-            
-            // Bouton Télécharger (fallback manuel)
-            document.getElementById('export-download').addEventListener('click', function() {
-                if (!pendingExport) return;
-                
-                // Télécharger le JSON
-                downloadJSON(pendingExport.jsonData, pendingExport.filename);
-                
-                // Sauvegarder comme dernier export
-                saveLastExport(pendingExport.jsonData, pendingExport.filename);
-                
-                // Supprimer le brouillon
-                localStorage.removeItem('audit5s_draft');
-                document.getElementById('draft-indicator').textContent = '';
-                
-                // Fermer la popup
-                closeExportModal();
-                
-                // Message de succès avec bouton SharePoint
-                const actionMsg = pendingExport.nbActions > 0 ? ` — ${pendingExport.nbActions} action${pendingExport.nbActions > 1 ? 's' : ''}` : '';
-                showToastWithAction(
-                    `Audit exporté — ${pendingExport.percent}%${actionMsg}`,
-                    'success',
-                    'Ouvrir SharePoint 5S',
-                    () => window.open(SHAREPOINT_URL, '_blank')
-                );
-                
-                // Reset après délai
-                setTimeout(() => {
-                    resetForm();
-                }, 5000);
-            });
-            
-            // Bouton Envoyer par mail
-            document.getElementById('export-mail').addEventListener('click', function() {
-                if (!pendingExport) return;
-                
-                // Construire le corps du mail
-                const data = pendingExport.jsonData;
-                const jsonCompact = JSON.stringify(data);
-                
-                const body = `Bonjour,
-
-Veuillez trouver ci-dessous les données de l'audit 5S.
-
-Zone : ${data.zone}
-Date : ${data.date}
-Auditeur : ${data.auditeur}
-Niveau : ${data.niveau}
-Score : ${data.scores.reduce((a, b) => a + b, 0)}/60 (${pendingExport.percent}%)
-Actions : ${pendingExport.nbActions}
-
-
-
-════════════════════════════════════
-⚠️ NE PAS MODIFIER CI-DESSOUS
-════════════════════════════════════
-${jsonCompact}
-════════════════════════════════════`;
-
-                const subject = `[AUDIT5S] ${pendingExport.filename}`;
-                const mailto = `mailto:${EMAIL_DEST}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                
-                // Ouvrir le client mail
-                window.location.href = mailto;
-                
-                // Sauvegarder comme dernier export
-                saveLastExport(pendingExport.jsonData, pendingExport.filename);
-                
-                // Supprimer le brouillon
-                localStorage.removeItem('audit5s_draft');
-                document.getElementById('draft-indicator').textContent = '';
-                
-                // Fermer la popup
-                closeExportModal();
-                
-                // Message de succès
-                showToast('Mail préparé — vérifiez et envoyez', 'success');
-                
-                // Reset après délai
-                setTimeout(() => {
-                    resetForm();
-                }, 1500);
             });
             
             // Bouton Annuler
