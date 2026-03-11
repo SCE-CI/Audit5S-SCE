@@ -4872,6 +4872,10 @@
             }
             
             const result = await response.json();
+            console.log('SharePoint upload SUCCESS - Full response:', result);
+            console.log('SharePoint file webUrl:', result.webUrl);
+            console.log('SharePoint file parentReference:', result.parentReference);
+            
             return {
                 webUrl: result.webUrl,
                 name: result.name,
