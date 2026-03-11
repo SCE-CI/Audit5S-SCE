@@ -4728,6 +4728,15 @@
                     if (response) {
                         msalAccount = response.account;
                         console.log('MSAL: Authentification réussie via redirect');
+                        
+                        // Vérifier si on revient d'un redirect mobile avec un upload en attente
+                        if (sessionStorage.getItem('pendingSharePointUpload') === 'true') {
+                            sessionStorage.removeItem('pendingSharePointUpload');
+                            // Afficher un message pour indiquer que l'utilisateur peut réessayer
+                            setTimeout(() => {
+                                showToast('Connecté à Microsoft — Réessayez l\'export', 'success');
+                            }, 500);
+                        }
                     }
                 } catch (error) {
                     console.error('MSAL: Erreur handleRedirectPromise', error);
@@ -4746,7 +4755,12 @@
             }
         }
         
-        // Obtenir un token d'accès (silencieux ou avec popup)
+        // Détecte si on est sur mobile
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+        
+        // Obtenir un token d'accès (silencieux ou avec popup/redirect)
         async function getAccessToken() {
             if (!msalInstance) {
                 throw new Error('MSAL non initialisé');
@@ -4765,21 +4779,32 @@
                 }
                 throw new Error('Pas de compte en cache');
             } catch (silentError) {
-                // Si échec silencieux, ouvrir popup
-                console.log('MSAL: Token silencieux échoué, ouverture popup...');
-                try {
-                    const response = await msalInstance.loginPopup(loginRequest);
-                    msalAccount = response.account;
-                    
-                    // Maintenant acquérir le token avec le compte
-                    const tokenResponse = await msalInstance.acquireTokenSilent({
-                        scopes: loginRequest.scopes,
-                        account: msalAccount
-                    });
-                    return tokenResponse.accessToken;
-                } catch (popupError) {
-                    console.error('MSAL: Erreur popup', popupError);
-                    throw popupError;
+                // Si échec silencieux, authentifier l'utilisateur
+                console.log('MSAL: Token silencieux échoué, authentification requise...');
+                
+                if (isMobileDevice()) {
+                    // Sur mobile, utiliser redirect (les popups ne fonctionnent pas bien)
+                    // Sauvegarder l'état pour reprendre après le redirect
+                    sessionStorage.setItem('pendingSharePointUpload', 'true');
+                    await msalInstance.loginRedirect(loginRequest);
+                    // Cette ligne ne sera jamais atteinte car on redirige
+                    return null;
+                } else {
+                    // Sur desktop, utiliser popup
+                    try {
+                        const response = await msalInstance.loginPopup(loginRequest);
+                        msalAccount = response.account;
+                        
+                        // Maintenant acquérir le token avec le compte
+                        const tokenResponse = await msalInstance.acquireTokenSilent({
+                            scopes: loginRequest.scopes,
+                            account: msalAccount
+                        });
+                        return tokenResponse.accessToken;
+                    } catch (popupError) {
+                        console.error('MSAL: Erreur popup', popupError);
+                        throw popupError;
+                    }
                 }
             }
         }
