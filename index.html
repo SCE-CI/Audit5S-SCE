@@ -3764,12 +3764,14 @@
         .dashboard-zone-bar-fill {
             height: 100%;
             border-radius: 2px;
+            background: var(--gray-40); /* Fallback */
+            transition: width 0.3s ease;
         }
         
-        .dashboard-zone-bar-fill.excellent { background: var(--traffic-green); }
-        .dashboard-zone-bar-fill.good { background: var(--traffic-yellow); }
-        .dashboard-zone-bar-fill.warning { background: var(--traffic-orange); }
-        .dashboard-zone-bar-fill.critical { background: var(--traffic-red); }
+        .dashboard-zone-bar-fill.excellent { background: var(--traffic-green) !important; }
+        .dashboard-zone-bar-fill.good { background: var(--traffic-yellow) !important; }
+        .dashboard-zone-bar-fill.warning { background: var(--traffic-orange) !important; }
+        .dashboard-zone-bar-fill.critical { background: var(--traffic-red) !important; }
         
         /* Indicateur de connexion */
         .dashboard-user-badge {
@@ -3946,6 +3948,15 @@
             background: #1a8754;
         }
         
+        .dashboard-action-btn.inprogress-action {
+            background: var(--traffic-orange);
+            color: var(--white);
+        }
+        
+        .dashboard-action-btn.inprogress-action:hover {
+            background: #d97706;
+        }
+        
         .dashboard-action-btn.cancel-action {
             background: var(--gray-20);
             color: var(--gray-70);
@@ -3958,6 +3969,32 @@
         .dashboard-action-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+        }
+        
+        /* Champ commentaire */
+        .dashboard-action-modal-comment {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .dashboard-action-comment-input {
+            width: 100%;
+            padding: var(--space-sm);
+            border: 1px solid var(--gray-30);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: var(--font-size-sm);
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        .dashboard-action-comment-input:focus {
+            outline: none;
+            border-color: var(--sartorius-yellow);
+        }
+        
+        .dashboard-action-comment-input.error {
+            border-color: var(--traffic-red);
+            animation: shake 0.3s ease;
         }
         
         /* Bouton clôturer dans le tableau */
@@ -8932,19 +8969,32 @@ Cordialement`);
                         <div class="dashboard-action-modal-value" id="modal-action-date"></div>
                     </div>
                     
+                    <!-- Champ commentaire -->
+                    <div class="dashboard-action-modal-comment">
+                        <label class="dashboard-action-modal-label" for="modal-comment">Commentaire <span id="modal-comment-required" style="color: var(--traffic-red); display: none;">*</span></label>
+                        <textarea id="modal-comment" class="dashboard-action-comment-input" rows="2" placeholder="Ajouter un commentaire..."></textarea>
+                    </div>
+                    
                     <div class="dashboard-action-modal-actions">
-                        <button class="dashboard-action-btn close-action" id="modal-btn-close" onclick="closeAction()">
+                        <button class="dashboard-action-btn close-action" id="modal-btn-close" onclick="handleAction('close')">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
-                            Clôturer l'action
+                            Clôturer
                         </button>
-                        <button class="dashboard-action-btn cancel-action" id="modal-btn-cancel" onclick="cancelAction()">
+                        <button class="dashboard-action-btn inprogress-action" id="modal-btn-inprogress" onclick="handleAction('inprogress')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            En cours
+                        </button>
+                        <button class="dashboard-action-btn cancel-action" id="modal-btn-cancel" onclick="handleAction('cancel')">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                 <line x1="6" y1="6" x2="18" y2="18"></line>
                             </svg>
-                            Annuler l'action
+                            Annuler
                         </button>
                     </div>
                 </div>
@@ -9484,7 +9534,7 @@ Cordialement`);
                             ${openActions > 0 ? ` - <span style="color: var(--traffic-orange);">${openActions} action${openActions > 1 ? 's' : ''}</span>` : ''}
                         </div>
                         <div class="dashboard-zone-bar">
-                            <div class="dashboard-zone-bar-fill ${scoreClass}" style="width: ${score}%"></div>
+                            <div class="dashboard-zone-bar-fill ${scoreClass}" style="width: ${Math.round(score)}%;"></div>
                         </div>
                     </div>
                 `;
@@ -9690,7 +9740,7 @@ Cordialement`);
         }
         
         // ═══════════════════════════════════════════════════════════════
-        // GESTION DES ACTIONS (clôture, annulation)
+        // GESTION DES ACTIONS (clôture, en cours, annulation)
         // ═══════════════════════════════════════════════════════════════
         
         let currentActionRowIndex = null;
@@ -9707,6 +9757,12 @@ Cordialement`);
             document.getElementById('modal-action-resp').textContent = action.responsable || '-';
             document.getElementById('modal-action-date').textContent = formatExcelDate(action.dateOuverture);
             
+            // Reset du champ commentaire
+            const commentInput = document.getElementById('modal-comment');
+            commentInput.value = '';
+            commentInput.classList.remove('error');
+            document.getElementById('modal-comment-required').style.display = 'none';
+            
             // Afficher le modal
             document.getElementById('dashboard-action-modal').classList.add('visible');
         }
@@ -9716,15 +9772,34 @@ Cordialement`);
             currentActionRowIndex = null;
         }
         
-        async function closeAction() {
+        async function handleAction(actionType) {
             if (currentActionRowIndex === null) return;
             
-            const btn = document.getElementById('modal-btn-close');
+            const commentInput = document.getElementById('modal-comment');
+            const comment = commentInput.value.trim();
+            
+            // Vérifier si commentaire obligatoire
+            if ((actionType === 'cancel' || actionType === 'inprogress') && !comment) {
+                commentInput.classList.add('error');
+                document.getElementById('modal-comment-required').style.display = 'inline';
+                commentInput.focus();
+                setTimeout(() => commentInput.classList.remove('error'), 500);
+                return;
+            }
+            
+            const btnId = actionType === 'close' ? 'modal-btn-close' : 
+                          actionType === 'inprogress' ? 'modal-btn-inprogress' : 'modal-btn-cancel';
+            const btn = document.getElementById(btnId);
+            const originalHtml = btn.innerHTML;
+            
             btn.disabled = true;
-            btn.innerHTML = '<span class="dashboard-loading-spinner" style="width: 16px; height: 16px; border-width: 2px;"></span> Clôture...';
+            btn.innerHTML = '<span class="dashboard-loading-spinner" style="width: 16px; height: 16px; border-width: 2px;"></span>';
+            
+            // Désactiver les autres boutons
+            document.querySelectorAll('.dashboard-action-btn').forEach(b => b.disabled = true);
             
             try {
-                await updateActionInExcel(currentActionRowIndex, 'close');
+                await updateActionInExcel(currentActionRowIndex, actionType, comment);
                 
                 // Rafraîchir les données
                 await refreshDashboardData();
@@ -9733,71 +9808,60 @@ Cordialement`);
                 closeActionModal();
                 
             } catch (error) {
-                console.error('Erreur clôture:', error);
-                alert('Erreur lors de la clôture: ' + error.message);
+                console.error('Erreur action:', error);
+                alert('Erreur: ' + error.message);
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Clôturer l'action`;
+                btn.innerHTML = originalHtml;
+                document.querySelectorAll('.dashboard-action-btn').forEach(b => b.disabled = false);
             }
         }
         
-        async function cancelAction() {
-            if (currentActionRowIndex === null) return;
-            
-            const btn = document.getElementById('modal-btn-cancel');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="dashboard-loading-spinner" style="width: 16px; height: 16px; border-width: 2px;"></span> Annulation...';
-            
-            try {
-                await updateActionInExcel(currentActionRowIndex, 'cancel');
-                
-                // Rafraîchir les données
-                await refreshDashboardData();
-                
-                // Fermer le modal
-                closeActionModal();
-                
-            } catch (error) {
-                console.error('Erreur annulation:', error);
-                alert('Erreur lors de l\'annulation: ' + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Annuler l'action`;
-            }
-        }
-        
-        async function updateActionInExcel(rowIndex, actionType) {
+        async function updateActionInExcel(rowIndex, actionType, userComment) {
             const accessToken = await getAccessToken();
-            
-            // La date de clôture est en colonne K (index 10), soit 11e colonne
-            // Le commentaire est en colonne J (index 9)
             
             const action = dashboardData.actions.find(a => a.rowIndex === rowIndex);
             if (!action) throw new Error('Action non trouvée');
             
-            // Construire le range pour cette ligne
-            // Les lignes du tableau commencent à l'index 0 dans l'API mais row 2 dans Excel (row 1 = headers)
-            const excelRow = rowIndex + 2; // +1 pour 1-indexé, +1 pour header
+            // La ligne Excel = rowIndex + 2 (1-indexé + header)
+            const excelRow = rowIndex + 2;
             
-            let updates = {};
+            // Date du jour au format Excel
+            const today = new Date();
+            const dateValue = Math.floor((today - new Date(1899, 11, 30)) / (24 * 60 * 60 * 1000));
+            
+            // Construire le nouveau commentaire
+            let newComment = '';
+            const userName = msalAccount?.name || 'Utilisateur';
             
             if (actionType === 'close') {
-                // Mettre la date de clôture (colonne K)
-                const today = new Date();
-                const dateValue = Math.floor((today - new Date(1899, 11, 30)) / (24 * 60 * 60 * 1000));
-                
-                // Ajouter "Clôturé par [nom]" si ce n'est pas le responsable
-                let commentaire = action.commentaire || '';
-                if (msalAccount && msalAccount.name) {
-                    const closedBy = msalAccount.name;
-                    if (closedBy !== action.responsable) {
-                        commentaire = (commentaire ? commentaire + ' | ' : '') + `Clôturé par ${closedBy}`;
-                    }
+                // Clôture : commentaire optionnel
+                if (userComment) {
+                    newComment = userComment;
                 }
-                
-                // Mettre à jour colonne K (date clôture)
+                // Ajouter "Clôturé par X" si ce n'est pas le responsable
+                if (userName !== action.responsable) {
+                    newComment = newComment ? `${newComment} | Clôturé par ${userName}` : `Clôturé par ${userName}`;
+                }
+            } else if (actionType === 'inprogress') {
+                // En cours : format "En cours - commentaire"
+                newComment = `En cours - ${userComment}`;
+            } else if (actionType === 'cancel') {
+                // Annulé : format "Annulé - commentaire"
+                newComment = `Annulé - ${userComment}`;
+            }
+            
+            // Combiner avec l'ancien commentaire si existant
+            const existingComment = action.commentaire || '';
+            if (existingComment && newComment) {
+                newComment = `${existingComment} | ${newComment}`;
+            } else if (existingComment) {
+                newComment = existingComment;
+            }
+            
+            // Mettre à jour la date de clôture (colonne K) - pour clôture et annulation
+            if (actionType === 'close' || actionType === 'cancel') {
                 const dateUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${dashboardData.excelItemId}/workbook/worksheets/${excelConfig.actionsSheet}/range(address='K${excelRow}')`;
-                await fetch(dateUrl, {
+                const dateResponse = await fetch(dateUrl, {
                     method: 'PATCH',
                     headers: {
                         'Authorization': `Bearer ${accessToken}`,
@@ -9806,38 +9870,28 @@ Cordialement`);
                     body: JSON.stringify({ values: [[dateValue]] })
                 });
                 
-                // Mettre à jour colonne J (commentaire) si nécessaire
-                if (commentaire !== action.commentaire) {
-                    const commentUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${dashboardData.excelItemId}/workbook/worksheets/${excelConfig.actionsSheet}/range(address='J${excelRow}')`;
-                    await fetch(commentUrl, {
-                        method: 'PATCH',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ values: [[commentaire]] })
-                    });
+                if (!dateResponse.ok) {
+                    const error = await dateResponse.json();
+                    throw new Error(error.error?.message || 'Erreur mise à jour date');
                 }
-                
-            } else if (actionType === 'cancel') {
-                // Ajouter "Annulé" dans le commentaire
-                let commentaire = action.commentaire || '';
-                if (!commentaire.toLowerCase().includes('annulé')) {
-                    commentaire = (commentaire ? commentaire + ' | ' : '') + 'Annulé';
-                    if (msalAccount && msalAccount.name) {
-                        commentaire += ` par ${msalAccount.name}`;
-                    }
-                }
-                
+            }
+            
+            // Mettre à jour le commentaire (colonne J) si nécessaire
+            if (newComment !== action.commentaire) {
                 const commentUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${dashboardData.excelItemId}/workbook/worksheets/${excelConfig.actionsSheet}/range(address='J${excelRow}')`;
-                await fetch(commentUrl, {
+                const commentResponse = await fetch(commentUrl, {
                     method: 'PATCH',
                     headers: {
                         'Authorization': `Bearer ${accessToken}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ values: [[commentaire]] })
+                    body: JSON.stringify({ values: [[newComment]] })
                 });
+                
+                if (!commentResponse.ok) {
+                    const error = await commentResponse.json();
+                    throw new Error(error.error?.message || 'Erreur mise à jour commentaire');
+                }
             }
         }
     </script>
