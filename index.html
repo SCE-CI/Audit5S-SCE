@@ -3386,6 +3386,175 @@
             outline: 2px solid var(--black);
             outline-offset: 2px;
         }
+        
+        /* ═══════════════════════════════════════════════════════════════
+           DASHBOARD TEST (caché par défaut)
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .dashboard-test-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gray-5);
+            z-index: 300;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .dashboard-test-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .dashboard-test {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+        }
+        
+        .dashboard-test-header {
+            background: var(--sartorius-yellow);
+            margin: calc(-1 * var(--space-lg));
+            margin-bottom: var(--space-lg);
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .dashboard-test-title {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+        }
+        
+        .dashboard-test-subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--gray-80);
+        }
+        
+        .dashboard-test-close {
+            background: rgba(0,0,0,0.1);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .dashboard-test-close svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .dashboard-test-section {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .dashboard-test-section h3 {
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-sm);
+            border-bottom: 2px solid var(--gray-10);
+        }
+        
+        .dashboard-test-btn {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--sartorius-yellow);
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: var(--space-sm);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .dashboard-test-btn:hover {
+            background: var(--sartorius-yellow-hover);
+        }
+        
+        .dashboard-test-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .dashboard-test-btn.secondary {
+            background: var(--gray-10);
+        }
+        
+        .dashboard-test-log {
+            background: var(--gray-90);
+            color: var(--gray-20);
+            font-family: monospace;
+            font-size: var(--font-size-xs);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .dashboard-test-log .log-success { color: var(--traffic-green); }
+        .dashboard-test-log .log-error { color: var(--traffic-red); }
+        .dashboard-test-log .log-info { color: var(--teal); }
+        
+        .dashboard-test-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--font-size-sm);
+            margin-top: var(--space-md);
+        }
+        
+        .dashboard-test-table th {
+            text-align: left;
+            padding: var(--space-sm);
+            background: var(--gray-5);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            color: var(--gray-60);
+        }
+        
+        .dashboard-test-table td {
+            padding: var(--space-sm);
+            border-bottom: 1px solid var(--gray-10);
+        }
+        
+        .dashboard-test-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+        
+        .dashboard-test-stat {
+            text-align: center;
+            padding: var(--space-md);
+            background: var(--gray-5);
+            border-radius: var(--radius-md);
+        }
+        
+        .dashboard-test-stat-value {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+        }
+        
+        .dashboard-test-stat-label {
+            font-size: var(--font-size-xs);
+            color: var(--gray-60);
+        }
     </style>
 </head>
 <body>
@@ -4619,6 +4788,15 @@
                             </svg>
                             Aide / À propos
                         </button>
+                        <!-- Accès caché au dashboard test (dev only) -->
+                        <button type="button" class="menu-item" id="menu-dashboard-test" style="display: none;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="3" y1="9" x2="21" y2="9"></line>
+                                <line x1="9" y1="21" x2="9" y2="9"></line>
+                            </svg>
+                            🧪 Dashboard Test
+                        </button>
                     </div>
                 </div>
             </div>
@@ -4871,14 +5049,25 @@
         // MICROSOFT AUTHENTICATION (MSAL) & SHAREPOINT UPLOAD
         // ═══════════════════════════════════════════════════════════════
         
+        // Détection automatique de l'environnement (prod vs dev local)
+        const isLocalDev = window.location.hostname === 'localhost' || 
+                          window.location.hostname === '127.0.0.1';
+        
+        const getRedirectUri = () => {
+            if (isLocalDev) {
+                // Dev local - utiliser l'URL actuelle (doit être configurée dans Azure AD)
+                return window.location.origin + '/';
+            }
+            return 'https://sce-ci.github.io/Audit5S-SCE/';
+        };
+        
         const msalConfig = {
             auth: {
                 clientId: 'd97a32d2-865c-480b-96c2-1cfdcea3636c',
                 authority: 'https://login.microsoftonline.com/sartorius.com',
-                // Le redirectUri doit correspondre EXACTEMENT à celui configuré dans Azure AD
-                redirectUri: 'https://sce-ci.github.io/Audit5S-SCE/',
+                redirectUri: getRedirectUri(),
                 navigateToLoginRequestUrl: false,
-                postLogoutRedirectUri: 'https://sce-ci.github.io/Audit5S-SCE/'
+                postLogoutRedirectUri: getRedirectUri()
             },
             cache: {
                 cacheLocation: 'localStorage',  // Persiste entre les sessions/onglets
@@ -4890,7 +5079,7 @@
                 iframeHashTimeout: 6000,
                 loadFrameTimeout: 0,
                 loggerOptions: {
-                    logLevel: 3 // Info
+                    logLevel: isLocalDev ? 3 : 0  // Plus de logs en dev
                 }
             }
         };
@@ -7878,7 +8067,507 @@ Cordialement`);
         // Initialiser l'aperçu au chargement
         document.addEventListener('DOMContentLoaded', function() {
             updatePlanningPreview();
+            initDashboardTest();
         });
+    </script>
+    
+    <!-- Dashboard Test (caché) -->
+    <div class="dashboard-test-overlay" id="dashboard-test-overlay">
+        <div class="dashboard-test">
+            <div class="dashboard-test-header">
+                <div>
+                    <h2 class="dashboard-test-title">🧪 Dashboard Test</h2>
+                    <p class="dashboard-test-subtitle">Lecture des données Excel depuis SharePoint</p>
+                </div>
+                <button class="dashboard-test-close" onclick="closeDashboardTest()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Section Connexion -->
+            <div class="dashboard-test-section">
+                <h3>1. Connexion SharePoint</h3>
+                <div id="dashboard-test-connection-status" style="margin-bottom: var(--space-md); color: var(--gray-60);">
+                    Non connecté
+                </div>
+                <button class="dashboard-test-btn" id="dashboard-test-connect">Se connecter</button>
+            </div>
+            
+            <!-- Section Lecture Audits -->
+            <div class="dashboard-test-section">
+                <h3>2. Lecture des Audits</h3>
+                <button class="dashboard-test-btn" id="dashboard-test-read-audits" disabled>Charger les audits</button>
+                <button class="dashboard-test-btn secondary" id="dashboard-test-clear-audits">Effacer</button>
+                
+                <div class="dashboard-test-stats" id="dashboard-test-audits-stats" style="display: none;">
+                    <div class="dashboard-test-stat">
+                        <div class="dashboard-test-stat-value" id="stat-total-audits">-</div>
+                        <div class="dashboard-test-stat-label">Audits total</div>
+                    </div>
+                    <div class="dashboard-test-stat">
+                        <div class="dashboard-test-stat-value" id="stat-audits-2026">-</div>
+                        <div class="dashboard-test-stat-label">En 2026</div>
+                    </div>
+                    <div class="dashboard-test-stat">
+                        <div class="dashboard-test-stat-value" id="stat-avg-score">-</div>
+                        <div class="dashboard-test-stat-label">Score moyen</div>
+                    </div>
+                </div>
+                
+                <div id="dashboard-test-audits-table"></div>
+            </div>
+            
+            <!-- Section Lecture Actions -->
+            <div class="dashboard-test-section">
+                <h3>3. Lecture des Actions</h3>
+                <button class="dashboard-test-btn" id="dashboard-test-read-actions" disabled>Charger les actions</button>
+                <button class="dashboard-test-btn secondary" id="dashboard-test-clear-actions">Effacer</button>
+                
+                <div class="dashboard-test-stats" id="dashboard-test-actions-stats" style="display: none;">
+                    <div class="dashboard-test-stat">
+                        <div class="dashboard-test-stat-value" id="stat-total-actions">-</div>
+                        <div class="dashboard-test-stat-label">Actions total</div>
+                    </div>
+                    <div class="dashboard-test-stat">
+                        <div class="dashboard-test-stat-value" id="stat-open-actions">-</div>
+                        <div class="dashboard-test-stat-label">Ouvertes</div>
+                    </div>
+                    <div class="dashboard-test-stat">
+                        <div class="dashboard-test-stat-value" id="stat-overdue-actions">-</div>
+                        <div class="dashboard-test-stat-label">> 30 jours</div>
+                    </div>
+                </div>
+                
+                <div id="dashboard-test-actions-table"></div>
+            </div>
+            
+            <!-- Section Log -->
+            <div class="dashboard-test-section">
+                <h3>Console</h3>
+                <div class="dashboard-test-log" id="dashboard-test-log">En attente...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // DASHBOARD TEST - Lecture Excel SharePoint
+        // ═══════════════════════════════════════════════════════════════
+        
+        // Configuration Excel
+        const excelConfig = {
+            fileName: 'Audit 5S.xlsx',
+            auditsSheet: '5S_Audit',
+            auditsTable: 'Tableau24',
+            actionsSheet: '5S_Actions',
+            actionsTable: 'Tableau1'
+        };
+        
+        // Variables pour stocker les données
+        let dashboardData = {
+            audits: [],
+            actions: [],
+            excelItemId: null
+        };
+        
+        // Log dans la console du dashboard
+        function dashLog(message, type = 'info') {
+            const logEl = document.getElementById('dashboard-test-log');
+            const timestamp = new Date().toLocaleTimeString('fr-FR');
+            const typeClass = type === 'success' ? 'log-success' : type === 'error' ? 'log-error' : 'log-info';
+            logEl.innerHTML += `<span class="${typeClass}">[${timestamp}] ${message}</span>\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        
+        // Activer/désactiver le menu caché avec "dev" dans l'URL
+        function initDashboardTest() {
+            // Afficher le bouton si ?dev dans l'URL ou en local
+            if (window.location.search.includes('dev') || isLocalDev) {
+                document.getElementById('menu-dashboard-test').style.display = '';
+            }
+            
+            // Event listeners
+            document.getElementById('menu-dashboard-test').addEventListener('click', function() {
+                closeMenu();
+                openDashboardTest();
+            });
+            
+            document.getElementById('dashboard-test-connect').addEventListener('click', dashboardTestConnect);
+            document.getElementById('dashboard-test-read-audits').addEventListener('click', dashboardTestReadAudits);
+            document.getElementById('dashboard-test-read-actions').addEventListener('click', dashboardTestReadActions);
+            document.getElementById('dashboard-test-clear-audits').addEventListener('click', () => {
+                document.getElementById('dashboard-test-audits-table').innerHTML = '';
+                document.getElementById('dashboard-test-audits-stats').style.display = 'none';
+            });
+            document.getElementById('dashboard-test-clear-actions').addEventListener('click', () => {
+                document.getElementById('dashboard-test-actions-table').innerHTML = '';
+                document.getElementById('dashboard-test-actions-stats').style.display = 'none';
+            });
+        }
+        
+        function openDashboardTest() {
+            document.getElementById('dashboard-test-overlay').classList.add('visible');
+            document.body.style.overflow = 'hidden';
+            updateDashboardConnectionStatus();
+        }
+        
+        function closeDashboardTest() {
+            document.getElementById('dashboard-test-overlay').classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+        
+        function updateDashboardConnectionStatus() {
+            const statusEl = document.getElementById('dashboard-test-connection-status');
+            const connectBtn = document.getElementById('dashboard-test-connect');
+            const readAuditsBtn = document.getElementById('dashboard-test-read-audits');
+            const readActionsBtn = document.getElementById('dashboard-test-read-actions');
+            
+            if (msalConnected && msalAccount) {
+                statusEl.innerHTML = `✅ Connecté en tant que <strong>${msalAccount.username}</strong>`;
+                statusEl.style.color = 'var(--traffic-green)';
+                connectBtn.textContent = 'Reconnecter';
+                readAuditsBtn.disabled = false;
+                readActionsBtn.disabled = false;
+            } else {
+                statusEl.innerHTML = '❌ Non connecté';
+                statusEl.style.color = 'var(--traffic-red)';
+                connectBtn.textContent = 'Se connecter';
+                readAuditsBtn.disabled = true;
+                readActionsBtn.disabled = true;
+            }
+        }
+        
+        async function dashboardTestConnect() {
+            dashLog('Tentative de connexion...');
+            try {
+                const token = await getAccessToken();
+                if (token) {
+                    dashLog('Connexion réussie!', 'success');
+                    updateDashboardConnectionStatus();
+                }
+            } catch (error) {
+                dashLog('Erreur connexion: ' + error.message, 'error');
+            }
+        }
+        
+        // Récupérer l'ID du fichier Excel
+        async function getExcelFileId() {
+            if (dashboardData.excelItemId) {
+                return dashboardData.excelItemId;
+            }
+            
+            const accessToken = await getAccessToken();
+            
+            // D'abord récupérer le siteId et driveId (comme pour l'upload)
+            const siteResolveUrl = `https://graph.microsoft.com/v1.0/sites/${sharepointConfig.siteUrl}:${sharepointConfig.sitePath}`;
+            const siteResponse = await fetch(siteResolveUrl, {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
+            const siteData = await siteResponse.json();
+            const siteId = siteData.id;
+            
+            // Récupérer le driveId de la bibliothèque 5S
+            const drivesUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives`;
+            const drivesResponse = await fetch(drivesUrl, {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
+            const drivesData = await drivesResponse.json();
+            const targetDrive = drivesData.value.find(d => d.name === sharepointConfig.libraryName);
+            
+            if (!targetDrive) {
+                throw new Error('Bibliothèque 5S non trouvée');
+            }
+            
+            dashLog(`Drive trouvé: ${targetDrive.name} (${targetDrive.id.substring(0, 20)}...)`);
+            
+            // Chercher le fichier Excel
+            const searchUrl = `https://graph.microsoft.com/v1.0/drives/${targetDrive.id}/root:/${excelConfig.fileName}`;
+            dashLog(`Recherche du fichier: ${excelConfig.fileName}`);
+            
+            const fileResponse = await fetch(searchUrl, {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
+            
+            if (!fileResponse.ok) {
+                throw new Error(`Fichier ${excelConfig.fileName} non trouvé`);
+            }
+            
+            const fileData = await fileResponse.json();
+            dashboardData.excelItemId = fileData.id;
+            dashboardData.driveId = targetDrive.id;
+            
+            dashLog(`Fichier trouvé! ID: ${fileData.id.substring(0, 20)}...`, 'success');
+            
+            return fileData.id;
+        }
+        
+        // Lire les audits depuis Excel
+        async function dashboardTestReadAudits() {
+            dashLog('Chargement des audits...');
+            
+            try {
+                const accessToken = await getAccessToken();
+                await getExcelFileId();
+                
+                // Lire les données du tableau des audits
+                const tableUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${dashboardData.excelItemId}/workbook/tables/${excelConfig.auditsTable}/rows`;
+                
+                dashLog(`Lecture de ${excelConfig.auditsTable}...`);
+                
+                const response = await fetch(tableUrl, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error?.message || 'Erreur lecture tableau');
+                }
+                
+                const data = await response.json();
+                dashLog(`${data.value.length} lignes récupérées`, 'success');
+                
+                // Parser les données
+                // Colonnes: Année; Semaine; Audit ID; Date d'audit; Auditeur principal; Zone; Niveau d'audit; ... Score moyen; Performance 5S; ...
+                dashboardData.audits = data.value.map(row => {
+                    const values = row.values[0];
+                    return {
+                        annee: values[0],
+                        semaine: values[1],
+                        auditId: values[2],
+                        date: values[3],
+                        auditeur: values[4],
+                        zone: values[5],
+                        niveau: values[6],
+                        scoreMoyen: values[21], // Score moyen
+                        performance: values[22] // Performance 5S (%)
+                    };
+                });
+                
+                // Afficher les stats
+                const audits2026 = dashboardData.audits.filter(a => a.annee === 2026 || a.annee === '2026');
+                const avgScore = dashboardData.audits.length > 0 
+                    ? Math.round(dashboardData.audits.reduce((sum, a) => sum + (parseFloat(a.performance) || 0), 0) / dashboardData.audits.length)
+                    : 0;
+                
+                document.getElementById('stat-total-audits').textContent = dashboardData.audits.length;
+                document.getElementById('stat-audits-2026').textContent = audits2026.length;
+                document.getElementById('stat-avg-score').textContent = avgScore + '%';
+                document.getElementById('dashboard-test-audits-stats').style.display = 'grid';
+                
+                // Afficher le tableau (10 derniers)
+                const recent = dashboardData.audits.slice(-10).reverse();
+                let tableHtml = `
+                    <table class="dashboard-test-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Zone</th>
+                                <th>Niveau</th>
+                                <th>Score</th>
+                                <th>Auditeur</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                recent.forEach(audit => {
+                    const scoreNum = parseFloat(audit.performance) || 0;
+                    const scoreClass = scoreNum >= 85 ? 'color: var(--traffic-green)' : 
+                                      scoreNum >= 70 ? '' : 
+                                      scoreNum >= 50 ? 'color: var(--traffic-orange)' : 'color: var(--traffic-red)';
+                    tableHtml += `
+                        <tr>
+                            <td>${audit.date || '-'}</td>
+                            <td>${audit.zone || '-'}</td>
+                            <td>${audit.niveau || '-'}</td>
+                            <td style="${scoreClass}; font-weight: 600;">${audit.performance ? audit.performance + '%' : '-'}</td>
+                            <td>${audit.auditeur || '-'}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHtml += '</tbody></table>';
+                document.getElementById('dashboard-test-audits-table').innerHTML = tableHtml;
+                
+                dashLog('Audits chargés avec succès!', 'success');
+                
+            } catch (error) {
+                dashLog('Erreur: ' + error.message, 'error');
+                console.error('Dashboard test error:', error);
+            }
+        }
+        
+        // Lire les actions depuis Excel
+        async function dashboardTestReadActions() {
+            dashLog('Chargement des actions...');
+            
+            try {
+                const accessToken = await getAccessToken();
+                await getExcelFileId();
+                
+                // Lire les données du tableau des actions
+                const tableUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${dashboardData.excelItemId}/workbook/tables/${excelConfig.actionsTable}/rows`;
+                
+                dashLog(`Lecture de ${excelConfig.actionsTable}...`);
+                
+                const response = await fetch(tableUrl, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error?.message || 'Erreur lecture tableau');
+                }
+                
+                const data = await response.json();
+                dashLog(`${data.value.length} lignes récupérées`, 'success');
+                
+                // Parser les données
+                // Colonnes: Année; Semaine; ActionID; Date d'ouverture; Niveau d'audit; Zone; Type; Action; Resp d'action; Commentaire; Date clôture
+                dashboardData.actions = data.value.map(row => {
+                    const values = row.values[0];
+                    return {
+                        annee: values[0],
+                        semaine: values[1],
+                        actionId: values[2],
+                        dateOuverture: values[3],
+                        niveau: values[4],
+                        zone: values[5],
+                        type: values[6],
+                        action: values[7],
+                        responsable: values[8],
+                        commentaire: values[9],
+                        dateCloture: values[10]
+                    };
+                });
+                
+                // Calculer les stats
+                const now = new Date();
+                let openCount = 0;
+                let overdueCount = 0;
+                
+                dashboardData.actions.forEach(action => {
+                    const isClosed = action.dateCloture && action.dateCloture !== '';
+                    const isCancelled = action.commentaire?.toLowerCase().includes('annulé');
+                    
+                    if (!isClosed && !isCancelled) {
+                        openCount++;
+                        // Vérifier si > 30 jours
+                        if (action.dateOuverture) {
+                            const openDate = parseExcelDate(action.dateOuverture);
+                            if (openDate) {
+                                const daysDiff = Math.floor((now - openDate) / (1000 * 60 * 60 * 24));
+                                if (daysDiff > 30) {
+                                    overdueCount++;
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                document.getElementById('stat-total-actions').textContent = dashboardData.actions.length;
+                document.getElementById('stat-open-actions').textContent = openCount;
+                document.getElementById('stat-overdue-actions').textContent = overdueCount;
+                document.getElementById('dashboard-test-actions-stats').style.display = 'grid';
+                
+                // Afficher le tableau (actions ouvertes en premier)
+                const sortedActions = [...dashboardData.actions].sort((a, b) => {
+                    const aOpen = !a.dateCloture && !a.commentaire?.toLowerCase().includes('annulé');
+                    const bOpen = !b.dateCloture && !b.commentaire?.toLowerCase().includes('annulé');
+                    if (aOpen && !bOpen) return -1;
+                    if (!aOpen && bOpen) return 1;
+                    return 0;
+                }).slice(0, 15);
+                
+                let tableHtml = `
+                    <table class="dashboard-test-table">
+                        <thead>
+                            <tr>
+                                <th>Statut</th>
+                                <th>Zone</th>
+                                <th>Action</th>
+                                <th>Responsable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                sortedActions.forEach(action => {
+                    const isClosed = action.dateCloture && action.dateCloture !== '';
+                    const isCancelled = action.commentaire?.toLowerCase().includes('annulé');
+                    
+                    let statusHtml, statusColor;
+                    if (isClosed) {
+                        statusHtml = '✅';
+                        statusColor = 'var(--traffic-green)';
+                    } else if (isCancelled) {
+                        statusHtml = '⚪';
+                        statusColor = 'var(--gray-50)';
+                    } else {
+                        // Vérifier ancienneté
+                        let isOverdue = false;
+                        if (action.dateOuverture) {
+                            const openDate = parseExcelDate(action.dateOuverture);
+                            if (openDate) {
+                                const daysDiff = Math.floor((now - openDate) / (1000 * 60 * 60 * 24));
+                                isOverdue = daysDiff > 30;
+                            }
+                        }
+                        statusHtml = isOverdue ? '🔴' : '🟠';
+                        statusColor = isOverdue ? 'var(--traffic-red)' : 'var(--traffic-orange)';
+                    }
+                    
+                    const actionText = action.action?.length > 50 ? action.action.substring(0, 50) + '...' : action.action;
+                    
+                    tableHtml += `
+                        <tr>
+                            <td style="text-align: center;">${statusHtml}</td>
+                            <td>${action.zone || '-'}</td>
+                            <td>${actionText || '-'}</td>
+                            <td>${action.responsable || '-'}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHtml += '</tbody></table>';
+                document.getElementById('dashboard-test-actions-table').innerHTML = tableHtml;
+                
+                dashLog('Actions chargées avec succès!', 'success');
+                
+            } catch (error) {
+                dashLog('Erreur: ' + error.message, 'error');
+                console.error('Dashboard test error:', error);
+            }
+        }
+        
+        // Parser une date Excel (peut être un nombre ou une chaîne)
+        function parseExcelDate(value) {
+            if (!value) return null;
+            
+            // Si c'est un nombre Excel (jours depuis 1900)
+            if (typeof value === 'number') {
+                const excelEpoch = new Date(1899, 11, 30);
+                return new Date(excelEpoch.getTime() + value * 24 * 60 * 60 * 1000);
+            }
+            
+            // Si c'est une chaîne de date
+            if (typeof value === 'string') {
+                // Essayer différents formats
+                const parsed = new Date(value);
+                if (!isNaN(parsed)) return parsed;
+                
+                // Format DD/MM/YYYY
+                const parts = value.split('/');
+                if (parts.length === 3) {
+                    return new Date(parts[2], parts[1] - 1, parts[0]);
+                }
+            }
+            
+            return null;
+        }
     </script>
 </body>
 </html>
