@@ -3779,6 +3779,64 @@
             text-transform: uppercase;
         }
         
+        /* Toolbar (rafraîchir + date modif) */
+        .dashboard-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-10);
+            font-size: var(--font-size-xs);
+            color: var(--gray-50);
+        }
+        
+        .dashboard-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .dashboard-refresh-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-xs) var(--space-sm);
+            background: var(--gray-10);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: var(--font-size-xs);
+            color: var(--gray-70);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .dashboard-refresh-btn:hover {
+            background: var(--gray-20);
+            color: var(--black);
+        }
+        
+        .dashboard-refresh-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .dashboard-refresh-btn.loading svg {
+            animation: dashboardSpin 0.8s linear infinite;
+        }
+        
+        .dashboard-last-modified {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+        
+        .dashboard-last-modified svg {
+            width: 12px;
+            height: 12px;
+        }
+        
         /* Actions - format tableau */
         .dashboard-actions-table {
             width: 100%;
@@ -8567,6 +8625,27 @@ Cordialement`);
                 </div>
             </nav>
             
+            <!-- Toolbar (visible quand données chargées) -->
+            <div class="dashboard-toolbar" id="dashboard-toolbar" style="display: none;">
+                <div class="dashboard-toolbar-left">
+                    <button class="dashboard-refresh-btn" id="dashboard-refresh-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <polyline points="1 20 1 14 7 14"></polyline>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                        Actualiser
+                    </button>
+                </div>
+                <div class="dashboard-last-modified" id="dashboard-last-modified">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span id="dashboard-last-modified-text">-</span>
+                </div>
+            </div>
+            
             <!-- Loading state -->
             <div class="dashboard-loading" id="dashboard-loading">
                 <div class="dashboard-loading-spinner"></div>
@@ -8758,6 +8837,11 @@ Cordialement`);
                     this.innerHTML = 'Se connecter avec Microsoft';
                 }
             });
+            
+            // Event listener pour le bouton rafraîchir
+            document.getElementById('dashboard-refresh-btn').addEventListener('click', function() {
+                refreshDashboardData();
+            });
         }
         
         function openDashboard() {
@@ -8791,12 +8875,14 @@ Cordialement`);
             const errorEl = document.getElementById('dashboard-error');
             const contentEl = document.getElementById('dashboard-content');
             const headerEl = document.getElementById('dashboard-header');
+            const toolbarEl = document.getElementById('dashboard-toolbar');
             
             // Reset des états
             loadingEl.style.display = 'none';
             connectEl.style.display = 'none';
             errorEl.style.display = 'none';
             contentEl.style.display = 'none';
+            toolbarEl.style.display = 'none';
             
             // Vérifier si MSAL est initialisé et si on a un compte
             if (!msalInstance) {
@@ -8845,6 +8931,12 @@ Cordialement`);
                 // Afficher le contenu
                 loadingEl.style.display = 'none';
                 contentEl.style.display = 'block';
+                
+                // Afficher la toolbar
+                document.getElementById('dashboard-toolbar').style.display = 'flex';
+                
+                // Afficher la date de dernière modification
+                updateLastModifiedDisplay();
                 
                 // Afficher l'indicateur de connexion avec initiales
                 const userBadge = document.getElementById('dashboard-user-badge');
@@ -8921,8 +9013,79 @@ Cordialement`);
             const fileData = await fileResponse.json();
             dashboardData.excelItemId = fileData.id;
             dashboardData.driveId = targetDrive.id;
+            dashboardData.lastModified = fileData.lastModifiedDateTime;
             
             return fileData.id;
+        }
+        
+        // Rafraîchir les données (force le rechargement)
+        async function refreshDashboardData() {
+            const refreshBtn = document.getElementById('dashboard-refresh-btn');
+            refreshBtn.classList.add('loading');
+            refreshBtn.disabled = true;
+            
+            // Réinitialiser les IDs pour forcer la relecture
+            dashboardData.excelItemId = null;
+            dashboardData.driveId = null;
+            
+            try {
+                await getExcelFileId();
+                await Promise.all([
+                    loadAuditsData(),
+                    loadActionsData()
+                ]);
+                
+                // Mettre à jour la date de modification
+                updateLastModifiedDisplay();
+                
+                // Re-render
+                renderOverview();
+                renderZonesGrid();
+                renderUrgentActions();
+                
+                // Garder le filtre actuel pour les actions
+                const activeFilter = document.querySelector('.dashboard-filter-btn.active');
+                renderActionsList(activeFilter ? activeFilter.dataset.filter : 'all');
+                
+                // Garder la recherche actuelle pour l'historique
+                const searchInput = document.getElementById('dashboard-search-input');
+                renderAuditsTable(searchInput ? searchInput.value : '');
+                
+            } catch (error) {
+                console.error('Refresh error:', error);
+            } finally {
+                refreshBtn.classList.remove('loading');
+                refreshBtn.disabled = false;
+            }
+        }
+        
+        // Mettre à jour l'affichage de la date de dernière modification
+        function updateLastModifiedDisplay() {
+            const textEl = document.getElementById('dashboard-last-modified-text');
+            if (dashboardData.lastModified) {
+                const date = new Date(dashboardData.lastModified);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMs / 3600000);
+                const diffDays = Math.floor(diffMs / 86400000);
+                
+                let timeAgo;
+                if (diffMins < 1) {
+                    timeAgo = "à l'instant";
+                } else if (diffMins < 60) {
+                    timeAgo = `il y a ${diffMins} min`;
+                } else if (diffHours < 24) {
+                    timeAgo = `il y a ${diffHours}h`;
+                } else {
+                    timeAgo = `il y a ${diffDays}j`;
+                }
+                
+                textEl.textContent = `Modifié ${timeAgo}`;
+                textEl.title = date.toLocaleString('fr-FR');
+            } else {
+                textEl.textContent = '-';
+            }
         }
         
         // Charger les audits
@@ -8942,8 +9105,14 @@ Cordialement`);
             const data = await response.json();
             
             // Parser les données
-            dashboardData.audits = data.value.map(row => {
+            dashboardData.audits = data.value.map((row, idx) => {
                 const values = row.values[0];
+                // Debug: afficher les dernières colonnes pour le premier audit
+                if (idx === data.value.length - 1) {
+                    console.log('Dernier audit - colonnes 19-25:', values.slice(19, 26));
+                    console.log('Colonne 21 (scoreMoyen):', values[21]);
+                    console.log('Colonne 22 (performance):', values[22]);
+                }
                 return {
                     annee: values[0],
                     semaine: values[1],
@@ -9013,9 +9182,36 @@ Cordialement`);
             return 'open';
         }
         
-        // Calculer la classe de score
+        // Parser un score/pourcentage Excel
+        // Excel renvoie les pourcentages formatés comme décimaux : 30% = 0.30
+        // Mais le score moyen peut être 1.2 (sur 3) qui ne doit pas être multiplié
+        // On utilise la colonne Performance qui est TOUJOURS un pourcentage (0-1)
+        function parseScorePercent(value) {
+            if (value === null || value === undefined || value === '') return 0;
+            
+            // Si c'est une chaîne avec %
+            if (typeof value === 'string') {
+                const cleaned = value.replace('%', '').replace(',', '.').trim();
+                const num = parseFloat(cleaned);
+                if (isNaN(num)) return 0;
+                // Si c'était "30%" on a 30, on le garde tel quel
+                // Si c'était "0.30" on multiplie par 100
+                return num <= 1 && num > 0 ? num * 100 : num;
+            }
+            
+            // Si c'est un nombre
+            if (typeof value === 'number') {
+                // Excel stocke les pourcentages comme décimaux (0.30 = 30%)
+                // Tout nombre <= 1 est considéré comme un décimal
+                return value <= 1 && value >= 0 ? value * 100 : value;
+            }
+            
+            return 0;
+        }
+        
+        // Calculer la classe de score (attend une valeur 0-100)
         function getScoreClass(score) {
-            const num = parseFloat(score) || 0;
+            const num = typeof score === 'number' ? score : parseScorePercent(score);
             if (num >= 85) return 'excellent';
             if (num >= 70) return 'good';
             if (num >= 50) return 'warning';
@@ -9036,7 +9232,7 @@ Cordialement`);
             
             // Score moyen (tous les audits)
             const avgScore = dashboardData.audits.length > 0
-                ? Math.round(dashboardData.audits.reduce((sum, a) => sum + (parseFloat(a.performance) || 0), 0) / dashboardData.audits.length)
+                ? Math.round(dashboardData.audits.reduce((sum, a) => sum + parseScorePercent(a.performance), 0) / dashboardData.audits.length)
                 : 0;
             
             // Actions ouvertes et en retard
@@ -9085,7 +9281,7 @@ Cordialement`);
                     `;
                 }
                 
-                const score = parseFloat(lastAudit.performance) || 0;
+                const score = parseScorePercent(lastAudit.performance);
                 const scoreClass = getScoreClass(score);
                 const dateFormatted = formatExcelDate(lastAudit.date);
                 
@@ -9249,7 +9445,7 @@ Cordialement`);
             
             tbody.innerHTML = filteredAudits.slice(0, 50).map(audit => {
                 const dateFormatted = formatExcelDate(audit.date);
-                const score = parseFloat(audit.performance) || 0;
+                const score = parseScorePercent(audit.performance);
                 const scoreClass = getScoreClass(score);
                 const niveauClass = audit.niveau === 'N2' ? 'n2' : 'n1';
                 
