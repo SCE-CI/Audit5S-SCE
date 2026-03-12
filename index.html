@@ -8466,12 +8466,13 @@ Cordialement`);
                     const scoreClass = scoreNum >= 85 ? 'color: var(--traffic-green)' : 
                                       scoreNum >= 70 ? '' : 
                                       scoreNum >= 50 ? 'color: var(--traffic-orange)' : 'color: var(--traffic-red)';
+                    const dateFormatted = formatExcelDate(audit.date);
                     tableHtml += `
                         <tr>
-                            <td>${audit.date || '-'}</td>
+                            <td>${dateFormatted}</td>
                             <td>${audit.zone || '-'}</td>
                             <td>${audit.niveau || '-'}</td>
-                            <td style="${scoreClass}; font-weight: 600;">${audit.performance ? audit.performance + '%' : '-'}</td>
+                            <td style="${scoreClass}; font-weight: 600;">${audit.performance ? Math.round(audit.performance) + '%' : '-'}</td>
                             <td>${audit.auditeur || '-'}</td>
                         </tr>
                     `;
@@ -8655,6 +8656,18 @@ Cordialement`);
             }
             
             return null;
+        }
+        
+        // Formater une date Excel pour l'affichage (DD/MM/YYYY)
+        function formatExcelDate(value) {
+            const date = parseExcelDate(value);
+            if (!date) return '-';
+            
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            
+            return `${day}/${month}/${year}`;
         }
     </script>
 </body>
