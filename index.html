@@ -8094,6 +8094,9 @@ Cordialement`);
                     Non connecté
                 </div>
                 <button class="dashboard-test-btn" id="dashboard-test-connect">Se connecter</button>
+                <button class="dashboard-test-btn secondary" id="dashboard-test-list-files">Lister les fichiers</button>
+                
+                <div id="dashboard-test-files-list" style="margin-top: var(--space-md);"></div>
             </div>
             
             <!-- Section Lecture Audits -->
@@ -8159,6 +8162,7 @@ Cordialement`);
         
         // Configuration Excel
         const excelConfig = {
+            folderPath: 'Audits 5S',          // Même dossier que les JSON
             fileName: 'Audit 5S.xlsx',
             auditsSheet: '5S_Audit',
             auditsTable: 'Tableau24',
@@ -8196,6 +8200,7 @@ Cordialement`);
             });
             
             document.getElementById('dashboard-test-connect').addEventListener('click', dashboardTestConnect);
+            document.getElementById('dashboard-test-list-files').addEventListener('click', dashboardTestListFiles);
             document.getElementById('dashboard-test-read-audits').addEventListener('click', dashboardTestReadAudits);
             document.getElementById('dashboard-test-read-actions').addEventListener('click', dashboardTestReadActions);
             document.getElementById('dashboard-test-clear-audits').addEventListener('click', () => {
@@ -8253,6 +8258,88 @@ Cordialement`);
             }
         }
         
+        // Lister les fichiers de la bibliothèque 5S
+        async function dashboardTestListFiles() {
+            dashLog('Listing des fichiers...');
+            
+            try {
+                const accessToken = await getAccessToken();
+                
+                // Récupérer le siteId
+                const siteResolveUrl = `https://graph.microsoft.com/v1.0/sites/${sharepointConfig.siteUrl}:${sharepointConfig.sitePath}`;
+                const siteResponse = await fetch(siteResolveUrl, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                const siteData = await siteResponse.json();
+                const siteId = siteData.id;
+                
+                // Récupérer le driveId de la bibliothèque 5S
+                const drivesUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives`;
+                const drivesResponse = await fetch(drivesUrl, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                const drivesData = await drivesResponse.json();
+                const targetDrive = drivesData.value.find(d => d.name === sharepointConfig.libraryName);
+                
+                if (!targetDrive) {
+                    throw new Error('Bibliothèque 5S non trouvée');
+                }
+                
+                // Lister tous les fichiers (récursif)
+                const listUrl = `https://graph.microsoft.com/v1.0/drives/${targetDrive.id}/root/children`;
+                const listResponse = await fetch(listUrl, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                const listData = await listResponse.json();
+                
+                dashLog(`${listData.value.length} éléments trouvés à la racine`, 'success');
+                
+                let html = '<div style="font-size: var(--font-size-sm); margin-top: var(--space-sm);">';
+                html += '<strong>Contenu de la bibliothèque 5S :</strong><br>';
+                
+                for (const item of listData.value) {
+                    const isFolder = item.folder !== undefined;
+                    const icon = isFolder ? '📁' : '📄';
+                    html += `${icon} ${item.name}`;
+                    
+                    if (isFolder) {
+                        // Lister le contenu du dossier
+                        const subUrl = `https://graph.microsoft.com/v1.0/drives/${targetDrive.id}/items/${item.id}/children`;
+                        const subResponse = await fetch(subUrl, {
+                            headers: { 'Authorization': `Bearer ${accessToken}` }
+                        });
+                        const subData = await subResponse.json();
+                        
+                        if (subData.value && subData.value.length > 0) {
+                            html += '<div style="margin-left: 20px; color: var(--gray-60);">';
+                            for (const subItem of subData.value) {
+                                const subIcon = subItem.folder ? '📁' : '📄';
+                                const isExcel = subItem.name.endsWith('.xlsx');
+                                const style = isExcel ? 'color: var(--traffic-green); font-weight: 600;' : '';
+                                html += `<div style="${style}">${subIcon} ${subItem.name}</div>`;
+                                
+                                if (isExcel) {
+                                    dashLog(`Excel trouvé: ${item.name}/${subItem.name}`, 'success');
+                                }
+                            }
+                            html += '</div>';
+                        }
+                    } else if (item.name.endsWith('.xlsx')) {
+                        html = html.replace(item.name, `<span style="color: var(--traffic-green); font-weight: 600;">${item.name}</span>`);
+                        dashLog(`Excel trouvé: ${item.name} (racine)`, 'success');
+                    }
+                    
+                    html += '<br>';
+                }
+                
+                html += '</div>';
+                document.getElementById('dashboard-test-files-list').innerHTML = html;
+                
+            } catch (error) {
+                dashLog('Erreur listing: ' + error.message, 'error');
+            }
+        }
+        
         // Récupérer l'ID du fichier Excel
         async function getExcelFileId() {
             if (dashboardData.excelItemId) {
@@ -8283,16 +8370,17 @@ Cordialement`);
             
             dashLog(`Drive trouvé: ${targetDrive.name} (${targetDrive.id.substring(0, 20)}...)`);
             
-            // Chercher le fichier Excel
-            const searchUrl = `https://graph.microsoft.com/v1.0/drives/${targetDrive.id}/root:/${excelConfig.fileName}`;
-            dashLog(`Recherche du fichier: ${excelConfig.fileName}`);
+            // Chercher le fichier Excel dans le dossier Audits 5S
+            const filePath = `${excelConfig.folderPath}/${excelConfig.fileName}`;
+            const searchUrl = `https://graph.microsoft.com/v1.0/drives/${targetDrive.id}/root:/${encodeURI(filePath)}`;
+            dashLog(`Recherche du fichier: ${filePath}`);
             
             const fileResponse = await fetch(searchUrl, {
                 headers: { 'Authorization': `Bearer ${accessToken}` }
             });
             
             if (!fileResponse.ok) {
-                throw new Error(`Fichier ${excelConfig.fileName} non trouvé`);
+                throw new Error(`Fichier ${filePath} non trouvé`);
             }
             
             const fileData = await fileResponse.json();
