@@ -2499,6 +2499,18 @@
             50% { transform: translateY(-2px) scale(1.3); }
         }
         
+        .menu-badge-beta {
+            margin-left: auto;
+            padding: 2px 8px;
+            background: var(--teal);
+            color: var(--white);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
         .menu-overlay {
             display: none;
             position: fixed;
@@ -3388,10 +3400,10 @@
         }
         
         /* ═══════════════════════════════════════════════════════════════
-           DASHBOARD TEST (caché par défaut)
+           DASHBOARD
         ═══════════════════════════════════════════════════════════════ */
         
-        .dashboard-test-overlay {
+        .dashboard-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -3405,38 +3417,76 @@
             overflow-y: auto;
         }
         
-        .dashboard-test-overlay.visible {
+        .dashboard-overlay.visible {
             opacity: 1;
             visibility: visible;
         }
         
-        .dashboard-test {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: var(--space-lg);
+        .dashboard {
+            min-height: 100vh;
         }
         
-        .dashboard-test-header {
+        /* Header du dashboard - identique à l'app principale */
+        .dashboard-header {
             background: var(--sartorius-yellow);
-            margin: calc(-1 * var(--space-lg));
-            margin-bottom: var(--space-lg);
-            padding: var(--space-lg);
+            color: var(--black);
+            padding: var(--space-sm) var(--space-md);
+            padding-left: var(--space-sm);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         
-        .dashboard-test-title {
-            font-size: var(--font-size-xl);
+        .dashboard-header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        
+        .dashboard-header .header-logo {
+            height: 62px;
+            width: auto;
+        }
+        
+        .dashboard-header-title {
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+            opacity: 0;
+            max-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: opacity 0.4s ease, max-width 0.4s ease;
+        }
+        
+        .dashboard-header.loaded .dashboard-header-title {
+            opacity: 1;
+            max-width: 200px;
+        }
+        
+        .dashboard-header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        
+        .dashboard-header-info {
+            text-align: left;
+        }
+        
+        .dashboard-header-info .title {
+            font-size: var(--font-size-base);
             font-weight: 700;
         }
         
-        .dashboard-test-subtitle {
+        .dashboard-header-info .date {
             font-size: var(--font-size-sm);
-            color: var(--gray-80);
+            color: var(--gray-70);
         }
         
-        .dashboard-test-close {
+        .dashboard-close {
             background: rgba(0,0,0,0.1);
             border: none;
             width: 40px;
@@ -3446,14 +3496,195 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background 0.15s;
+            flex-shrink: 0;
         }
         
-        .dashboard-test-close svg {
+        .dashboard-close:hover {
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .dashboard-close svg {
             width: 24px;
             height: 24px;
         }
         
-        .dashboard-test-section {
+        /* Content wrapper pour max-width */
+        .dashboard-content-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        /* Navigation tabs */
+        .dashboard-nav {
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-20);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .dashboard-nav-inner {
+            display: flex;
+            padding: 0 var(--space-md);
+        }
+        
+        .dashboard-nav-tab {
+            padding: var(--space-md) var(--space-lg);
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-family: inherit;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--gray-60);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+        
+        .dashboard-nav-tab:hover {
+            color: var(--black);
+        }
+        
+        .dashboard-nav-tab.active {
+            color: var(--black);
+            font-weight: 600;
+            border-bottom-color: var(--sartorius-yellow);
+        }
+        
+        /* Loading state */
+        .dashboard-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-xl);
+            color: var(--gray-60);
+            min-height: 300px;
+        }
+        
+        .dashboard-loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--gray-20);
+            border-top-color: var(--sartorius-yellow);
+            border-radius: 50%;
+            animation: dashboardSpin 0.8s linear infinite;
+            margin-bottom: var(--space-md);
+        }
+        
+        @keyframes dashboardSpin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* État non connecté */
+        .dashboard-connect {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-xl);
+            min-height: 300px;
+            text-align: center;
+        }
+        
+        .dashboard-connect-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: var(--space-lg);
+            color: var(--gray-40);
+        }
+        
+        .dashboard-connect-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .dashboard-connect-text {
+            color: var(--gray-60);
+            margin-bottom: var(--space-lg);
+            max-width: 300px;
+        }
+        
+        /* Error state */
+        .dashboard-error {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-xl);
+            color: var(--gray-60);
+            min-height: 300px;
+            text-align: center;
+        }
+        
+        .dashboard-error-icon {
+            width: 48px;
+            height: 48px;
+            color: var(--traffic-red);
+            margin-bottom: var(--space-md);
+        }
+        
+        .dashboard-error p {
+            margin-bottom: var(--space-md);
+        }
+        
+        /* Content */
+        .dashboard-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+        }
+        
+        .dashboard-tab {
+            display: none;
+        }
+        
+        .dashboard-tab.active {
+            display: block;
+        }
+        
+        /* Stats grid */
+        .dashboard-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        @media (max-width: 600px) {
+            .dashboard-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .dashboard-stat-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md);
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .dashboard-stat-value {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .dashboard-stat-value.green { color: var(--traffic-green); }
+        .dashboard-stat-value.orange { color: var(--traffic-orange); }
+        .dashboard-stat-value.red { color: var(--traffic-red); }
+        
+        .dashboard-stat-label {
+            font-size: var(--font-size-xs);
+            color: var(--gray-60);
+            margin-top: var(--space-xs);
+        }
+        
+        /* Sections */
+        .dashboard-section {
             background: var(--white);
             border-radius: var(--radius-lg);
             padding: var(--space-lg);
@@ -3461,14 +3692,222 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
-        .dashboard-test-section h3 {
-            font-size: var(--font-size-lg);
+        .dashboard-section-title {
+            font-size: var(--font-size-base);
+            font-weight: 700;
             margin-bottom: var(--space-md);
             padding-bottom: var(--space-sm);
             border-bottom: 2px solid var(--gray-10);
         }
         
-        .dashboard-test-btn {
+        /* Zones grid */
+        .dashboard-zones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-md);
+        }
+        
+        .dashboard-zone-card {
+            padding: var(--space-md);
+            background: var(--gray-5);
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--gray-30);
+        }
+        
+        .dashboard-zone-card.excellent { border-left-color: var(--traffic-green); }
+        .dashboard-zone-card.good { border-left-color: var(--traffic-yellow); }
+        .dashboard-zone-card.warning { border-left-color: var(--traffic-orange); }
+        .dashboard-zone-card.critical { border-left-color: var(--traffic-red); }
+        
+        .dashboard-zone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .dashboard-zone-name {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+        
+        .dashboard-zone-score {
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+        }
+        
+        .dashboard-zone-score.excellent { color: var(--traffic-green); }
+        .dashboard-zone-score.good { color: var(--gray-80); }
+        .dashboard-zone-score.warning { color: var(--traffic-orange); }
+        .dashboard-zone-score.critical { color: var(--traffic-red); }
+        
+        .dashboard-zone-meta {
+            font-size: var(--font-size-xs);
+            color: var(--gray-50);
+        }
+        
+        .dashboard-zone-bar {
+            height: 4px;
+            background: var(--gray-20);
+            border-radius: 2px;
+            margin-top: var(--space-sm);
+            overflow: hidden;
+        }
+        
+        .dashboard-zone-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+        }
+        
+        .dashboard-zone-bar-fill.excellent { background: var(--traffic-green); }
+        .dashboard-zone-bar-fill.good { background: var(--traffic-yellow); }
+        .dashboard-zone-bar-fill.warning { background: var(--traffic-orange); }
+        .dashboard-zone-bar-fill.critical { background: var(--traffic-red); }
+        
+        /* Actions */
+        .dashboard-action-item {
+            display: flex;
+            gap: var(--space-md);
+            padding: var(--space-md);
+            background: var(--gray-5);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-sm);
+            align-items: flex-start;
+        }
+        
+        .dashboard-action-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+        
+        .dashboard-action-status.open { background: var(--traffic-orange); }
+        .dashboard-action-status.overdue { background: var(--traffic-red); }
+        .dashboard-action-status.closed { background: var(--traffic-green); }
+        .dashboard-action-status.cancelled { background: var(--gray-40); }
+        
+        .dashboard-action-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .dashboard-action-text {
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .dashboard-action-meta {
+            font-size: var(--font-size-xs);
+            color: var(--gray-50);
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+        
+        .dashboard-action-meta strong {
+            color: var(--gray-70);
+        }
+        
+        /* Filters */
+        .dashboard-filters {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+            flex-wrap: wrap;
+        }
+        
+        .dashboard-filter-btn {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--gray-10);
+            border: none;
+            border-radius: 20px;
+            font-family: inherit;
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .dashboard-filter-btn:hover {
+            background: var(--gray-20);
+        }
+        
+        .dashboard-filter-btn.active {
+            background: var(--sartorius-yellow);
+            font-weight: 600;
+        }
+        
+        /* Search */
+        .dashboard-search {
+            margin-bottom: var(--space-md);
+        }
+        
+        .dashboard-search-input {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 2px solid var(--gray-20);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: var(--font-size-base);
+            transition: border-color 0.15s;
+        }
+        
+        .dashboard-search-input:focus {
+            outline: none;
+            border-color: var(--sartorius-yellow);
+        }
+        
+        /* Table */
+        .dashboard-table-wrapper {
+            overflow-x: auto;
+        }
+        
+        .dashboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .dashboard-table th {
+            text-align: left;
+            padding: var(--space-sm) var(--space-md);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            color: var(--gray-60);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--gray-20);
+            white-space: nowrap;
+        }
+        
+        .dashboard-table td {
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 1px solid var(--gray-10);
+            font-size: var(--font-size-sm);
+        }
+        
+        .dashboard-table tr:hover td {
+            background: var(--gray-5);
+        }
+        
+        .dashboard-table .score-excellent { color: var(--traffic-green); font-weight: 600; }
+        .dashboard-table .score-good { color: var(--gray-80); font-weight: 600; }
+        .dashboard-table .score-warning { color: var(--traffic-orange); font-weight: 600; }
+        .dashboard-table .score-critical { color: var(--traffic-red); font-weight: 600; }
+        
+        .dashboard-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+        }
+        
+        .dashboard-badge.n1 { background: var(--gray-20); color: var(--gray-70); }
+        .dashboard-badge.n2 { background: var(--sartorius-yellow); color: var(--black); }
+        
+        /* Button */
+        .dashboard-btn {
             padding: var(--space-sm) var(--space-md);
             background: var(--sartorius-yellow);
             border: none;
@@ -3477,83 +3916,25 @@
             font-size: var(--font-size-sm);
             font-weight: 600;
             cursor: pointer;
-            margin-right: var(--space-sm);
-            margin-bottom: var(--space-sm);
+            transition: background 0.15s;
         }
         
-        .dashboard-test-btn:hover {
+        .dashboard-btn:hover {
             background: var(--sartorius-yellow-hover);
         }
         
-        .dashboard-test-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .dashboard-test-btn.secondary {
-            background: var(--gray-10);
-        }
-        
-        .dashboard-test-log {
-            background: var(--gray-90);
-            color: var(--gray-20);
-            font-family: monospace;
-            font-size: var(--font-size-xs);
-            padding: var(--space-md);
-            border-radius: var(--radius-md);
-            max-height: 300px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-        
-        .dashboard-test-log .log-success { color: var(--traffic-green); }
-        .dashboard-test-log .log-error { color: var(--traffic-red); }
-        .dashboard-test-log .log-info { color: var(--teal); }
-        
-        .dashboard-test-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: var(--font-size-sm);
-            margin-top: var(--space-md);
-        }
-        
-        .dashboard-test-table th {
-            text-align: left;
-            padding: var(--space-sm);
-            background: var(--gray-5);
-            font-size: var(--font-size-xs);
-            font-weight: 600;
-            color: var(--gray-60);
-        }
-        
-        .dashboard-test-table td {
-            padding: var(--space-sm);
-            border-bottom: 1px solid var(--gray-10);
-        }
-        
-        .dashboard-test-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: var(--space-md);
-            margin-bottom: var(--space-md);
-        }
-        
-        .dashboard-test-stat {
+        /* Empty state */
+        .dashboard-empty {
             text-align: center;
-            padding: var(--space-md);
-            background: var(--gray-5);
-            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            color: var(--gray-50);
         }
         
-        .dashboard-test-stat-value {
-            font-size: var(--font-size-2xl);
-            font-weight: 700;
-        }
-        
-        .dashboard-test-stat-label {
-            font-size: var(--font-size-xs);
-            color: var(--gray-60);
+        .dashboard-empty svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: var(--space-md);
+            opacity: 0.5;
         }
     </style>
 </head>
@@ -4788,14 +5169,17 @@
                             </svg>
                             Aide / À propos
                         </button>
-                        <!-- Accès caché au dashboard test (dev only) -->
-                        <button type="button" class="menu-item" id="menu-dashboard-test" style="display: none;">
+                    </div>
+                    <div class="menu-section">
+                        <div class="menu-section-title">Analyse</div>
+                        <button type="button" class="menu-item" id="menu-dashboard">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                                 <line x1="3" y1="9" x2="21" y2="9"></line>
                                 <line x1="9" y1="21" x2="9" y2="9"></line>
                             </svg>
-                            🧪 Dashboard Test
+                            Tableau de bord
+                            <span class="menu-badge-beta">Beta</span>
                         </button>
                     </div>
                 </div>
@@ -8067,102 +8451,180 @@ Cordialement`);
         // Initialiser l'aperçu au chargement
         document.addEventListener('DOMContentLoaded', function() {
             updatePlanningPreview();
-            initDashboardTest();
+            initDashboard();
         });
     </script>
     
-    <!-- Dashboard Test (caché) -->
-    <div class="dashboard-test-overlay" id="dashboard-test-overlay">
-        <div class="dashboard-test">
-            <div class="dashboard-test-header">
-                <div>
-                    <h2 class="dashboard-test-title">🧪 Dashboard Test</h2>
-                    <p class="dashboard-test-subtitle">Lecture des données Excel depuis SharePoint</p>
-                </div>
-                <button class="dashboard-test-close" onclick="closeDashboardTest()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
+    <!-- Dashboard -->
+    <div class="dashboard-overlay" id="dashboard-overlay">
+        <div class="dashboard">
+            <!-- Header identique à l'app principale -->
+            <div class="dashboard-header" id="dashboard-header">
+                <div class="dashboard-header-left">
+                    <!-- Logo Sartorius -->
+                    <svg class="header-logo" viewBox="0 0 2204.72 850.39" fill="#20201E">
+                        <path d="M1569.06,460.27c0,57.84,36.17,112.4,107.04,112.4c69.22,0,106.34-54.56,106.34-112.4v-11.64h-40.72v11.64c0,43-20.43,75.48-65.62,75.48c-45.19,0-65.62-33.34-65.62-75.48V283.47h-41.42V460.27z"/>
+                        <rect x="1478.3" y="283.47" width="41.42" height="283.46"/>
+                        <path d="M973.25,427.46c0,80.81,63.75,144.4,144.07,144.4c80.33,0,144-63.59,144-144.4c0-80.4-63.68-143.99-144-143.99h-6.7v36.1h6.7c58.99,0,105.51,47.18,105.51,107.89c0,61.12-46.52,108.3-105.51,108.3c-58.99,0-105.58-47.18-105.58-108.3H973.25z"/>
+                        <path d="M1740.34,351.18c0,34.87,16.27,54.72,42.26,68.69c20.12,10.68,41.21,13.15,60.91,20.55c28.8,10.65,37.54,25.34,37.54,46.14c0,28.49-19.58,46.68-51.87,46.68h-4.07v33.7h2.45c57.33,0,93.69-35.8,93.69-80.55c0-29.37-14.25-59.06-51.97-75.91c-20.12-9.04-44.29-13.62-61.89-21.02c-19.28-8.22-26.33-19.38-26.33-37.87c0-22.19,18.44-39.04,46.52-39.04c36.88,0,54.07,18.08,54.91,44.39h37.3c1.26-41.1-28.5-79.32-92.21-79.32C1775.2,277.62,1740.34,310.08,1740.34,351.18"/>
+                        <path d="M1263.53,320.8h82.77c26.78,0,52.71,20.92,52.71,52.1c0,29.95-23.85,52.51-53.97,52.51h-43.67v37.33l32.9-0.32l55.03,104.52h45.6l-59.43-109.35c31.08-9.44,62.1-41.61,62.1-84.69c0-51.28-36.82-89.43-89.95-89.43h-84.1V320.8z"/>
+                        <polygon points="852.34,320.8 902.61,320.8 902.61,566.93 943.61,566.93 943.61,320.8 1061.65,320.8 1061.65,283.47 852.34,283.47"/>
+                        <polygon points="451.71,566.93 491.88,566.93 581.41,332.28 673.87,566.93 716.96,566.93 602.75,283.47 560.07,283.47"/>
+                        <path d="M292.56,351.07c0,32.83,13.39,54.99,41.01,68.94c20.09,10.26,41.85,13.13,61.51,20.52c20.92,7.8,28.87,14.36,31.8,25.85h42.26c-5.86-24.21-22.18-43.91-47.28-55.4c-20.09-9.03-45.61-13.95-63.19-21.34c-19.25-8.21-25.11-19.7-25.11-38.17c0-22.16,18.41-38.98,46.45-38.98c36.82,0,53.98,18.06,54.82,44.32h37.24c1.25-41.04-28.46-79.2-92.06-79.2C327.71,277.62,292.56,310.03,292.56,351.07 M283.5,478.7c-1.26,45.96,29.57,88.23,99.45,88.23h2.51v-34.47h-2.51c-37.24,0-60.53-23.8-60.53-53.76v-15.15H283.5V478.7z"/>
+                        <path d="M666.04,320.8h84.33c26.77,0,52.71,20.92,52.71,52.1c0,29.95-23.85,52.51-53.97,52.51h-45.23v37.33l34.46-0.32l55.03,104.52h45.6l-59.43-109.35c31.08-9.44,62.1-41.61,62.1-84.69c0-51.28-36.82-89.43-89.95-89.43h-85.67V320.8z"/>
                     </svg>
+                    <span class="dashboard-header-title">Tableau de bord</span>
+                </div>
+                <div class="dashboard-header-right">
+                    <div class="dashboard-header-info">
+                        <div class="title">Audit 5S</div>
+                        <div class="date" id="dashboard-header-date"></div>
+                    </div>
+                    <button class="dashboard-close" onclick="closeDashboard()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Navigation tabs -->
+            <nav class="dashboard-nav">
+                <div class="dashboard-nav-inner">
+                    <button class="dashboard-nav-tab active" data-tab="overview">Vue d'ensemble</button>
+                    <button class="dashboard-nav-tab" data-tab="actions">Actions</button>
+                    <button class="dashboard-nav-tab" data-tab="history">Historique</button>
+                </div>
+            </nav>
+            
+            <!-- Loading state -->
+            <div class="dashboard-loading" id="dashboard-loading">
+                <div class="dashboard-loading-spinner"></div>
+                <p>Chargement des données...</p>
+            </div>
+            
+            <!-- État non connecté -->
+            <div class="dashboard-connect" id="dashboard-connect">
+                <svg class="dashboard-connect-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                    <polyline points="10 17 15 12 10 7"></polyline>
+                    <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                <div class="dashboard-connect-title">Connexion requise</div>
+                <p class="dashboard-connect-text">Connectez-vous à votre compte Microsoft pour accéder aux données des audits.</p>
+                <button class="dashboard-btn" id="dashboard-connect-btn">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: -2px;">
+                        <rect x="3" y="3" width="8" height="8" fill="#F25022" stroke="none"/>
+                        <rect x="13" y="3" width="8" height="8" fill="#7FBA00" stroke="none"/>
+                        <rect x="3" y="13" width="8" height="8" fill="#00A4EF" stroke="none"/>
+                        <rect x="13" y="13" width="8" height="8" fill="#FFB900" stroke="none"/>
+                    </svg>
+                    Se connecter avec Microsoft
                 </button>
             </div>
             
-            <!-- Section Connexion -->
-            <div class="dashboard-test-section">
-                <h3>1. Connexion SharePoint</h3>
-                <div id="dashboard-test-connection-status" style="margin-bottom: var(--space-md); color: var(--gray-60);">
-                    Non connecté
-                </div>
-                <button class="dashboard-test-btn" id="dashboard-test-connect">Se connecter</button>
-                <button class="dashboard-test-btn secondary" id="dashboard-test-list-files">Lister les fichiers</button>
-                
-                <div id="dashboard-test-files-list" style="margin-top: var(--space-md);"></div>
+            <!-- Error state -->
+            <div class="dashboard-error" id="dashboard-error">
+                <svg class="dashboard-error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <p id="dashboard-error-message">Erreur de chargement</p>
+                <button class="dashboard-btn" onclick="loadDashboardData()">Réessayer</button>
             </div>
             
-            <!-- Section Lecture Audits -->
-            <div class="dashboard-test-section">
-                <h3>2. Lecture des Audits</h3>
-                <button class="dashboard-test-btn" id="dashboard-test-read-audits" disabled>Charger les audits</button>
-                <button class="dashboard-test-btn secondary" id="dashboard-test-clear-audits">Effacer</button>
+            <!-- Content -->
+            <div class="dashboard-content" id="dashboard-content" style="display: none;">
                 
-                <div class="dashboard-test-stats" id="dashboard-test-audits-stats" style="display: none;">
-                    <div class="dashboard-test-stat">
-                        <div class="dashboard-test-stat-value" id="stat-total-audits">-</div>
-                        <div class="dashboard-test-stat-label">Audits total</div>
+                <!-- TAB: Vue d'ensemble -->
+                <div class="dashboard-tab active" id="tab-overview">
+                    <!-- Stats rapides -->
+                    <div class="dashboard-stats-grid">
+                        <div class="dashboard-stat-card">
+                            <div class="dashboard-stat-value" id="dash-stat-score">-</div>
+                            <div class="dashboard-stat-label">Score moyen</div>
+                        </div>
+                        <div class="dashboard-stat-card">
+                            <div class="dashboard-stat-value" id="dash-stat-audits">-</div>
+                            <div class="dashboard-stat-label">Audits ce mois</div>
+                        </div>
+                        <div class="dashboard-stat-card">
+                            <div class="dashboard-stat-value" id="dash-stat-actions">-</div>
+                            <div class="dashboard-stat-label">Actions ouvertes</div>
+                        </div>
+                        <div class="dashboard-stat-card">
+                            <div class="dashboard-stat-value" id="dash-stat-overdue">-</div>
+                            <div class="dashboard-stat-label">&gt; 30 jours</div>
+                        </div>
                     </div>
-                    <div class="dashboard-test-stat">
-                        <div class="dashboard-test-stat-value" id="stat-audits-2026">-</div>
-                        <div class="dashboard-test-stat-label">En 2026</div>
+                    
+                    <!-- Zones overview -->
+                    <div class="dashboard-section">
+                        <h3 class="dashboard-section-title">État des zones</h3>
+                        <div class="dashboard-zones-grid" id="dashboard-zones-grid">
+                            <!-- Rempli dynamiquement -->
+                        </div>
                     </div>
-                    <div class="dashboard-test-stat">
-                        <div class="dashboard-test-stat-value" id="stat-avg-score">-</div>
-                        <div class="dashboard-test-stat-label">Score moyen</div>
-                    </div>
-                </div>
-                
-                <div id="dashboard-test-audits-table"></div>
-            </div>
-            
-            <!-- Section Lecture Actions -->
-            <div class="dashboard-test-section">
-                <h3>3. Lecture des Actions</h3>
-                <button class="dashboard-test-btn" id="dashboard-test-read-actions" disabled>Charger les actions</button>
-                <button class="dashboard-test-btn secondary" id="dashboard-test-clear-actions">Effacer</button>
-                
-                <div class="dashboard-test-stats" id="dashboard-test-actions-stats" style="display: none;">
-                    <div class="dashboard-test-stat">
-                        <div class="dashboard-test-stat-value" id="stat-total-actions">-</div>
-                        <div class="dashboard-test-stat-label">Actions total</div>
-                    </div>
-                    <div class="dashboard-test-stat">
-                        <div class="dashboard-test-stat-value" id="stat-open-actions">-</div>
-                        <div class="dashboard-test-stat-label">Ouvertes</div>
-                    </div>
-                    <div class="dashboard-test-stat">
-                        <div class="dashboard-test-stat-value" id="stat-overdue-actions">-</div>
-                        <div class="dashboard-test-stat-label">> 30 jours</div>
+                    
+                    <!-- Actions urgentes -->
+                    <div class="dashboard-section">
+                        <h3 class="dashboard-section-title">Actions urgentes</h3>
+                        <div id="dashboard-urgent-actions">
+                            <!-- Rempli dynamiquement -->
+                        </div>
                     </div>
                 </div>
                 
-                <div id="dashboard-test-actions-table"></div>
-            </div>
-            
-            <!-- Section Log -->
-            <div class="dashboard-test-section">
-                <h3>Console</h3>
-                <div class="dashboard-test-log" id="dashboard-test-log">En attente...</div>
+                <!-- TAB: Actions -->
+                <div class="dashboard-tab" id="tab-actions">
+                    <div class="dashboard-filters">
+                        <button class="dashboard-filter-btn active" data-filter="all">Toutes</button>
+                        <button class="dashboard-filter-btn" data-filter="open">Ouvertes</button>
+                        <button class="dashboard-filter-btn" data-filter="overdue">&gt; 30 jours</button>
+                        <button class="dashboard-filter-btn" data-filter="closed">Clôturées</button>
+                    </div>
+                    <div id="dashboard-actions-list">
+                        <!-- Rempli dynamiquement -->
+                    </div>
+                </div>
+                
+                <!-- TAB: Historique -->
+                <div class="dashboard-tab" id="tab-history">
+                    <div class="dashboard-search">
+                        <input type="text" class="dashboard-search-input" id="dashboard-search-input" placeholder="Rechercher par zone, auditeur...">
+                    </div>
+                    <div class="dashboard-table-wrapper">
+                        <table class="dashboard-table" id="dashboard-audits-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Zone</th>
+                                    <th>Niveau</th>
+                                    <th>Score</th>
+                                    <th>Auditeur</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-audits-tbody">
+                                <!-- Rempli dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
             </div>
         </div>
     </div>
     
     <script>
         // ═══════════════════════════════════════════════════════════════
-        // DASHBOARD TEST - Lecture Excel SharePoint
+        // DASHBOARD - Lecture Excel SharePoint
         // ═══════════════════════════════════════════════════════════════
         
         // Configuration Excel
         const excelConfig = {
-            folderPath: 'Audits 5S',          // Même dossier que les JSON
+            folderPath: 'Audits 5S',
             fileName: 'Audit 5S.xlsx',
             auditsSheet: '5S_Audit',
             auditsTable: 'Tableau24',
@@ -8174,169 +8636,164 @@ Cordialement`);
         let dashboardData = {
             audits: [],
             actions: [],
-            excelItemId: null
+            excelItemId: null,
+            driveId: null
         };
         
-        // Log dans la console du dashboard
-        function dashLog(message, type = 'info') {
-            const logEl = document.getElementById('dashboard-test-log');
-            const timestamp = new Date().toLocaleTimeString('fr-FR');
-            const typeClass = type === 'success' ? 'log-success' : type === 'error' ? 'log-error' : 'log-info';
-            logEl.innerHTML += `<span class="${typeClass}">[${timestamp}] ${message}</span>\n`;
-            logEl.scrollTop = logEl.scrollHeight;
-        }
+        // Liste des zones connues
+        const dashboardZones = ['Assemblage', 'Process / Entrée', 'Outillage', 'Extérieurs'];
         
-        // Activer/désactiver le menu caché avec "dev" dans l'URL
-        function initDashboardTest() {
-            // Afficher le bouton si ?dev dans l'URL ou en local
-            if (window.location.search.includes('dev') || isLocalDev) {
-                document.getElementById('menu-dashboard-test').style.display = '';
-            }
-            
-            // Event listeners
-            document.getElementById('menu-dashboard-test').addEventListener('click', function() {
+        // Initialisation du dashboard
+        function initDashboard() {
+            // Event listener pour le menu
+            document.getElementById('menu-dashboard').addEventListener('click', function() {
                 closeMenu();
-                openDashboardTest();
+                openDashboard();
             });
             
-            document.getElementById('dashboard-test-connect').addEventListener('click', dashboardTestConnect);
-            document.getElementById('dashboard-test-list-files').addEventListener('click', dashboardTestListFiles);
-            document.getElementById('dashboard-test-read-audits').addEventListener('click', dashboardTestReadAudits);
-            document.getElementById('dashboard-test-read-actions').addEventListener('click', dashboardTestReadActions);
-            document.getElementById('dashboard-test-clear-audits').addEventListener('click', () => {
-                document.getElementById('dashboard-test-audits-table').innerHTML = '';
-                document.getElementById('dashboard-test-audits-stats').style.display = 'none';
+            // Event listeners pour les onglets
+            document.querySelectorAll('.dashboard-nav-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.dashboard-nav-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const tabId = this.dataset.tab;
+                    document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
+                    document.getElementById('tab-' + tabId).classList.add('active');
+                });
             });
-            document.getElementById('dashboard-test-clear-actions').addEventListener('click', () => {
-                document.getElementById('dashboard-test-actions-table').innerHTML = '';
-                document.getElementById('dashboard-test-actions-stats').style.display = 'none';
+            
+            // Event listeners pour les filtres d'actions
+            document.querySelectorAll('.dashboard-filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.dashboard-filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    renderActionsList(this.dataset.filter);
+                });
+            });
+            
+            // Event listener pour la recherche
+            document.getElementById('dashboard-search-input').addEventListener('input', function() {
+                renderAuditsTable(this.value);
+            });
+            
+            // Event listener pour le bouton connexion
+            document.getElementById('dashboard-connect-btn').addEventListener('click', async function() {
+                this.disabled = true;
+                this.innerHTML = '<span class="dashboard-loading-spinner" style="width: 16px; height: 16px; border-width: 2px; margin-right: 8px;"></span>Connexion...';
+                try {
+                    await getAccessToken();
+                    loadDashboardData();
+                } catch (e) {
+                    this.disabled = false;
+                    this.innerHTML = 'Se connecter avec Microsoft';
+                }
             });
         }
         
-        function openDashboardTest() {
-            document.getElementById('dashboard-test-overlay').classList.add('visible');
+        function openDashboard() {
+            document.getElementById('dashboard-overlay').classList.add('visible');
             document.body.style.overflow = 'hidden';
-            updateDashboardConnectionStatus();
+            
+            // Mettre à jour la date dans le header
+            const dateEl = document.getElementById('dashboard-header-date');
+            const now = new Date();
+            dateEl.textContent = now.toLocaleDateString('fr-FR', { 
+                weekday: 'long', 
+                day: 'numeric', 
+                month: 'long' 
+            });
+            
+            // Charger les données
+            loadDashboardData();
         }
         
-        function closeDashboardTest() {
-            document.getElementById('dashboard-test-overlay').classList.remove('visible');
+        function closeDashboard() {
+            document.getElementById('dashboard-overlay').classList.remove('visible');
             document.body.style.overflow = '';
+            // Reset header animation
+            document.getElementById('dashboard-header').classList.remove('loaded');
         }
         
-        function updateDashboardConnectionStatus() {
-            const statusEl = document.getElementById('dashboard-test-connection-status');
-            const connectBtn = document.getElementById('dashboard-test-connect');
-            const readAuditsBtn = document.getElementById('dashboard-test-read-audits');
-            const readActionsBtn = document.getElementById('dashboard-test-read-actions');
+        // Charger toutes les données
+        async function loadDashboardData() {
+            const loadingEl = document.getElementById('dashboard-loading');
+            const connectEl = document.getElementById('dashboard-connect');
+            const errorEl = document.getElementById('dashboard-error');
+            const contentEl = document.getElementById('dashboard-content');
+            const headerEl = document.getElementById('dashboard-header');
             
-            if (msalConnected && msalAccount) {
-                statusEl.innerHTML = `✅ Connecté en tant que <strong>${msalAccount.username}</strong>`;
-                statusEl.style.color = 'var(--traffic-green)';
-                connectBtn.textContent = 'Reconnecter';
-                readAuditsBtn.disabled = false;
-                readActionsBtn.disabled = false;
-            } else {
-                statusEl.innerHTML = '❌ Non connecté';
-                statusEl.style.color = 'var(--traffic-red)';
-                connectBtn.textContent = 'Se connecter';
-                readAuditsBtn.disabled = true;
-                readActionsBtn.disabled = true;
+            // Reset des états
+            loadingEl.style.display = 'none';
+            connectEl.style.display = 'none';
+            errorEl.style.display = 'none';
+            contentEl.style.display = 'none';
+            
+            // Vérifier si MSAL est initialisé et si on a un compte
+            if (!msalInstance) {
+                // Attendre un peu que MSAL s'initialise
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
-        }
-        
-        async function dashboardTestConnect() {
-            dashLog('Tentative de connexion...');
+            
+            // Vérifier si l'utilisateur est connecté
+            if (!msalConnected && !msalAccount) {
+                // Afficher l'écran de connexion
+                connectEl.style.display = 'flex';
+                // Reset du bouton connexion
+                const connectBtn = document.getElementById('dashboard-connect-btn');
+                connectBtn.disabled = false;
+                connectBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="16" height="16" style="margin-right: 8px; vertical-align: -2px;">
+                        <rect x="3" y="3" width="8" height="8" fill="#F25022"/>
+                        <rect x="13" y="3" width="8" height="8" fill="#7FBA00"/>
+                        <rect x="3" y="13" width="8" height="8" fill="#00A4EF"/>
+                        <rect x="13" y="13" width="8" height="8" fill="#FFB900"/>
+                    </svg>
+                    Se connecter avec Microsoft
+                `;
+                return;
+            }
+            
+            // Afficher le loading
+            loadingEl.style.display = 'flex';
+            
             try {
+                // S'assurer qu'on a un token
                 const token = await getAccessToken();
-                if (token) {
-                    dashLog('Connexion réussie!', 'success');
-                    updateDashboardConnectionStatus();
-                }
-            } catch (error) {
-                dashLog('Erreur connexion: ' + error.message, 'error');
-            }
-        }
-        
-        // Lister les fichiers de la bibliothèque 5S
-        async function dashboardTestListFiles() {
-            dashLog('Listing des fichiers...');
-            
-            try {
-                const accessToken = await getAccessToken();
-                
-                // Récupérer le siteId
-                const siteResolveUrl = `https://graph.microsoft.com/v1.0/sites/${sharepointConfig.siteUrl}:${sharepointConfig.sitePath}`;
-                const siteResponse = await fetch(siteResolveUrl, {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                const siteData = await siteResponse.json();
-                const siteId = siteData.id;
-                
-                // Récupérer le driveId de la bibliothèque 5S
-                const drivesUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives`;
-                const drivesResponse = await fetch(drivesUrl, {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                const drivesData = await drivesResponse.json();
-                const targetDrive = drivesData.value.find(d => d.name === sharepointConfig.libraryName);
-                
-                if (!targetDrive) {
-                    throw new Error('Bibliothèque 5S non trouvée');
+                if (!token) {
+                    throw new Error('Impossible d\'obtenir un token d\'accès');
                 }
                 
-                // Lister tous les fichiers (récursif)
-                const listUrl = `https://graph.microsoft.com/v1.0/drives/${targetDrive.id}/root/children`;
-                const listResponse = await fetch(listUrl, {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                const listData = await listResponse.json();
+                // Récupérer le fichier Excel
+                await getExcelFileId();
                 
-                dashLog(`${listData.value.length} éléments trouvés à la racine`, 'success');
+                // Charger audits et actions en parallèle
+                await Promise.all([
+                    loadAuditsData(),
+                    loadActionsData()
+                ]);
                 
-                let html = '<div style="font-size: var(--font-size-sm); margin-top: var(--space-sm);">';
-                html += '<strong>Contenu de la bibliothèque 5S :</strong><br>';
+                // Afficher le contenu
+                loadingEl.style.display = 'none';
+                contentEl.style.display = 'block';
                 
-                for (const item of listData.value) {
-                    const isFolder = item.folder !== undefined;
-                    const icon = isFolder ? '📁' : '📄';
-                    html += `${icon} ${item.name}`;
-                    
-                    if (isFolder) {
-                        // Lister le contenu du dossier
-                        const subUrl = `https://graph.microsoft.com/v1.0/drives/${targetDrive.id}/items/${item.id}/children`;
-                        const subResponse = await fetch(subUrl, {
-                            headers: { 'Authorization': `Bearer ${accessToken}` }
-                        });
-                        const subData = await subResponse.json();
-                        
-                        if (subData.value && subData.value.length > 0) {
-                            html += '<div style="margin-left: 20px; color: var(--gray-60);">';
-                            for (const subItem of subData.value) {
-                                const subIcon = subItem.folder ? '📁' : '📄';
-                                const isExcel = subItem.name.endsWith('.xlsx');
-                                const style = isExcel ? 'color: var(--traffic-green); font-weight: 600;' : '';
-                                html += `<div style="${style}">${subIcon} ${subItem.name}</div>`;
-                                
-                                if (isExcel) {
-                                    dashLog(`Excel trouvé: ${item.name}/${subItem.name}`, 'success');
-                                }
-                            }
-                            html += '</div>';
-                        }
-                    } else if (item.name.endsWith('.xlsx')) {
-                        html = html.replace(item.name, `<span style="color: var(--traffic-green); font-weight: 600;">${item.name}</span>`);
-                        dashLog(`Excel trouvé: ${item.name} (racine)`, 'success');
-                    }
-                    
-                    html += '<br>';
-                }
+                // Animation du header
+                setTimeout(() => {
+                    headerEl.classList.add('loaded');
+                }, 100);
                 
-                html += '</div>';
-                document.getElementById('dashboard-test-files-list').innerHTML = html;
+                // Rendre les différentes sections
+                renderOverview();
+                renderZonesGrid();
+                renderUrgentActions();
+                renderActionsList('all');
+                renderAuditsTable('');
                 
             } catch (error) {
-                dashLog('Erreur listing: ' + error.message, 'error');
+                console.error('Dashboard error:', error);
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'flex';
+                document.getElementById('dashboard-error-message').textContent = error.message || 'Erreur lors du chargement des données';
             }
         }
         
@@ -8348,7 +8805,7 @@ Cordialement`);
             
             const accessToken = await getAccessToken();
             
-            // D'abord récupérer le siteId et driveId (comme pour l'upload)
+            // Récupérer le siteId
             const siteResolveUrl = `https://graph.microsoft.com/v1.0/sites/${sharepointConfig.siteUrl}:${sharepointConfig.sitePath}`;
             const siteResponse = await fetch(siteResolveUrl, {
                 headers: { 'Authorization': `Bearer ${accessToken}` }
@@ -8368,268 +8825,350 @@ Cordialement`);
                 throw new Error('Bibliothèque 5S non trouvée');
             }
             
-            dashLog(`Drive trouvé: ${targetDrive.name} (${targetDrive.id.substring(0, 20)}...)`);
-            
-            // Chercher le fichier Excel dans le dossier Audits 5S
+            // Chercher le fichier Excel
             const filePath = `${excelConfig.folderPath}/${excelConfig.fileName}`;
             const searchUrl = `https://graph.microsoft.com/v1.0/drives/${targetDrive.id}/root:/${encodeURI(filePath)}`;
-            dashLog(`Recherche du fichier: ${filePath}`);
             
             const fileResponse = await fetch(searchUrl, {
                 headers: { 'Authorization': `Bearer ${accessToken}` }
             });
             
             if (!fileResponse.ok) {
-                throw new Error(`Fichier ${filePath} non trouvé`);
+                throw new Error(`Fichier Excel non trouvé`);
             }
             
             const fileData = await fileResponse.json();
             dashboardData.excelItemId = fileData.id;
             dashboardData.driveId = targetDrive.id;
             
-            dashLog(`Fichier trouvé! ID: ${fileData.id.substring(0, 20)}...`, 'success');
-            
             return fileData.id;
         }
         
-        // Lire les audits depuis Excel
-        async function dashboardTestReadAudits() {
-            dashLog('Chargement des audits...');
+        // Charger les audits
+        async function loadAuditsData() {
+            const accessToken = await getAccessToken();
             
-            try {
-                const accessToken = await getAccessToken();
-                await getExcelFileId();
-                
-                // Lire les données du tableau des audits
-                const tableUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${dashboardData.excelItemId}/workbook/tables/${excelConfig.auditsTable}/rows`;
-                
-                dashLog(`Lecture de ${excelConfig.auditsTable}...`);
-                
-                const response = await fetch(tableUrl, {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error?.message || 'Erreur lecture tableau');
-                }
-                
-                const data = await response.json();
-                dashLog(`${data.value.length} lignes récupérées`, 'success');
-                
-                // Parser les données
-                // Colonnes: Année; Semaine; Audit ID; Date d'audit; Auditeur principal; Zone; Niveau d'audit; ... Score moyen; Performance 5S; ...
-                dashboardData.audits = data.value.map(row => {
-                    const values = row.values[0];
-                    return {
-                        annee: values[0],
-                        semaine: values[1],
-                        auditId: values[2],
-                        date: values[3],
-                        auditeur: values[4],
-                        zone: values[5],
-                        niveau: values[6],
-                        scoreMoyen: values[21], // Score moyen
-                        performance: values[22] // Performance 5S (%)
-                    };
-                });
-                
-                // Afficher les stats
-                const audits2026 = dashboardData.audits.filter(a => a.annee === 2026 || a.annee === '2026');
-                const avgScore = dashboardData.audits.length > 0 
-                    ? Math.round(dashboardData.audits.reduce((sum, a) => sum + (parseFloat(a.performance) || 0), 0) / dashboardData.audits.length)
-                    : 0;
-                
-                document.getElementById('stat-total-audits').textContent = dashboardData.audits.length;
-                document.getElementById('stat-audits-2026').textContent = audits2026.length;
-                document.getElementById('stat-avg-score').textContent = avgScore + '%';
-                document.getElementById('dashboard-test-audits-stats').style.display = 'grid';
-                
-                // Afficher le tableau (10 derniers)
-                const recent = dashboardData.audits.slice(-10).reverse();
-                let tableHtml = `
-                    <table class="dashboard-test-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Zone</th>
-                                <th>Niveau</th>
-                                <th>Score</th>
-                                <th>Auditeur</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                
-                recent.forEach(audit => {
-                    const scoreNum = parseFloat(audit.performance) || 0;
-                    const scoreClass = scoreNum >= 85 ? 'color: var(--traffic-green)' : 
-                                      scoreNum >= 70 ? '' : 
-                                      scoreNum >= 50 ? 'color: var(--traffic-orange)' : 'color: var(--traffic-red)';
-                    const dateFormatted = formatExcelDate(audit.date);
-                    tableHtml += `
-                        <tr>
-                            <td>${dateFormatted}</td>
-                            <td>${audit.zone || '-'}</td>
-                            <td>${audit.niveau || '-'}</td>
-                            <td style="${scoreClass}; font-weight: 600;">${audit.performance ? Math.round(audit.performance) + '%' : '-'}</td>
-                            <td>${audit.auditeur || '-'}</td>
-                        </tr>
-                    `;
-                });
-                
-                tableHtml += '</tbody></table>';
-                document.getElementById('dashboard-test-audits-table').innerHTML = tableHtml;
-                
-                dashLog('Audits chargés avec succès!', 'success');
-                
-            } catch (error) {
-                dashLog('Erreur: ' + error.message, 'error');
-                console.error('Dashboard test error:', error);
+            const tableUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${dashboardData.excelItemId}/workbook/tables/${excelConfig.auditsTable}/rows`;
+            
+            const response = await fetch(tableUrl, {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Erreur lecture des audits');
             }
+            
+            const data = await response.json();
+            
+            // Parser les données
+            dashboardData.audits = data.value.map(row => {
+                const values = row.values[0];
+                return {
+                    annee: values[0],
+                    semaine: values[1],
+                    auditId: values[2],
+                    date: values[3],
+                    auditeur: values[4],
+                    zone: values[5],
+                    niveau: values[6],
+                    scoreMoyen: values[21],
+                    performance: values[22]
+                };
+            });
         }
         
-        // Lire les actions depuis Excel
-        async function dashboardTestReadActions() {
-            dashLog('Chargement des actions...');
+        // Charger les actions
+        async function loadActionsData() {
+            const accessToken = await getAccessToken();
             
-            try {
-                const accessToken = await getAccessToken();
-                await getExcelFileId();
+            const tableUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${dashboardData.excelItemId}/workbook/tables/${excelConfig.actionsTable}/rows`;
+            
+            const response = await fetch(tableUrl, {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Erreur lecture des actions');
+            }
+            
+            const data = await response.json();
+            
+            // Parser les données
+            dashboardData.actions = data.value.map(row => {
+                const values = row.values[0];
+                return {
+                    annee: values[0],
+                    semaine: values[1],
+                    actionId: values[2],
+                    dateOuverture: values[3],
+                    niveau: values[4],
+                    zone: values[5],
+                    type: values[6],
+                    action: values[7],
+                    responsable: values[8],
+                    commentaire: values[9],
+                    dateCloture: values[10]
+                };
+            });
+        }
+        
+        // Calculer le statut d'une action
+        function getActionStatus(action) {
+            const isClosed = action.dateCloture && action.dateCloture !== '';
+            const isCancelled = action.commentaire?.toLowerCase().includes('annulé');
+            
+            if (isClosed) return 'closed';
+            if (isCancelled) return 'cancelled';
+            
+            // Vérifier ancienneté (> 30 jours)
+            if (action.dateOuverture) {
+                const openDate = parseExcelDate(action.dateOuverture);
+                if (openDate) {
+                    const daysDiff = Math.floor((new Date() - openDate) / (1000 * 60 * 60 * 24));
+                    if (daysDiff > 30) return 'overdue';
+                }
+            }
+            
+            return 'open';
+        }
+        
+        // Calculer la classe de score
+        function getScoreClass(score) {
+            const num = parseFloat(score) || 0;
+            if (num >= 85) return 'excellent';
+            if (num >= 70) return 'good';
+            if (num >= 50) return 'warning';
+            return 'critical';
+        }
+        
+        // Rendre la vue d'ensemble
+        function renderOverview() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            
+            // Audits du mois
+            const auditsThisMonth = dashboardData.audits.filter(a => {
+                const date = parseExcelDate(a.date);
+                return date && date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            });
+            
+            // Score moyen (tous les audits)
+            const avgScore = dashboardData.audits.length > 0
+                ? Math.round(dashboardData.audits.reduce((sum, a) => sum + (parseFloat(a.performance) || 0), 0) / dashboardData.audits.length)
+                : 0;
+            
+            // Actions ouvertes et en retard
+            let openCount = 0;
+            let overdueCount = 0;
+            dashboardData.actions.forEach(action => {
+                const status = getActionStatus(action);
+                if (status === 'open') openCount++;
+                if (status === 'overdue') overdueCount++;
+            });
+            
+            // Mettre à jour les stats
+            const scoreEl = document.getElementById('dash-stat-score');
+            scoreEl.textContent = avgScore + '%';
+            scoreEl.className = 'dashboard-stat-value ' + getScoreClass(avgScore);
+            
+            document.getElementById('dash-stat-audits').textContent = auditsThisMonth.length;
+            
+            const actionsEl = document.getElementById('dash-stat-actions');
+            actionsEl.textContent = openCount + overdueCount;
+            actionsEl.className = 'dashboard-stat-value' + ((openCount + overdueCount) > 0 ? ' orange' : '');
+            
+            const overdueEl = document.getElementById('dash-stat-overdue');
+            overdueEl.textContent = overdueCount;
+            overdueEl.className = 'dashboard-stat-value' + (overdueCount > 0 ? ' red' : '');
+        }
+        
+        // Rendre la grille des zones
+        function renderZonesGrid() {
+            const container = document.getElementById('dashboard-zones-grid');
+            
+            // Pour chaque zone, trouver le dernier audit
+            const zonesHtml = dashboardZones.map(zoneName => {
+                const zoneAudits = dashboardData.audits.filter(a => a.zone === zoneName);
+                const lastAudit = zoneAudits.length > 0 ? zoneAudits[zoneAudits.length - 1] : null;
                 
-                // Lire les données du tableau des actions
-                const tableUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${dashboardData.excelItemId}/workbook/tables/${excelConfig.actionsTable}/rows`;
-                
-                dashLog(`Lecture de ${excelConfig.actionsTable}...`);
-                
-                const response = await fetch(tableUrl, {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error?.message || 'Erreur lecture tableau');
+                if (!lastAudit) {
+                    return `
+                        <div class="dashboard-zone-card">
+                            <div class="dashboard-zone-header">
+                                <div class="dashboard-zone-name">${zoneName}</div>
+                                <div class="dashboard-zone-score">-</div>
+                            </div>
+                            <div class="dashboard-zone-meta">Aucun audit</div>
+                        </div>
+                    `;
                 }
                 
-                const data = await response.json();
-                dashLog(`${data.value.length} lignes récupérées`, 'success');
+                const score = parseFloat(lastAudit.performance) || 0;
+                const scoreClass = getScoreClass(score);
+                const dateFormatted = formatExcelDate(lastAudit.date);
                 
-                // Parser les données
-                // Colonnes: Année; Semaine; ActionID; Date d'ouverture; Niveau d'audit; Zone; Type; Action; Resp d'action; Commentaire; Date clôture
-                dashboardData.actions = data.value.map(row => {
-                    const values = row.values[0];
-                    return {
-                        annee: values[0],
-                        semaine: values[1],
-                        actionId: values[2],
-                        dateOuverture: values[3],
-                        niveau: values[4],
-                        zone: values[5],
-                        type: values[6],
-                        action: values[7],
-                        responsable: values[8],
-                        commentaire: values[9],
-                        dateCloture: values[10]
-                    };
-                });
+                // Compter les actions ouvertes pour cette zone
+                const openActions = dashboardData.actions.filter(a => {
+                    return a.zone === zoneName && ['open', 'overdue'].includes(getActionStatus(a));
+                }).length;
                 
-                // Calculer les stats
-                const now = new Date();
-                let openCount = 0;
-                let overdueCount = 0;
-                
-                dashboardData.actions.forEach(action => {
-                    const isClosed = action.dateCloture && action.dateCloture !== '';
-                    const isCancelled = action.commentaire?.toLowerCase().includes('annulé');
-                    
-                    if (!isClosed && !isCancelled) {
-                        openCount++;
-                        // Vérifier si > 30 jours
-                        if (action.dateOuverture) {
-                            const openDate = parseExcelDate(action.dateOuverture);
-                            if (openDate) {
-                                const daysDiff = Math.floor((now - openDate) / (1000 * 60 * 60 * 24));
-                                if (daysDiff > 30) {
-                                    overdueCount++;
-                                }
-                            }
-                        }
-                    }
-                });
-                
-                document.getElementById('stat-total-actions').textContent = dashboardData.actions.length;
-                document.getElementById('stat-open-actions').textContent = openCount;
-                document.getElementById('stat-overdue-actions').textContent = overdueCount;
-                document.getElementById('dashboard-test-actions-stats').style.display = 'grid';
-                
-                // Afficher le tableau (actions ouvertes en premier)
-                const sortedActions = [...dashboardData.actions].sort((a, b) => {
-                    const aOpen = !a.dateCloture && !a.commentaire?.toLowerCase().includes('annulé');
-                    const bOpen = !b.dateCloture && !b.commentaire?.toLowerCase().includes('annulé');
-                    if (aOpen && !bOpen) return -1;
-                    if (!aOpen && bOpen) return 1;
-                    return 0;
-                }).slice(0, 15);
-                
-                let tableHtml = `
-                    <table class="dashboard-test-table">
-                        <thead>
-                            <tr>
-                                <th>Statut</th>
-                                <th>Zone</th>
-                                <th>Action</th>
-                                <th>Responsable</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                return `
+                    <div class="dashboard-zone-card ${scoreClass}">
+                        <div class="dashboard-zone-header">
+                            <div class="dashboard-zone-name">${zoneName}</div>
+                            <div class="dashboard-zone-score ${scoreClass}">${Math.round(score)}%</div>
+                        </div>
+                        <div class="dashboard-zone-meta">
+                            ${lastAudit.niveau} - ${dateFormatted} - ${lastAudit.auditeur}
+                            ${openActions > 0 ? ` - <span style="color: var(--traffic-orange);">${openActions} action${openActions > 1 ? 's' : ''}</span>` : ''}
+                        </div>
+                        <div class="dashboard-zone-bar">
+                            <div class="dashboard-zone-bar-fill ${scoreClass}" style="width: ${score}%"></div>
+                        </div>
+                    </div>
                 `;
-                
-                sortedActions.forEach(action => {
-                    const isClosed = action.dateCloture && action.dateCloture !== '';
-                    const isCancelled = action.commentaire?.toLowerCase().includes('annulé');
-                    
-                    let statusHtml, statusColor;
-                    if (isClosed) {
-                        statusHtml = '✅';
-                        statusColor = 'var(--traffic-green)';
-                    } else if (isCancelled) {
-                        statusHtml = '⚪';
-                        statusColor = 'var(--gray-50)';
-                    } else {
-                        // Vérifier ancienneté
-                        let isOverdue = false;
-                        if (action.dateOuverture) {
-                            const openDate = parseExcelDate(action.dateOuverture);
-                            if (openDate) {
-                                const daysDiff = Math.floor((now - openDate) / (1000 * 60 * 60 * 24));
-                                isOverdue = daysDiff > 30;
-                            }
-                        }
-                        statusHtml = isOverdue ? '🔴' : '🟠';
-                        statusColor = isOverdue ? 'var(--traffic-red)' : 'var(--traffic-orange)';
-                    }
-                    
-                    const actionText = action.action?.length > 50 ? action.action.substring(0, 50) + '...' : action.action;
-                    
-                    tableHtml += `
-                        <tr>
-                            <td style="text-align: center;">${statusHtml}</td>
-                            <td>${action.zone || '-'}</td>
-                            <td>${actionText || '-'}</td>
-                            <td>${action.responsable || '-'}</td>
-                        </tr>
-                    `;
-                });
-                
-                tableHtml += '</tbody></table>';
-                document.getElementById('dashboard-test-actions-table').innerHTML = tableHtml;
-                
-                dashLog('Actions chargées avec succès!', 'success');
-                
-            } catch (error) {
-                dashLog('Erreur: ' + error.message, 'error');
-                console.error('Dashboard test error:', error);
+            }).join('');
+            
+            container.innerHTML = zonesHtml;
+        }
+        
+        // Rendre les actions urgentes (> 30 jours ou ouvertes récentes)
+        function renderUrgentActions() {
+            const container = document.getElementById('dashboard-urgent-actions');
+            
+            // Filtrer les actions ouvertes et en retard
+            const urgentActions = dashboardData.actions
+                .filter(a => ['open', 'overdue'].includes(getActionStatus(a)))
+                .sort((a, b) => {
+                    // En retard d'abord
+                    const statusA = getActionStatus(a);
+                    const statusB = getActionStatus(b);
+                    if (statusA === 'overdue' && statusB !== 'overdue') return -1;
+                    if (statusB === 'overdue' && statusA !== 'overdue') return 1;
+                    return 0;
+                })
+                .slice(0, 5);
+            
+            if (urgentActions.length === 0) {
+                container.innerHTML = '<div class="dashboard-empty">Aucune action urgente</div>';
+                return;
             }
+            
+            container.innerHTML = urgentActions.map(action => {
+                const status = getActionStatus(action);
+                const dateFormatted = formatExcelDate(action.dateOuverture);
+                
+                return `
+                    <div class="dashboard-action-item">
+                        <div class="dashboard-action-status ${status}"></div>
+                        <div class="dashboard-action-content">
+                            <div class="dashboard-action-text">${action.action || '-'}</div>
+                            <div class="dashboard-action-meta">
+                                <span><strong>Zone:</strong> ${action.zone || '-'}</span>
+                                <span><strong>Resp:</strong> ${action.responsable || '-'}</span>
+                                <span><strong>Ouvert:</strong> ${dateFormatted}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Rendre la liste des actions (avec filtre)
+        function renderActionsList(filter) {
+            const container = document.getElementById('dashboard-actions-list');
+            
+            let filteredActions = dashboardData.actions.filter(a => {
+                const status = getActionStatus(a);
+                if (filter === 'all') return true;
+                if (filter === 'open') return status === 'open';
+                if (filter === 'overdue') return status === 'overdue';
+                if (filter === 'closed') return status === 'closed' || status === 'cancelled';
+                return true;
+            });
+            
+            // Trier : ouvertes/retard d'abord, puis par date
+            filteredActions.sort((a, b) => {
+                const statusOrder = { overdue: 0, open: 1, closed: 2, cancelled: 3 };
+                const statusA = statusOrder[getActionStatus(a)];
+                const statusB = statusOrder[getActionStatus(b)];
+                if (statusA !== statusB) return statusA - statusB;
+                return 0;
+            });
+            
+            if (filteredActions.length === 0) {
+                container.innerHTML = '<div class="dashboard-empty">Aucune action</div>';
+                return;
+            }
+            
+            container.innerHTML = filteredActions.map(action => {
+                const status = getActionStatus(action);
+                const dateFormatted = formatExcelDate(action.dateOuverture);
+                const closeDateFormatted = action.dateCloture ? formatExcelDate(action.dateCloture) : '';
+                
+                let metaExtra = '';
+                if (status === 'closed') {
+                    metaExtra = `<span style="color: var(--traffic-green);"><strong>Clôturé:</strong> ${closeDateFormatted}</span>`;
+                } else if (status === 'cancelled') {
+                    metaExtra = `<span style="color: var(--gray-50);"><strong>Annulé</strong></span>`;
+                }
+                
+                return `
+                    <div class="dashboard-action-item">
+                        <div class="dashboard-action-status ${status}"></div>
+                        <div class="dashboard-action-content">
+                            <div class="dashboard-action-text">${action.action || '-'}</div>
+                            <div class="dashboard-action-meta">
+                                <span><strong>Zone:</strong> ${action.zone || '-'}</span>
+                                <span><strong>Resp:</strong> ${action.responsable || '-'}</span>
+                                <span><strong>Ouvert:</strong> ${dateFormatted}</span>
+                                ${metaExtra}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Rendre le tableau des audits (avec recherche)
+        function renderAuditsTable(searchQuery) {
+            const tbody = document.getElementById('dashboard-audits-tbody');
+            
+            let filteredAudits = [...dashboardData.audits].reverse(); // Plus récent en premier
+            
+            // Filtrer par recherche
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase();
+                filteredAudits = filteredAudits.filter(a => {
+                    return (a.zone?.toLowerCase().includes(query)) ||
+                           (a.auditeur?.toLowerCase().includes(query)) ||
+                           (a.niveau?.toLowerCase().includes(query)) ||
+                           (a.auditId?.toLowerCase().includes(query));
+                });
+            }
+            
+            if (filteredAudits.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--gray-50);">Aucun audit trouvé</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filteredAudits.slice(0, 50).map(audit => {
+                const dateFormatted = formatExcelDate(audit.date);
+                const score = parseFloat(audit.performance) || 0;
+                const scoreClass = getScoreClass(score);
+                const niveauClass = audit.niveau === 'N2' ? 'n2' : 'n1';
+                
+                return `
+                    <tr>
+                        <td>${dateFormatted}</td>
+                        <td>${audit.zone || '-'}</td>
+                        <td><span class="dashboard-badge ${niveauClass}">${audit.niveau || '-'}</span></td>
+                        <td class="score-${scoreClass}">${Math.round(score)}%</td>
+                        <td>${audit.auditeur || '-'}</td>
+                    </tr>
+                `;
+            }).join('');
         }
         
         // Parser une date Excel (peut être un nombre ou une chaîne)
@@ -8644,7 +9183,6 @@ Cordialement`);
             
             // Si c'est une chaîne de date
             if (typeof value === 'string') {
-                // Essayer différents formats
                 const parsed = new Date(value);
                 if (!isNaN(parsed)) return parsed;
                 
