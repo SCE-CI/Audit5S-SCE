@@ -4881,8 +4881,8 @@
                 postLogoutRedirectUri: 'https://sce-ci.github.io/Audit5S-SCE/'
             },
             cache: {
-                cacheLocation: 'sessionStorage',
-                storeAuthStateInCookie: true // Aide pour les popups cross-origin
+                cacheLocation: 'localStorage',  // Persiste entre les sessions/onglets
+                storeAuthStateInCookie: true    // Aide pour les popups cross-origin
             },
             system: {
                 allowNativeBroker: false,
