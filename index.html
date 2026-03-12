@@ -3779,22 +3779,13 @@
             text-transform: uppercase;
         }
         
-        /* Toolbar (rafraîchir + date modif) */
-        .dashboard-toolbar {
+        /* Nav avec refresh et date à droite */
+        .dashboard-nav-right {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: var(--space-sm) var(--space-md);
-            background: var(--white);
-            border-bottom: 1px solid var(--gray-10);
-            font-size: var(--font-size-xs);
-            color: var(--gray-50);
-        }
-        
-        .dashboard-toolbar-left {
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
+            gap: var(--space-md);
+            margin-left: auto;
+            padding-right: var(--space-md);
         }
         
         .dashboard-refresh-btn {
@@ -3830,6 +3821,8 @@
             display: flex;
             align-items: center;
             gap: var(--space-xs);
+            font-size: var(--font-size-xs);
+            color: var(--gray-50);
         }
         
         .dashboard-last-modified svg {
@@ -8623,28 +8616,23 @@ Cordialement`);
                     <button class="dashboard-nav-tab" data-tab="actions">Actions</button>
                     <button class="dashboard-nav-tab" data-tab="history">Historique</button>
                 </div>
-            </nav>
-            
-            <!-- Toolbar (visible quand données chargées) -->
-            <div class="dashboard-toolbar" id="dashboard-toolbar" style="display: none;">
-                <div class="dashboard-toolbar-left">
+                <div class="dashboard-nav-right" id="dashboard-nav-right" style="display: none;">
+                    <div class="dashboard-last-modified" id="dashboard-last-modified">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span id="dashboard-last-modified-text">-</span>
+                    </div>
                     <button class="dashboard-refresh-btn" id="dashboard-refresh-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="23 4 23 10 17 10"></polyline>
                             <polyline points="1 20 1 14 7 14"></polyline>
                             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
                         </svg>
-                        Actualiser
                     </button>
                 </div>
-                <div class="dashboard-last-modified" id="dashboard-last-modified">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    <span id="dashboard-last-modified-text">-</span>
-                </div>
-            </div>
+            </nav>
             
             <!-- Loading state -->
             <div class="dashboard-loading" id="dashboard-loading">
@@ -8875,14 +8863,14 @@ Cordialement`);
             const errorEl = document.getElementById('dashboard-error');
             const contentEl = document.getElementById('dashboard-content');
             const headerEl = document.getElementById('dashboard-header');
-            const toolbarEl = document.getElementById('dashboard-toolbar');
+            const navRightEl = document.getElementById('dashboard-nav-right');
             
             // Reset des états
             loadingEl.style.display = 'none';
             connectEl.style.display = 'none';
             errorEl.style.display = 'none';
             contentEl.style.display = 'none';
-            toolbarEl.style.display = 'none';
+            navRightEl.style.display = 'none';
             
             // Vérifier si MSAL est initialisé et si on a un compte
             if (!msalInstance) {
@@ -8932,8 +8920,8 @@ Cordialement`);
                 loadingEl.style.display = 'none';
                 contentEl.style.display = 'block';
                 
-                // Afficher la toolbar
-                document.getElementById('dashboard-toolbar').style.display = 'flex';
+                // Afficher la partie droite de la nav (refresh + date)
+                document.getElementById('dashboard-nav-right').style.display = 'flex';
                 
                 // Afficher la date de dernière modification
                 updateLastModifiedDisplay();
@@ -9105,14 +9093,9 @@ Cordialement`);
             const data = await response.json();
             
             // Parser les données
-            dashboardData.audits = data.value.map((row, idx) => {
+            // Colonnes: 0-6 métadonnées, 27 (AB) = Score moyen, 28 (AC) = Performance
+            dashboardData.audits = data.value.map(row => {
                 const values = row.values[0];
-                // Debug: afficher les dernières colonnes pour le premier audit
-                if (idx === data.value.length - 1) {
-                    console.log('Dernier audit - colonnes 19-25:', values.slice(19, 26));
-                    console.log('Colonne 21 (scoreMoyen):', values[21]);
-                    console.log('Colonne 22 (performance):', values[22]);
-                }
                 return {
                     annee: values[0],
                     semaine: values[1],
@@ -9121,8 +9104,8 @@ Cordialement`);
                     auditeur: values[4],
                     zone: values[5],
                     niveau: values[6],
-                    scoreMoyen: values[21],
-                    performance: values[22]
+                    scoreMoyen: values[27],    // Colonne AB (index 27)
+                    performance: values[28]    // Colonne AC (index 28)
                 };
             });
         }
