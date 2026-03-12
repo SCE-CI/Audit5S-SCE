@@ -3517,15 +3517,18 @@
         
         /* Navigation tabs */
         .dashboard-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             background: var(--white);
             border-bottom: 1px solid var(--gray-20);
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+            padding: 0 var(--space-lg);
+            max-width: 1000px;
+            margin: 0 auto;
         }
         
         .dashboard-nav-inner {
             display: flex;
-            padding: 0 var(--space-md);
         }
         
         .dashboard-nav-tab {
@@ -3632,7 +3635,7 @@
         
         /* Content */
         .dashboard-content {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: var(--space-lg);
         }
@@ -3783,22 +3786,19 @@
         .dashboard-nav-right {
             display: flex;
             align-items: center;
-            gap: var(--space-md);
-            margin-left: auto;
-            padding-right: var(--space-md);
+            gap: var(--space-sm);
         }
         
         .dashboard-refresh-btn {
             display: flex;
             align-items: center;
-            gap: var(--space-xs);
-            padding: var(--space-xs) var(--space-sm);
+            justify-content: center;
+            width: 32px;
+            height: 32px;
             background: var(--gray-10);
             border: none;
             border-radius: var(--radius-sm);
-            font-family: inherit;
-            font-size: var(--font-size-xs);
-            color: var(--gray-70);
+            color: var(--gray-60);
             cursor: pointer;
             transition: all 0.15s;
         }
@@ -3809,8 +3809,8 @@
         }
         
         .dashboard-refresh-btn svg {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
         }
         
         .dashboard-refresh-btn.loading svg {
@@ -3820,7 +3820,7 @@
         .dashboard-last-modified {
             display: flex;
             align-items: center;
-            gap: var(--space-xs);
+            gap: 4px;
             font-size: var(--font-size-xs);
             color: var(--gray-50);
         }
@@ -9264,9 +9264,12 @@ Cordialement`);
                     `;
                 }
                 
-                const score = parseScorePercent(lastAudit.performance);
+                const score = parseScorePercent(lastAudit.performance) || parseScorePercent(lastAudit.scoreMoyen);
                 const scoreClass = getScoreClass(score);
                 const dateFormatted = formatExcelDate(lastAudit.date);
+                
+                // Debug temporaire
+                console.log(`Zone ${zoneName}: performance=${lastAudit.performance}, scoreMoyen=${lastAudit.scoreMoyen}, parsed=${score}`);
                 
                 // Compter les actions ouvertes pour cette zone
                 const openActions = dashboardData.actions.filter(a => {
