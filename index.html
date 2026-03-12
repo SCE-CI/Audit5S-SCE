@@ -3837,6 +3837,205 @@
             height: 12px;
         }
         
+        /* ═══════════════════════════════════════════════════════════════
+           ONGLET ZONES - Graphiques
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .dashboard-zone-selector {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+            flex-wrap: wrap;
+        }
+        
+        .dashboard-zone-btn {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--gray-10);
+            border: 2px solid transparent;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .dashboard-zone-btn:hover {
+            background: var(--gray-20);
+        }
+        
+        .dashboard-zone-btn.active {
+            background: var(--sartorius-yellow);
+            border-color: var(--black);
+            font-weight: 600;
+        }
+        
+        /* Cartes de stats de zone */
+        .dashboard-zone-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        @media (max-width: 600px) {
+            .dashboard-zone-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .dashboard-zone-stat {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .dashboard-zone-stat-value {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+        }
+        
+        .dashboard-zone-stat-label {
+            font-size: var(--font-size-xs);
+            color: var(--gray-60);
+            margin-top: 2px;
+        }
+        
+        /* Graphique d'évolution */
+        .dashboard-chart-container {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .dashboard-chart-title {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            color: var(--gray-80);
+        }
+        
+        .dashboard-chart {
+            position: relative;
+            height: 200px;
+        }
+        
+        .dashboard-chart svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .dashboard-chart-line {
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        
+        .dashboard-chart-area {
+            opacity: 0.1;
+        }
+        
+        .dashboard-chart-dot {
+            fill: var(--white);
+            stroke-width: 2.5;
+        }
+        
+        .dashboard-chart-grid-line {
+            stroke: var(--gray-10);
+            stroke-width: 1;
+        }
+        
+        .dashboard-chart-axis-label {
+            font-size: 10px;
+            fill: var(--gray-50);
+        }
+        
+        .dashboard-chart-threshold {
+            stroke: var(--gray-30);
+            stroke-width: 1;
+            stroke-dasharray: 4 4;
+        }
+        
+        .dashboard-chart-threshold-label {
+            font-size: 9px;
+            fill: var(--gray-50);
+        }
+        
+        /* Légende */
+        .dashboard-chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-lg);
+            margin-top: var(--space-md);
+            flex-wrap: wrap;
+        }
+        
+        .dashboard-chart-legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: var(--font-size-xs);
+            color: var(--gray-60);
+        }
+        
+        .dashboard-chart-legend-color {
+            width: 12px;
+            height: 3px;
+            border-radius: 2px;
+        }
+        
+        /* Tableau historique de zone */
+        .dashboard-zone-history {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        /* Radar chart 5S */
+        .dashboard-radar-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-xl);
+            flex-wrap: wrap;
+        }
+        
+        .dashboard-radar {
+            width: 200px;
+            height: 200px;
+        }
+        
+        .dashboard-radar-labels {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        
+        .dashboard-radar-label {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: var(--font-size-sm);
+        }
+        
+        .dashboard-radar-label-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--sartorius-yellow);
+        }
+        
+        .dashboard-radar-label-value {
+            font-weight: 600;
+            margin-left: auto;
+        }
+        
         /* Modal clôture action */
         .dashboard-action-modal {
             display: none;
@@ -8803,6 +9002,7 @@ Cordialement`);
                 <div class="dashboard-nav-content">
                     <div class="dashboard-nav-inner">
                         <button class="dashboard-nav-tab active" data-tab="overview">Vue d'ensemble</button>
+                        <button class="dashboard-nav-tab" data-tab="zones">Zones</button>
                         <button class="dashboard-nav-tab" data-tab="actions">Actions</button>
                         <button class="dashboard-nav-tab" data-tab="history">Historique</button>
                     </div>
@@ -8900,6 +9100,65 @@ Cordialement`);
                         <h3 class="dashboard-section-title">Actions urgentes</h3>
                         <div id="dashboard-urgent-actions">
                             <!-- Rempli dynamiquement -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- TAB: Zones -->
+                <div class="dashboard-tab" id="tab-zones">
+                    <!-- Sélecteur de zone -->
+                    <div class="dashboard-zone-selector" id="dashboard-zone-selector">
+                        <!-- Rempli dynamiquement -->
+                    </div>
+                    
+                    <!-- Stats de la zone sélectionnée -->
+                    <div class="dashboard-zone-stats" id="dashboard-zone-stats">
+                        <!-- Rempli dynamiquement -->
+                    </div>
+                    
+                    <!-- Graphique d'évolution -->
+                    <div class="dashboard-chart-container">
+                        <div class="dashboard-chart-title">Évolution de la performance</div>
+                        <div class="dashboard-chart" id="dashboard-zone-chart">
+                            <!-- SVG généré dynamiquement -->
+                        </div>
+                        <div class="dashboard-chart-legend">
+                            <div class="dashboard-chart-legend-item">
+                                <div class="dashboard-chart-legend-color" style="background: var(--sartorius-yellow);"></div>
+                                <span>Performance %</span>
+                            </div>
+                            <div class="dashboard-chart-legend-item">
+                                <div class="dashboard-chart-legend-color" style="background: var(--gray-30);"></div>
+                                <span>Objectif 85%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Radar 5S du dernier audit -->
+                    <div class="dashboard-chart-container">
+                        <div class="dashboard-chart-title">Dernier audit - Scores par S</div>
+                        <div class="dashboard-radar-container" id="dashboard-zone-radar">
+                            <!-- Généré dynamiquement -->
+                        </div>
+                    </div>
+                    
+                    <!-- Historique des audits de la zone -->
+                    <div class="dashboard-zone-history">
+                        <div class="dashboard-chart-title">Historique des audits</div>
+                        <div class="dashboard-table-wrapper">
+                            <table class="dashboard-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Niveau</th>
+                                        <th>Score</th>
+                                        <th>Auditeur</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-zone-history-tbody">
+                                    <!-- Rempli dynamiquement -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -9197,6 +9456,7 @@ Cordialement`);
                 renderOverview();
                 renderZonesGrid();
                 renderUrgentActions();
+                initZonesTab();
                 renderActionsList('all');
                 renderAuditsTable('');
                 
@@ -9582,6 +9842,246 @@ Cordialement`);
                             </div>
                         </div>
                     </div>
+                `;
+            }).join('');
+        }
+        
+        // ═══════════════════════════════════════════════════════════════
+        // ONGLET ZONES - Graphiques et historique par zone
+        // ═══════════════════════════════════════════════════════════════
+        
+        let selectedZone = null;
+        
+        function initZonesTab() {
+            // Créer les boutons de sélection de zone
+            const selectorContainer = document.getElementById('dashboard-zone-selector');
+            selectorContainer.innerHTML = dashboardZones.map((zone, idx) => {
+                return `<button class="dashboard-zone-btn${idx === 0 ? ' active' : ''}" data-zone="${zone}">${zone}</button>`;
+            }).join('');
+            
+            // Event listeners
+            selectorContainer.querySelectorAll('.dashboard-zone-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    selectorContainer.querySelectorAll('.dashboard-zone-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedZone = this.dataset.zone;
+                    renderZoneDetails(selectedZone);
+                });
+            });
+            
+            // Sélectionner la première zone par défaut
+            selectedZone = dashboardZones[0];
+            renderZoneDetails(selectedZone);
+        }
+        
+        function renderZoneDetails(zoneName) {
+            const zoneAudits = dashboardData.audits.filter(a => a.zone === zoneName);
+            const zoneActions = dashboardData.actions.filter(a => a.zone === zoneName);
+            
+            // Stats
+            renderZoneStats(zoneAudits, zoneActions);
+            
+            // Graphique d'évolution
+            renderZoneChart(zoneAudits);
+            
+            // Radar 5S (dernier audit)
+            renderZoneRadar(zoneAudits);
+            
+            // Historique
+            renderZoneHistory(zoneAudits);
+        }
+        
+        function renderZoneStats(audits, actions) {
+            const container = document.getElementById('dashboard-zone-stats');
+            
+            // Calculs
+            const totalAudits = audits.length;
+            const avgScore = totalAudits > 0 
+                ? Math.round(audits.reduce((sum, a) => sum + parseScorePercent(a.performance), 0) / totalAudits)
+                : 0;
+            const lastAudit = audits.length > 0 ? audits[audits.length - 1] : null;
+            const lastScore = lastAudit ? Math.round(parseScorePercent(lastAudit.performance)) : 0;
+            const openActions = actions.filter(a => ['open', 'overdue'].includes(getActionStatus(a))).length;
+            
+            container.innerHTML = `
+                <div class="dashboard-zone-stat">
+                    <div class="dashboard-zone-stat-value">${totalAudits}</div>
+                    <div class="dashboard-zone-stat-label">Audits total</div>
+                </div>
+                <div class="dashboard-zone-stat">
+                    <div class="dashboard-zone-stat-value ${getScoreClass(avgScore)}">${avgScore}%</div>
+                    <div class="dashboard-zone-stat-label">Moyenne</div>
+                </div>
+                <div class="dashboard-zone-stat">
+                    <div class="dashboard-zone-stat-value ${getScoreClass(lastScore)}">${lastScore}%</div>
+                    <div class="dashboard-zone-stat-label">Dernier audit</div>
+                </div>
+                <div class="dashboard-zone-stat">
+                    <div class="dashboard-zone-stat-value ${openActions > 0 ? 'orange' : ''}">${openActions}</div>
+                    <div class="dashboard-zone-stat-label">Actions ouvertes</div>
+                </div>
+            `;
+        }
+        
+        function renderZoneChart(audits) {
+            const container = document.getElementById('dashboard-zone-chart');
+            
+            if (audits.length < 2) {
+                container.innerHTML = '<div class="dashboard-empty" style="height: 100%; display: flex; align-items: center; justify-content: center;">Pas assez de données pour afficher le graphique</div>';
+                return;
+            }
+            
+            // Prendre les 12 derniers audits max
+            const recentAudits = audits.slice(-12);
+            
+            // Dimensions
+            const width = container.offsetWidth || 600;
+            const height = 200;
+            const padding = { top: 20, right: 30, bottom: 30, left: 40 };
+            const chartWidth = width - padding.left - padding.right;
+            const chartHeight = height - padding.top - padding.bottom;
+            
+            // Échelles
+            const xStep = chartWidth / (recentAudits.length - 1);
+            const yMin = 0;
+            const yMax = 100;
+            
+            // Créer les points
+            const points = recentAudits.map((audit, i) => {
+                const score = parseScorePercent(audit.performance);
+                const x = padding.left + i * xStep;
+                const y = padding.top + chartHeight - (score / yMax * chartHeight);
+                return { x, y, score, date: formatExcelDate(audit.date), niveau: audit.niveau };
+            });
+            
+            // Ligne et aire
+            const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+            const areaPath = linePath + ` L ${points[points.length-1].x} ${padding.top + chartHeight} L ${points[0].x} ${padding.top + chartHeight} Z`;
+            
+            // Seuil 85%
+            const thresholdY = padding.top + chartHeight - (85 / yMax * chartHeight);
+            
+            // SVG
+            let svg = `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">`;
+            
+            // Grille horizontale
+            [0, 25, 50, 75, 100].forEach(val => {
+                const y = padding.top + chartHeight - (val / yMax * chartHeight);
+                svg += `<line class="dashboard-chart-grid-line" x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}"/>`;
+                svg += `<text class="dashboard-chart-axis-label" x="${padding.left - 8}" y="${y + 3}" text-anchor="end">${val}</text>`;
+            });
+            
+            // Seuil 85%
+            svg += `<line class="dashboard-chart-threshold" x1="${padding.left}" y1="${thresholdY}" x2="${width - padding.right}" y2="${thresholdY}"/>`;
+            svg += `<text class="dashboard-chart-threshold-label" x="${width - padding.right + 5}" y="${thresholdY + 3}">85%</text>`;
+            
+            // Aire sous la courbe
+            svg += `<path class="dashboard-chart-area" d="${areaPath}" fill="var(--sartorius-yellow)"/>`;
+            
+            // Ligne
+            svg += `<path class="dashboard-chart-line" d="${linePath}" stroke="var(--sartorius-yellow)"/>`;
+            
+            // Points et labels
+            points.forEach((p, i) => {
+                const scoreClass = getScoreClass(p.score);
+                const color = scoreClass === 'excellent' ? 'var(--traffic-green)' : 
+                              scoreClass === 'good' ? 'var(--sartorius-yellow)' : 
+                              scoreClass === 'warning' ? 'var(--traffic-orange)' : 'var(--traffic-red)';
+                
+                svg += `<circle class="dashboard-chart-dot" cx="${p.x}" cy="${p.y}" r="5" stroke="${color}"/>`;
+                
+                // Label date (tous les 2-3 points selon le nombre)
+                const showLabel = recentAudits.length <= 6 || i % Math.ceil(recentAudits.length / 6) === 0 || i === recentAudits.length - 1;
+                if (showLabel) {
+                    const dateShort = p.date.substring(0, 5); // DD/MM
+                    svg += `<text class="dashboard-chart-axis-label" x="${p.x}" y="${height - 5}" text-anchor="middle">${dateShort}</text>`;
+                }
+            });
+            
+            svg += '</svg>';
+            container.innerHTML = svg;
+        }
+        
+        function renderZoneRadar(audits) {
+            const container = document.getElementById('dashboard-zone-radar');
+            
+            if (audits.length === 0) {
+                container.innerHTML = '<div class="dashboard-empty">Aucun audit disponible</div>';
+                return;
+            }
+            
+            const lastAudit = audits[audits.length - 1];
+            
+            // Les 5S - colonnes 7 à 11 (Seiri, Seiton, Seiso, Seiketsu, Shitsuke)
+            // On prend les scores moyens par S (colonnes après les 15 critères)
+            // En fait on va utiliser les colonnes Score 1S à 5S (indices 17-21 normalement, mais on a 27-28 pour perf)
+            // Simplifions : affichons la performance globale avec un radar simplifié
+            
+            const score = Math.round(parseScorePercent(lastAudit.performance));
+            const dateFormatted = formatExcelDate(lastAudit.date);
+            
+            // Radar simplifié - cercle avec score
+            const size = 160;
+            const center = size / 2;
+            const radius = 60;
+            const scoreRadius = (score / 100) * radius;
+            
+            let svg = `<svg class="dashboard-radar" viewBox="0 0 ${size} ${size}">`;
+            
+            // Cercles de référence
+            [25, 50, 75, 100].forEach(val => {
+                const r = (val / 100) * radius;
+                svg += `<circle cx="${center}" cy="${center}" r="${r}" fill="none" stroke="var(--gray-20)" stroke-width="1"/>`;
+            });
+            
+            // Seuil 85%
+            const threshold85 = (85 / 100) * radius;
+            svg += `<circle cx="${center}" cy="${center}" r="${threshold85}" fill="none" stroke="var(--gray-40)" stroke-width="1" stroke-dasharray="4 4"/>`;
+            
+            // Score actuel
+            const scoreColor = getScoreClass(score) === 'excellent' ? 'var(--traffic-green)' : 
+                               getScoreClass(score) === 'good' ? 'var(--sartorius-yellow)' : 
+                               getScoreClass(score) === 'warning' ? 'var(--traffic-orange)' : 'var(--traffic-red)';
+            
+            svg += `<circle cx="${center}" cy="${center}" r="${scoreRadius}" fill="${scoreColor}" fill-opacity="0.2" stroke="${scoreColor}" stroke-width="2"/>`;
+            svg += `<text x="${center}" y="${center}" text-anchor="middle" dominant-baseline="middle" font-size="24" font-weight="700" fill="${scoreColor}">${score}%</text>`;
+            
+            svg += '</svg>';
+            
+            container.innerHTML = `
+                <div style="text-align: center;">
+                    ${svg}
+                    <div style="font-size: var(--font-size-sm); color: var(--gray-60); margin-top: var(--space-sm);">
+                        ${lastAudit.niveau} - ${dateFormatted}<br>
+                        <span style="font-size: var(--font-size-xs);">Auditeur: ${lastAudit.auditeur}</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderZoneHistory(audits) {
+            const tbody = document.getElementById('dashboard-zone-history-tbody');
+            
+            if (audits.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--gray-50);">Aucun audit</td></tr>';
+                return;
+            }
+            
+            // Trier par date décroissante
+            const sortedAudits = [...audits].reverse();
+            
+            tbody.innerHTML = sortedAudits.map(audit => {
+                const score = Math.round(parseScorePercent(audit.performance));
+                const scoreClass = getScoreClass(score);
+                const dateFormatted = formatExcelDate(audit.date);
+                
+                return `
+                    <tr>
+                        <td>${dateFormatted}</td>
+                        <td><span class="dashboard-badge ${audit.niveau === 'N2' ? 'n2' : 'n1'}">${audit.niveau}</span></td>
+                        <td><span class="score-${scoreClass}">${score}%</span></td>
+                        <td>${audit.auditeur}</td>
+                    </tr>
                 `;
             }).join('');
         }
