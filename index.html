@@ -5001,9 +5001,35 @@
                 if (accounts.length > 0) {
                     msalAccount = accounts[0];
                     tryProactiveAuth();
+                } else if (isMobileDevice()) {
+                    // Sur mobile, tenter une connexion SSO silencieuse
+                    // (utilise les cookies Microsoft si l'utilisateur est connecté ailleurs)
+                    tryMobileSsoSilent();
                 }
             } catch (error) {
                 console.error('MSAL: Erreur initialisation', error);
+            }
+        }
+        
+        // Tentative de SSO silencieux sur mobile (sans interaction utilisateur)
+        async function tryMobileSsoSilent() {
+            if (!msalInstance) return;
+            
+            try {
+                // ssoSilent tente de récupérer un token via les cookies Microsoft
+                const response = await msalInstance.ssoSilent({
+                    scopes: loginRequest.scopes
+                });
+                
+                if (response && response.account) {
+                    msalAccount = response.account;
+                    msalConnected = true;
+                    console.log('MSAL: SSO silencieux réussi', msalAccount.username);
+                    updateMsalStatusDisplay();
+                }
+            } catch (error) {
+                // Échec silencieux attendu si pas de session Microsoft active
+                console.log('MSAL: SSO silencieux non disponible');
             }
         }
         
