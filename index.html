@@ -3764,23 +3764,81 @@
         .dashboard-zone-bar-fill.warning { background: var(--traffic-orange); }
         .dashboard-zone-bar-fill.critical { background: var(--traffic-red); }
         
-        /* Actions */
-        .dashboard-action-item {
+        /* Indicateur de connexion */
+        .dashboard-user-badge {
             display: flex;
-            gap: var(--space-md);
-            padding: var(--space-md);
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--traffic-green);
+            color: var(--white);
+            border-radius: 50%;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        /* Actions - format tableau */
+        .dashboard-actions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .dashboard-actions-table th {
+            text-align: left;
+            padding: var(--space-sm) var(--space-sm);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            color: var(--gray-60);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--gray-20);
+        }
+        
+        .dashboard-actions-table th:first-child {
+            width: 30px;
+            text-align: center;
+        }
+        
+        .dashboard-actions-table td {
+            padding: var(--space-sm);
+            border-bottom: 1px solid var(--gray-10);
+            font-size: var(--font-size-sm);
+            vertical-align: top;
+        }
+        
+        .dashboard-actions-table tr:hover td {
             background: var(--gray-5);
-            border-radius: var(--radius-md);
-            margin-bottom: var(--space-sm);
-            align-items: flex-start;
+        }
+        
+        .dashboard-actions-table .col-status {
+            text-align: center;
+            width: 30px;
+        }
+        
+        .dashboard-actions-table .col-action {
+            max-width: 300px;
+        }
+        
+        .dashboard-actions-table .col-zone {
+            white-space: nowrap;
+        }
+        
+        .dashboard-actions-table .col-resp {
+            white-space: nowrap;
+        }
+        
+        .dashboard-actions-table .col-date {
+            white-space: nowrap;
+            color: var(--gray-60);
         }
         
         .dashboard-action-status {
+            display: inline-block;
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            flex-shrink: 0;
-            margin-top: 5px;
         }
         
         .dashboard-action-status.open { background: var(--traffic-orange); }
@@ -3788,26 +3846,36 @@
         .dashboard-action-status.closed { background: var(--traffic-green); }
         .dashboard-action-status.cancelled { background: var(--gray-40); }
         
-        .dashboard-action-content {
+        /* Actions urgentes (vue d'ensemble) - format compact */
+        .dashboard-urgent-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--gray-10);
+        }
+        
+        .dashboard-urgent-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dashboard-urgent-content {
             flex: 1;
             min-width: 0;
         }
         
-        .dashboard-action-text {
+        .dashboard-urgent-text {
             font-size: var(--font-size-sm);
-            margin-bottom: var(--space-xs);
+            margin-bottom: 2px;
         }
         
-        .dashboard-action-meta {
+        .dashboard-urgent-meta {
             font-size: var(--font-size-xs);
             color: var(--gray-50);
-            display: flex;
-            gap: var(--space-md);
-            flex-wrap: wrap;
         }
         
-        .dashboard-action-meta strong {
-            color: var(--gray-70);
+        .dashboard-urgent-meta span {
+            margin-right: var(--space-md);
         }
         
         /* Filters */
@@ -8480,6 +8548,7 @@ Cordialement`);
                         <div class="title">Audit 5S</div>
                         <div class="date" id="dashboard-header-date"></div>
                     </div>
+                    <div class="dashboard-user-badge" id="dashboard-user-badge" style="display: none;"></div>
                     <button class="dashboard-close" onclick="closeDashboard()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -8777,6 +8846,18 @@ Cordialement`);
                 loadingEl.style.display = 'none';
                 contentEl.style.display = 'block';
                 
+                // Afficher l'indicateur de connexion avec initiales
+                const userBadge = document.getElementById('dashboard-user-badge');
+                if (msalAccount && msalAccount.name) {
+                    const nameParts = msalAccount.name.split(' ');
+                    const initials = nameParts.length >= 2 
+                        ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
+                        : msalAccount.name.substring(0, 2).toUpperCase();
+                    userBadge.textContent = initials;
+                    userBadge.title = msalAccount.name;
+                    userBadge.style.display = 'flex';
+                }
+                
                 // Animation du header
                 setTimeout(() => {
                     headerEl.classList.add('loaded');
@@ -9060,14 +9141,14 @@ Cordialement`);
                 const dateFormatted = formatExcelDate(action.dateOuverture);
                 
                 return `
-                    <div class="dashboard-action-item">
+                    <div class="dashboard-urgent-item">
                         <div class="dashboard-action-status ${status}"></div>
-                        <div class="dashboard-action-content">
-                            <div class="dashboard-action-text">${action.action || '-'}</div>
-                            <div class="dashboard-action-meta">
-                                <span><strong>Zone:</strong> ${action.zone || '-'}</span>
-                                <span><strong>Resp:</strong> ${action.responsable || '-'}</span>
-                                <span><strong>Ouvert:</strong> ${dateFormatted}</span>
+                        <div class="dashboard-urgent-content">
+                            <div class="dashboard-urgent-text">${action.action || '-'}</div>
+                            <div class="dashboard-urgent-meta">
+                                <span>${action.zone || '-'}</span>
+                                <span>${action.responsable || '-'}</span>
+                                <span>${dateFormatted}</span>
                             </div>
                         </div>
                     </div>
@@ -9102,33 +9183,46 @@ Cordialement`);
                 return;
             }
             
-            container.innerHTML = filteredActions.map(action => {
+            let html = `
+                <div class="dashboard-table-wrapper">
+                    <table class="dashboard-actions-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Action</th>
+                                <th>Zone</th>
+                                <th>Responsable</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            filteredActions.forEach(action => {
                 const status = getActionStatus(action);
                 const dateFormatted = formatExcelDate(action.dateOuverture);
                 const closeDateFormatted = action.dateCloture ? formatExcelDate(action.dateCloture) : '';
                 
-                let metaExtra = '';
+                let dateDisplay = dateFormatted;
                 if (status === 'closed') {
-                    metaExtra = `<span style="color: var(--traffic-green);"><strong>Clôturé:</strong> ${closeDateFormatted}</span>`;
+                    dateDisplay = `<span style="color: var(--traffic-green);">Clôturé ${closeDateFormatted}</span>`;
                 } else if (status === 'cancelled') {
-                    metaExtra = `<span style="color: var(--gray-50);"><strong>Annulé</strong></span>`;
+                    dateDisplay = `<span style="color: var(--gray-50);">Annulé</span>`;
                 }
                 
-                return `
-                    <div class="dashboard-action-item">
-                        <div class="dashboard-action-status ${status}"></div>
-                        <div class="dashboard-action-content">
-                            <div class="dashboard-action-text">${action.action || '-'}</div>
-                            <div class="dashboard-action-meta">
-                                <span><strong>Zone:</strong> ${action.zone || '-'}</span>
-                                <span><strong>Resp:</strong> ${action.responsable || '-'}</span>
-                                <span><strong>Ouvert:</strong> ${dateFormatted}</span>
-                                ${metaExtra}
-                            </div>
-                        </div>
-                    </div>
+                html += `
+                    <tr>
+                        <td class="col-status"><span class="dashboard-action-status ${status}"></span></td>
+                        <td class="col-action">${action.action || '-'}</td>
+                        <td class="col-zone">${action.zone || '-'}</td>
+                        <td class="col-resp">${action.responsable || '-'}</td>
+                        <td class="col-date">${dateDisplay}</td>
+                    </tr>
                 `;
-            }).join('');
+            });
+            
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
         }
         
         // Rendre le tableau des audits (avec recherche)
