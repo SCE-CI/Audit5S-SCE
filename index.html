@@ -9339,6 +9339,65 @@ Cordialement`);
             document.getElementById('dashboard-refresh-btn').addEventListener('click', function() {
                 refreshDashboardData();
             });
+            
+            // Vérifier si un paramètre d'action est présent dans l'URL
+            checkUrlActionParams();
+        }
+        
+        // Vérifier les paramètres URL pour action directe
+        function checkUrlActionParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const actionParam = urlParams.get('action');
+            const actionId = urlParams.get('id');
+            
+            if (actionParam && actionId) {
+                // Stocker pour traitement après chargement des données
+                pendingActionFromUrl = { action: actionParam, id: actionId };
+                
+                // Ouvrir le dashboard automatiquement
+                openDashboard();
+                
+                // Nettoyer l'URL (sans recharger la page)
+                const cleanUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+            }
+        }
+        
+        // Variable pour stocker l'action en attente depuis l'URL
+        let pendingActionFromUrl = null;
+        
+        // Traiter l'action en attente après chargement des données
+        function processPendingUrlAction() {
+            if (!pendingActionFromUrl) return;
+            
+            const { action, id } = pendingActionFromUrl;
+            pendingActionFromUrl = null;
+            
+            // Trouver l'action par son ID
+            const actionData = dashboardData.actions.find(a => a.actionId === id);
+            
+            if (!actionData) {
+                alert(`Action "${id}" non trouvée.`);
+                return;
+            }
+            
+            // Vérifier si l'action est encore ouverte
+            const status = getActionStatus(actionData);
+            if (status === 'closed' || status === 'cancelled') {
+                alert(`Cette action a déjà été ${status === 'closed' ? 'clôturée' : 'annulée'}.`);
+                return;
+            }
+            
+            // Aller à l'onglet Actions
+            document.querySelectorAll('.dashboard-nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.dashboard-nav-tab[data-tab="actions"]').classList.add('active');
+            document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-actions').classList.add('active');
+            
+            // Ouvrir le modal de gestion
+            setTimeout(() => {
+                openActionModal(actionData.rowIndex);
+            }, 300);
         }
         
         function openDashboard() {
@@ -9459,6 +9518,9 @@ Cordialement`);
                 initZonesTab();
                 renderActionsList('all');
                 renderAuditsTable('');
+                
+                // Traiter une action en attente depuis l'URL
+                processPendingUrlAction();
                 
             } catch (error) {
                 console.error('Dashboard error:', error);
