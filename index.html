@@ -4268,20 +4268,27 @@
         
         @media (max-width: 600px) {
             /* Header mobile */
+            /* Header mobile - sticky */
+            .dashboard-header {
+                position: sticky;
+                top: 0;
+                z-index: 20;
+            }
+            
             .dashboard-header-content {
                 padding: var(--space-sm);
             }
             
             .dashboard-header .header-logo {
-                height: 45px;
+                height: 40px;
             }
             
             .dashboard-header-title {
-                font-size: var(--font-size-base);
+                font-size: var(--font-size-sm);
             }
             
             .dashboard-header.loaded .dashboard-header-title {
-                max-width: 120px;
+                max-width: 80px;
             }
             
             .dashboard-beta-badge {
@@ -4294,37 +4301,19 @@
             }
             
             .dashboard-close {
-                width: 36px;
-                height: 36px;
+                width: 32px;
+                height: 32px;
+            }
+            
+            .dashboard-close svg {
+                width: 20px;
+                height: 20px;
             }
             
             .dashboard-user-badge {
-                width: 28px;
-                height: 28px;
-                font-size: var(--font-size-xs);
-            }
-            
-            /* Navigation mobile */
-            .dashboard-nav-content {
-                padding: 0 var(--space-sm);
-            }
-            
-            .dashboard-nav-tab {
-                padding: var(--space-sm) var(--space-sm);
-                font-size: var(--font-size-xs);
-            }
-            
-            .dashboard-nav-right {
-                gap: var(--space-xs);
-            }
-            
-            .dashboard-last-modified {
-                display: none;
-            }
-            
-            .dashboard-refresh-btn {
-                width: 32px;
-                height: 32px;
+                width: 26px;
+                height: 26px;
+                font-size: 10px;
             }
             
             /* Navigation bottom bar mobile */
@@ -4349,23 +4338,26 @@
             }
             
             .dashboard-nav-tab {
+                position: relative;
                 flex: 1;
+                display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 2px;
-                padding: var(--space-sm) var(--space-xs);
+                gap: 4px;
+                padding: 10px 4px 8px;
                 border-bottom: none;
                 font-size: 10px;
             }
             
             .dashboard-nav-tab::before {
                 content: '';
-                width: 22px;
-                height: 22px;
-                background-size: contain;
+                display: block;
+                width: 24px;
+                height: 24px;
+                background-size: 24px 24px;
                 background-repeat: no-repeat;
                 background-position: center;
-                opacity: 0.6;
+                opacity: 0.5;
             }
             
             .dashboard-nav-tab.active::before {
@@ -4400,10 +4392,10 @@
                 top: 0;
                 left: 50%;
                 transform: translateX(-50%);
-                width: 32px;
+                width: 40px;
                 height: 3px;
                 background: var(--sartorius-yellow);
-                border-radius: 0 0 2px 2px;
+                border-radius: 0 0 3px 3px;
             }
             
             .dashboard-nav-right {
@@ -4412,7 +4404,7 @@
             
             /* Refresh button dans le header mobile */
             .dashboard-header-right {
-                gap: var(--space-sm);
+                gap: var(--space-xs);
             }
             
             .dashboard-mobile-refresh {
