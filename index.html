@@ -4805,17 +4805,26 @@
         .dashboard-action-modal-close {
             background: none;
             border: none;
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             cursor: pointer;
             color: var(--gray-50);
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 50%;
+            transition: all 0.15s;
         }
         
-        .dashboard-action-modal-close:hover {
+        .dashboard-action-modal-close:hover,
+        .dashboard-action-modal-close:active {
             color: var(--black);
+            background: var(--gray-10);
+        }
+        
+        .dashboard-action-modal-close svg {
+            width: 24px;
+            height: 24px;
         }
         
         .dashboard-action-modal-body {
@@ -10380,8 +10389,8 @@ Cordialement`);
         </div>
         
         <!-- Modal clôture action -->
-        <div class="dashboard-action-modal" id="dashboard-action-modal">
-            <div class="dashboard-action-modal-content">
+        <div class="dashboard-action-modal" id="dashboard-action-modal" onclick="closeActionModal()">
+            <div class="dashboard-action-modal-content" onclick="event.stopPropagation()">
                 <div class="dashboard-action-modal-header">
                     <span class="dashboard-action-modal-title">Gérer l'action</span>
                     <button class="dashboard-action-modal-close" onclick="closeActionModal()">
