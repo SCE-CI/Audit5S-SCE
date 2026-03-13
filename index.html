@@ -4288,12 +4288,18 @@
             }
             
             .dashboard-header.loaded .dashboard-header-title {
-                max-width: 80px;
+                max-width: 200px;
             }
             
             .dashboard-beta-badge {
-                font-size: 8px;
-                padding: 2px 4px;
+                position: fixed;
+                bottom: 70px;
+                right: 10px;
+                font-size: 9px;
+                padding: 3px 6px;
+                background: rgba(0, 0, 0, 0.7);
+                color: var(--white);
+                z-index: 15;
             }
             
             .dashboard-header-info {
@@ -7704,8 +7710,8 @@
         
         function getDefaultActionType(criteriaId) {
             const score = auditData.scores[criteriaId];
-            // Score 0-1 : Écart, Score 2 : Élévation
-            return (score !== undefined && score <= 1) ? 'ecart' : 'elevation';
+            // Score 0-2 : Écart, Score 3-4 : Élévation
+            return (score !== undefined && score <= 2) ? 'ecart' : 'elevation';
         }
         
         function collapseOtherActions(currentCard) {
@@ -8788,17 +8794,44 @@
             const actionText = document.getElementById('mobile-action-text').value.trim();
             const responsable = document.getElementById('mobile-action-responsable').value.trim();
             
-            // Mettre à jour les données
-            if (actionText || responsable || mobileActionPhotos.length > 0) {
-                auditData.actions[criteriaId] = {
-                    type: type,
-                    action: actionText,
-                    responsable: responsable,
-                    photos: mobileActionPhotos.length > 0 ? [...mobileActionPhotos] : undefined
-                };
-            } else {
-                delete auditData.actions[criteriaId];
+            // Validation : description ET responsable obligatoires
+            let hasError = false;
+            
+            const textInput = document.getElementById('mobile-action-text');
+            const respInput = document.getElementById('mobile-action-responsable');
+            
+            if (!actionText) {
+                textInput.style.borderColor = 'var(--traffic-red)';
+                textInput.style.animation = 'shake 0.3s';
+                setTimeout(() => { 
+                    textInput.style.animation = ''; 
+                    textInput.style.borderColor = '';
+                }, 300);
+                hasError = true;
             }
+            
+            if (!responsable) {
+                respInput.style.borderColor = 'var(--traffic-red)';
+                respInput.style.animation = 'shake 0.3s';
+                setTimeout(() => { 
+                    respInput.style.animation = ''; 
+                    respInput.style.borderColor = '';
+                }, 300);
+                hasError = true;
+            }
+            
+            if (hasError) {
+                showToast('Veuillez remplir la description et le responsable', 'warning');
+                return;
+            }
+            
+            // Mettre à jour les données
+            auditData.actions[criteriaId] = {
+                type: type,
+                action: actionText,
+                responsable: responsable,
+                photos: mobileActionPhotos.length > 0 ? [...mobileActionPhotos] : undefined
+            };
             
             // Synchroniser avec le bloc action inline
             const actionBlock = card.querySelector('.action-block');
@@ -10116,9 +10149,9 @@ Cordialement`);
                             <path d="M666.04,320.8h84.33c26.77,0,52.71,20.92,52.71,52.1c0,29.95-23.85,52.51-53.97,52.51h-45.23v37.33l34.46-0.32l55.03,104.52h45.6l-59.43-109.35c31.08-9.44,62.1-41.61,62.1-84.69c0-51.28-36.82-89.43-89.95-89.43h-85.67V320.8z"/>
                         </svg>
                         <span class="dashboard-header-title">Tableau de bord</span>
-                        <span class="dashboard-beta-badge">Beta</span>
                     </div>
                     <div class="dashboard-header-right">
+                        <span class="dashboard-beta-badge">Beta</span>
                         <div class="dashboard-header-info">
                             <div class="title">Audit 5S</div>
                             <div class="date" id="dashboard-header-date"></div>
