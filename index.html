@@ -1993,50 +1993,53 @@
             gap: var(--space-md);
         }
         
-        .score-display {
+        .bottom-bar-item {
             display: flex;
-            align-items: baseline;
-            gap: var(--space-xs);
-            padding: var(--space-sm) var(--space-md);
-            background: var(--gray-5);
-            border-radius: var(--radius-md);
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            position: relative;
+        }
+        
+        .bottom-bar-label {
+            font-size: 9px;
+            font-weight: 500;
+            color: var(--gray-50);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
             white-space: nowrap;
         }
         
-        .score-display .score-value {
-            font-size: var(--font-size-xl);
-            font-weight: 700;
-            color: var(--black);
+        .dashboard-shortcut {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: var(--gray-10);
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.15s;
+            flex-shrink: 0;
         }
         
-        .score-display .score-max {
-            font-size: var(--font-size-sm);
-            color: var(--gray-50);
+        .dashboard-shortcut:hover {
+            background: var(--gray-20);
         }
         
-        .score-display .score-percent {
-            font-size: var(--font-size-sm);
-            font-weight: 700;
-            padding: 2px var(--space-xs);
-            border-radius: var(--radius-sm);
-            margin-left: var(--space-xs);
+        .dashboard-shortcut:active {
+            transform: scale(0.95);
         }
         
-        .score-percent.low { 
-            background: var(--score-1); 
-            color: var(--white);
+        .dashboard-shortcut svg {
+            width: 20px;
+            height: 20px;
+            color: var(--gray-70);
         }
-        .score-percent.medium { 
-            background: var(--score-2); 
+        
+        .dashboard-shortcut:hover svg {
             color: var(--black);
-        }
-        .score-percent.good { 
-            background: var(--score-3); 
-            color: var(--black);
-        }
-        .score-percent.excellent { 
-            background: var(--score-4); 
-            color: var(--white);
         }
         
         .submit-btn {
@@ -2073,6 +2076,24 @@
         
         .submit-btn.ready:hover {
             background: #E6D600;
+        }
+        
+        /* Score intégré dans le texte du bouton */
+        .submit-score {
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        .submit-score::before {
+            content: ' • ';
+        }
+        
+        .submit-score:empty {
+            display: none;
+        }
+        
+        .submit-score:empty::before {
+            display: none;
         }
         
         /* ═══════════════════════════════════════════════════════════════
@@ -2187,20 +2208,18 @@
                 gap: 8px;
             }
             
-            .score-display {
-                padding: 6px 10px;
+            .dashboard-shortcut {
+                width: 40px;
+                height: 40px;
             }
             
-            .score-display .score-value {
-                font-size: 1rem;
+            .dashboard-shortcut svg {
+                width: 18px;
+                height: 18px;
             }
             
-            .score-display .score-max {
-                font-size: 0.75rem;
-            }
-            
-            .score-display .score-percent {
-                font-size: 0.7rem;
+            .bottom-bar-label {
+                font-size: 8px;
             }
             
             .submit-btn {
@@ -2670,6 +2689,349 @@
         
         .export-modal-overlay.visible .export-modal {
             transform: scale(1);
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════
+           MODALE MOBILE ACTION
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .mobile-action-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--white);
+            z-index: 300;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .mobile-action-modal.visible {
+            display: flex;
+        }
+        
+        .mobile-action-header {
+            display: flex;
+            align-items: center;
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 1px solid var(--gray-10);
+            gap: var(--space-sm);
+        }
+        
+        .mobile-action-back {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: var(--gray-60);
+            cursor: pointer;
+        }
+        
+        .mobile-action-back svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .mobile-action-title {
+            flex: 1;
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+        }
+        
+        .mobile-action-body {
+            flex: 1;
+            padding: var(--space-lg);
+            overflow-y: auto;
+        }
+        
+        .mobile-action-footer {
+            padding: var(--space-md) var(--space-lg);
+            border-top: 1px solid var(--gray-10);
+        }
+        
+        /* Formulaire */
+        .mobile-action-group {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .mobile-action-label {
+            display: block;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            color: var(--gray-60);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .mobile-action-criterion {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            background: var(--gray-5);
+            border-radius: var(--radius-md);
+        }
+        
+        .mobile-action-criterion-badge {
+            width: 32px;
+            height: 32px;
+            background: var(--gray-20);
+            color: var(--gray-80);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-xs);
+            font-weight: 700;
+        }
+        
+        .mobile-action-criterion-text {
+            flex: 1;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+        }
+        
+        /* Toggle type */
+        .mobile-action-type-toggle {
+            display: flex;
+            gap: var(--space-sm);
+        }
+        
+        .mobile-action-type-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            background: var(--white);
+            border: 2px solid var(--gray-20);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            color: var(--gray-60);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .mobile-action-type-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .mobile-action-type-btn.selected {
+            border-color: var(--sartorius-yellow);
+            background: rgba(255, 237, 0, 0.1);
+            color: var(--black);
+        }
+        
+        .mobile-action-type-btn .radio-dot {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--gray-40);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .mobile-action-type-btn.selected .radio-dot {
+            border-color: var(--black);
+        }
+        
+        .mobile-action-type-btn.selected .radio-dot::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--black);
+            border-radius: 50%;
+        }
+        
+        /* Inputs */
+        .mobile-action-input {
+            width: 100%;
+            padding: var(--space-md);
+            border: 1px solid var(--gray-20);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 16px; /* Prevent iOS zoom */
+            background: var(--white);
+        }
+        
+        .mobile-action-input:focus {
+            outline: none;
+            border-color: var(--sartorius-yellow);
+            box-shadow: 0 0 0 3px rgba(255, 237, 0, 0.2);
+        }
+        
+        .mobile-action-textarea {
+            min-height: 120px;
+            resize: none;
+        }
+        
+        /* Autocomplete dans modale */
+        .mobile-action-autocomplete {
+            position: relative;
+        }
+        
+        .mobile-action-autocomplete .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border: 1px solid var(--gray-20);
+            border-top: none;
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+        
+        .mobile-action-autocomplete .autocomplete-suggestions.visible {
+            display: block;
+        }
+        
+        .mobile-action-autocomplete .autocomplete-item {
+            padding: var(--space-sm) var(--space-md);
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+        }
+        
+        .mobile-action-autocomplete .autocomplete-item:hover,
+        .mobile-action-autocomplete .autocomplete-item.selected {
+            background: var(--gray-5);
+        }
+        
+        /* Photo button */
+        .mobile-action-photo-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            width: 100%;
+            padding: var(--space-md);
+            background: var(--gray-5);
+            border: 1px dashed var(--gray-30);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .mobile-action-photo-btn:hover {
+            background: var(--gray-10);
+        }
+        
+        .mobile-action-photo-btn .icon-wrapper {
+            width: 44px;
+            height: 44px;
+            background: var(--white);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .mobile-action-photo-btn .icon-wrapper svg {
+            width: 22px;
+            height: 22px;
+            color: var(--gray-60);
+        }
+        
+        .mobile-action-photo-btn .text {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .mobile-action-photo-btn .text-main {
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--gray-80);
+        }
+        
+        .mobile-action-photo-btn .text-sub {
+            font-size: var(--font-size-xs);
+            color: var(--gray-50);
+        }
+        
+        .mobile-action-photo-btn .photo-count-badge {
+            background: var(--traffic-green);
+            color: var(--white);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+        }
+        
+        /* Photo preview */
+        .mobile-action-photo-preview {
+            display: flex;
+            gap: var(--space-sm);
+            margin-top: var(--space-sm);
+            flex-wrap: wrap;
+        }
+        
+        .mobile-action-photo-thumb {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        
+        .mobile-action-photo-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .mobile-action-photo-thumb .remove-photo {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background: rgba(0,0,0,0.6);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Submit button */
+        .mobile-action-submit {
+            width: 100%;
+            padding: var(--space-md);
+            background: var(--sartorius-yellow);
+            color: var(--black);
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        
+        .mobile-action-submit:hover {
+            background: #E6D600;
+        }
+        
+        .mobile-action-submit:disabled {
+            background: var(--gray-20);
+            color: var(--gray-50);
+            cursor: not-allowed;
         }
         
         /* ═══════════════════════════════════════════════════════════════
@@ -3290,13 +3652,12 @@
             border-top-color: var(--gray-30);
         }
         
-        body.dark-mode .score-display {
-            background: var(--gray-10);
+        body.dark-mode .dashboard-shortcut {
+            background: var(--gray-20);
         }
         
-        /* Score percent jaune - texte sombre */
-        body.dark-mode .score-percent.good {
-            color: #000000;
+        body.dark-mode .dashboard-shortcut:hover {
+            background: var(--gray-30);
         }
         
         /* Coches des scores 2 et 3 - forcer noir */
@@ -3468,10 +3829,33 @@
             max-width: 200px;
         }
         
+        .dashboard-beta-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: opacity 0.3s ease 0.2s, transform 0.3s ease 0.2s;
+        }
+        
+        .dashboard-header.loaded .dashboard-beta-badge {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
         .dashboard-header-right {
             display: flex;
             align-items: center;
             gap: var(--space-md);
+        }
+        
+        .dashboard-mobile-refresh {
+            display: none;
         }
         
         .dashboard-header-info {
@@ -3878,9 +4262,352 @@
             margin-bottom: var(--space-lg);
         }
         
+        /* ═══════════════════════════════════════════════════════════════
+           DASHBOARD - Styles Mobile
+        ═══════════════════════════════════════════════════════════════ */
+        
         @media (max-width: 600px) {
+            /* Header mobile */
+            .dashboard-header-content {
+                padding: var(--space-sm);
+            }
+            
+            .dashboard-header .header-logo {
+                height: 45px;
+            }
+            
+            .dashboard-header-title {
+                font-size: var(--font-size-base);
+            }
+            
+            .dashboard-header.loaded .dashboard-header-title {
+                max-width: 120px;
+            }
+            
+            .dashboard-beta-badge {
+                font-size: 8px;
+                padding: 2px 4px;
+            }
+            
+            .dashboard-header-info {
+                display: none;
+            }
+            
+            .dashboard-close {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .dashboard-user-badge {
+                width: 28px;
+                height: 28px;
+                font-size: var(--font-size-xs);
+            }
+            
+            /* Navigation mobile */
+            .dashboard-nav-content {
+                padding: 0 var(--space-sm);
+            }
+            
+            .dashboard-nav-tab {
+                padding: var(--space-sm) var(--space-sm);
+                font-size: var(--font-size-xs);
+            }
+            
+            .dashboard-nav-right {
+                gap: var(--space-xs);
+            }
+            
+            .dashboard-last-modified {
+                display: none;
+            }
+            
+            .dashboard-refresh-btn {
+                width: 32px;
+                height: 32px;
+            }
+            
+            /* Navigation bottom bar mobile */
+            .dashboard-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                border-bottom: none;
+                border-top: 1px solid var(--gray-20);
+                z-index: 10;
+            }
+            
+            .dashboard-nav-content {
+                padding: 0;
+                justify-content: center;
+            }
+            
+            .dashboard-nav-inner {
+                flex: 1;
+                justify-content: space-around;
+            }
+            
+            .dashboard-nav-tab {
+                flex: 1;
+                flex-direction: column;
+                align-items: center;
+                gap: 2px;
+                padding: var(--space-sm) var(--space-xs);
+                border-bottom: none;
+                font-size: 10px;
+            }
+            
+            .dashboard-nav-tab::before {
+                content: '';
+                width: 22px;
+                height: 22px;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                opacity: 0.6;
+            }
+            
+            .dashboard-nav-tab.active::before {
+                opacity: 1;
+            }
+            
+            .dashboard-nav-tab[data-tab="overview"]::before {
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7'/%3E%3Crect x='14' y='3' width='7' height='7'/%3E%3Crect x='14' y='14' width='7' height='7'/%3E%3Crect x='3' y='14' width='7' height='7'/%3E%3C/svg%3E");
+            }
+            
+            .dashboard-nav-tab[data-tab="zones"]::before {
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E");
+            }
+            
+            .dashboard-nav-tab[data-tab="actions"]::before {
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 11.08V12a10 10 0 1 1-5.93-9.14'/%3E%3Cpolyline points='22 4 12 14.01 9 11.01'/%3E%3C/svg%3E");
+            }
+            
+            .dashboard-nav-tab[data-tab="history"]::before {
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E");
+            }
+            
+            .dashboard-nav-tab.active {
+                border-bottom: none;
+                color: var(--black);
+                font-weight: 600;
+            }
+            
+            .dashboard-nav-tab.active::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 32px;
+                height: 3px;
+                background: var(--sartorius-yellow);
+                border-radius: 0 0 2px 2px;
+            }
+            
+            .dashboard-nav-right {
+                display: none;
+            }
+            
+            /* Refresh button dans le header mobile */
+            .dashboard-header-right {
+                gap: var(--space-sm);
+            }
+            
+            .dashboard-mobile-refresh {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 36px;
+                height: 36px;
+                background: rgba(0,0,0,0.1);
+                border: none;
+                border-radius: 50%;
+                cursor: pointer;
+            }
+            
+            .dashboard-mobile-refresh svg {
+                width: 18px;
+                height: 18px;
+            }
+            
+            /* Ajuster le padding bottom du content pour la nav */
+            .dashboard-content {
+                padding-bottom: 70px;
+            }
+            
+            /* Content mobile */
+            .dashboard-content {
+                padding: var(--space-sm);
+            }
+            
+            /* Stats grid mobile */
+            .dashboard-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--space-sm);
+            }
+            
+            .dashboard-stat-card {
+                padding: var(--space-sm);
+            }
+            
+            .dashboard-stat-value {
+                font-size: var(--font-size-lg);
+            }
+            
+            /* Sections mobile */
+            .dashboard-section {
+                padding: var(--space-md);
+                margin-bottom: var(--space-md);
+            }
+            
+            .dashboard-section-title {
+                font-size: var(--font-size-sm);
+            }
+            
+            /* Zones grid mobile */
+            .dashboard-zones-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-sm);
+            }
+            
+            .dashboard-zone-card {
+                padding: var(--space-sm);
+            }
+            
+            /* Zone stats mobile (onglet Zones) */
             .dashboard-zone-stats {
                 grid-template-columns: repeat(2, 1fr);
+                gap: var(--space-sm);
+            }
+            
+            .dashboard-zone-stat {
+                padding: var(--space-sm);
+            }
+            
+            .dashboard-zone-stat-value {
+                font-size: var(--font-size-lg);
+            }
+            
+            /* Zone selector mobile */
+            .dashboard-zone-selector {
+                gap: var(--space-xs);
+                margin-bottom: var(--space-md);
+            }
+            
+            .dashboard-zone-btn {
+                padding: var(--space-xs) var(--space-sm);
+                font-size: var(--font-size-xs);
+            }
+            
+            /* Charts mobile */
+            .dashboard-chart-container {
+                padding: var(--space-md);
+                margin-bottom: var(--space-md);
+            }
+            
+            .dashboard-chart {
+                height: 160px;
+            }
+            
+            .dashboard-chart-legend {
+                gap: var(--space-md);
+            }
+            
+            /* Filters mobile */
+            .dashboard-filters {
+                gap: var(--space-xs);
+                margin-bottom: var(--space-md);
+                flex-wrap: wrap;
+            }
+            
+            .dashboard-filter-btn {
+                padding: var(--space-xs) var(--space-sm);
+                font-size: var(--font-size-xs);
+            }
+            
+            /* Search mobile */
+            .dashboard-search {
+                margin-bottom: var(--space-md);
+            }
+            
+            .dashboard-search-input {
+                padding: var(--space-sm);
+                font-size: var(--font-size-sm);
+            }
+            
+            /* Tables mobile */
+            .dashboard-table th,
+            .dashboard-table td {
+                padding: var(--space-xs) var(--space-sm);
+                font-size: var(--font-size-xs);
+            }
+            
+            .dashboard-actions-table th,
+            .dashboard-actions-table td {
+                padding: var(--space-xs) var(--space-sm);
+                font-size: var(--font-size-xs);
+            }
+            
+            .dashboard-actions-table .col-action {
+                max-width: 120px;
+            }
+            
+            .dashboard-action-close-btn {
+                padding: 2px 6px;
+                font-size: 10px;
+            }
+            
+            /* Urgent actions mobile */
+            .dashboard-urgent-item {
+                padding: var(--space-sm);
+            }
+            
+            .dashboard-urgent-text {
+                font-size: var(--font-size-sm);
+            }
+            
+            .dashboard-urgent-meta {
+                font-size: 10px;
+            }
+            
+            /* Modal mobile */
+            .dashboard-action-modal-content {
+                max-height: 85vh;
+            }
+            
+            .dashboard-action-modal-body {
+                padding: var(--space-md);
+            }
+            
+            /* Zone history mobile */
+            .dashboard-zone-history {
+                padding: var(--space-md);
+            }
+            
+            /* Radar mobile */
+            .dashboard-radar {
+                width: 150px;
+                height: 150px;
+            }
+        }
+        
+        /* Extra small screens */
+        @media (max-width: 380px) {
+            .dashboard-nav-tab {
+                padding: var(--space-xs) 6px;
+                font-size: 10px;
+            }
+            
+            .dashboard-zone-btn {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+            
+            .dashboard-filter-btn {
+                padding: 4px 8px;
+                font-size: 10px;
             }
         }
         
@@ -5567,23 +6294,31 @@
         </footer>
     </main>
     
-    <!-- Bandeau fixe bas : score + bouton + menu -->
+    <!-- Bandeau fixe bas : dashboard + bouton + menu -->
     <div class="submit-container">
         <div class="bottom-bar">
-            <div class="score-display">
-                <span class="score-value" id="score-total">0</span>
-                <span class="score-max">/ 60</span>
-                <span class="score-percent" id="score-percent">0%</span>
+            <div class="bottom-bar-item">
+                <button type="button" class="dashboard-shortcut" id="dashboard-shortcut" onclick="openDashboard()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                </button>
+                <span class="bottom-bar-label">Tableau de bord</span>
             </div>
             <button type="button" class="submit-btn" id="submit-btn" disabled>
                 <span id="submit-text">Compléter l'audit</span>
+                <span class="submit-score" id="submit-score"></span>
             </button>
-            <div style="position: relative;">
+            <div class="bottom-bar-item">
                 <button type="button" class="menu-btn" id="menu-btn" aria-label="Menu">
                     <span></span>
                     <span></span>
                     <span></span>
                 </button>
+                <span class="bottom-bar-label">Menu</span>
                 <div class="menu-popup" id="menu-popup">
                     <div class="menu-section">
                         <div class="menu-section-title">Audit en cours</div>
@@ -5824,6 +6559,91 @@
     
     <!-- Toast notification -->
     <div class="toast" id="toast"></div>
+    
+    <!-- Modale Mobile Action -->
+    <div class="mobile-action-modal" id="mobile-action-modal">
+        <div class="mobile-action-header">
+            <button type="button" class="mobile-action-back" onclick="closeMobileActionModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </button>
+            <div class="mobile-action-title">Ajouter une action</div>
+        </div>
+        
+        <div class="mobile-action-body">
+            <div class="mobile-action-group">
+                <label class="mobile-action-label">Critère concerné</label>
+                <div class="mobile-action-criterion">
+                    <div class="mobile-action-criterion-badge" id="mobile-action-criterion-badge">S1</div>
+                    <div class="mobile-action-criterion-text" id="mobile-action-criterion-text">Seiri 1 - Distinction utile/inutile</div>
+                </div>
+            </div>
+            
+            <div class="mobile-action-group">
+                <label class="mobile-action-label">Type d'action</label>
+                <div class="mobile-action-type-toggle">
+                    <button type="button" class="mobile-action-type-btn selected" data-type="ecart" onclick="selectMobileActionType('ecart')">
+                        <span class="radio-dot"></span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                        Écart
+                    </button>
+                    <button type="button" class="mobile-action-type-btn" data-type="elevation" onclick="selectMobileActionType('elevation')">
+                        <span class="radio-dot"></span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                            <polyline points="17 6 23 6 23 12"></polyline>
+                        </svg>
+                        Élévation
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mobile-action-group">
+                <label class="mobile-action-label">Description de l'action</label>
+                <textarea class="mobile-action-input mobile-action-textarea" id="mobile-action-text" placeholder="Décrire l'action à réaliser..."></textarea>
+            </div>
+            
+            <div class="mobile-action-group">
+                <label class="mobile-action-label">Responsable</label>
+                <div class="mobile-action-autocomplete">
+                    <input type="text" class="mobile-action-input" id="mobile-action-responsable" placeholder="Rechercher un collaborateur..." autocomplete="off">
+                    <div class="autocomplete-suggestions" id="mobile-action-suggestions"></div>
+                </div>
+            </div>
+            
+            <div class="mobile-action-group">
+                <label class="mobile-action-label">Photo (optionnel)</label>
+                <input type="file" id="mobile-action-photo-input" accept="image/*" capture="environment" style="display: none;">
+                <button type="button" class="mobile-action-photo-btn" onclick="document.getElementById('mobile-action-photo-input').click()">
+                    <div class="icon-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                    </div>
+                    <div class="text">
+                        <div class="text-main">Ajouter une photo</div>
+                        <div class="text-sub">Maximum 3 photos</div>
+                    </div>
+                    <span class="photo-count-badge" id="mobile-action-photo-count" style="display: none;">0/3</span>
+                </button>
+                <div class="mobile-action-photo-preview" id="mobile-action-photo-preview"></div>
+            </div>
+        </div>
+        
+        <div class="mobile-action-footer">
+            <button type="button" class="mobile-action-submit" id="mobile-action-submit" onclick="submitMobileAction()">
+                Valider l'action
+            </button>
+        </div>
+    </div>
     
     <script>
         // ═══════════════════════════════════════════════════════════════
@@ -6797,6 +7617,13 @@
                     e.stopPropagation();
                     const card = this.closest('.criteria-card');
                     const criteriaId = card.dataset.criteria;
+                    
+                    // Sur mobile, ouvrir la modale plein écran
+                    if (window.innerWidth <= 600) {
+                        openMobileActionModal(card, criteriaId);
+                        return;
+                    }
+                    
                     const actionBlock = card.querySelector('.action-block');
                     
                     // Réduire les autres blocs action ouverts
@@ -7258,16 +8085,6 @@
             const totalScore = Object.values(auditData.scores).reduce((a, b) => a + b, 0);
             const percent = Math.round((totalScore / MAX_SCORE) * 100);
             
-            document.getElementById('score-total').textContent = totalScore;
-            
-            const percentEl = document.getElementById('score-percent');
-            percentEl.textContent = `${percent}%`;
-            percentEl.className = 'score-percent';
-            if (percent < 50) percentEl.classList.add('low');
-            else if (percent < 70) percentEl.classList.add('medium');
-            else if (percent < 85) percentEl.classList.add('good');
-            else percentEl.classList.add('excellent');
-            
             const sections = ['seiri', 'seiton', 'seiso', 'seiketsu', 'shitsuke'];
             sections.forEach(section => {
                 const sectionScores = Object.entries(auditData.scores)
@@ -7292,6 +8109,14 @@
             
             const submitBtn = document.getElementById('submit-btn');
             const submitText = document.getElementById('submit-text');
+            const submitScore = document.getElementById('submit-score');
+            
+            // Score affiché si l'audit a commencé
+            if (scoredCount > 0) {
+                submitScore.textContent = `${totalScore}/60 • ${percent}%`;
+            } else {
+                submitScore.textContent = '';
+            }
             
             if (!auditeur) {
                 submitBtn.disabled = true;
@@ -7304,11 +8129,12 @@
             } else if (scoredCount < TOTAL_CRITERIA) {
                 submitBtn.disabled = true;
                 submitBtn.classList.remove('ready');
-                submitText.textContent = `${TOTAL_CRITERIA - scoredCount} critère${(TOTAL_CRITERIA - scoredCount) > 1 ? 's' : ''} restant${(TOTAL_CRITERIA - scoredCount) > 1 ? 's' : ''}`;
+                const remaining = TOTAL_CRITERIA - scoredCount;
+                submitText.textContent = `${remaining} critère${remaining > 1 ? 's' : ''} restant${remaining > 1 ? 's' : ''}`;
             } else {
                 submitBtn.disabled = false;
                 submitBtn.classList.add('ready');
-                submitText.textContent = 'Enregistrer';
+                submitText.textContent = 'Enregistrer l\'audit';
             }
             
             // Auto-save silencieux
@@ -7786,6 +8612,254 @@
         function toggleOptional(element) {
             const content = element.nextElementSibling;
             content.classList.toggle('visible');
+        }
+        
+        // ═══════════════════════════════════════════════════════════════
+        // MODALE MOBILE ACTION
+        // ═══════════════════════════════════════════════════════════════
+        
+        let mobileActionCurrentCard = null;
+        let mobileActionCurrentCriteriaId = null;
+        let mobileActionPhotos = [];
+        
+        const CRITERIA_LABELS = {
+            'seiri_1': { badge: 'S1-1', text: 'Distinction utile/inutile' },
+            'seiri_2': { badge: 'S1-2', text: 'Objets inutiles retirés' },
+            'seiri_3': { badge: 'S1-3', text: 'Pas de rebuts visibles' },
+            'seiton_1': { badge: 'S2-1', text: 'Place définie pour chaque chose' },
+            'seiton_2': { badge: 'S2-2', text: 'Identification claire et cohérente' },
+            'seiton_3': { badge: 'S2-3', text: 'Accès facile et rangement logique' },
+            'seiso_1': { badge: 'S3-1', text: 'Propreté générale' },
+            'seiso_2': { badge: 'S3-2', text: 'Équipements et outils propres' },
+            'seiso_3': { badge: 'S3-3', text: 'Sources de salissures maîtrisées' },
+            'seiketsu_1': { badge: 'S4-1', text: 'Standards et consignes affichés' },
+            'seiketsu_2': { badge: 'S4-2', text: 'Management visuel efficace' },
+            'seiketsu_3': { badge: 'S4-3', text: 'Respect des règles 5S' },
+            'shitsuke_1': { badge: 'S5-1', text: 'Implication de l\'équipe' },
+            'shitsuke_2': { badge: 'S5-2', text: 'Audits réguliers et suivi' },
+            'shitsuke_3': { badge: 'S5-3', text: 'Actions d\'amélioration réalisées' }
+        };
+        
+        function openMobileActionModal(card, criteriaId) {
+            mobileActionCurrentCard = card;
+            mobileActionCurrentCriteriaId = criteriaId;
+            mobileActionPhotos = [];
+            
+            const modal = document.getElementById('mobile-action-modal');
+            const criteriaLabel = CRITERIA_LABELS[criteriaId] || { badge: '?', text: criteriaId };
+            
+            // Remplir les infos du critère
+            document.getElementById('mobile-action-criterion-badge').textContent = criteriaLabel.badge;
+            document.getElementById('mobile-action-criterion-text').textContent = criteriaLabel.text;
+            
+            // Réinitialiser les champs
+            const existingAction = auditData.actions[criteriaId];
+            
+            // Type
+            const defaultType = existingAction?.type || getDefaultActionType(criteriaId);
+            document.querySelectorAll('.mobile-action-type-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.type === defaultType);
+            });
+            
+            // Texte et responsable
+            document.getElementById('mobile-action-text').value = existingAction?.action || '';
+            document.getElementById('mobile-action-responsable').value = existingAction?.responsable || '';
+            
+            // Photos - réinitialiser et copier si existantes
+            mobileActionPhotos = [];
+            if (existingAction?.photos && Array.isArray(existingAction.photos)) {
+                // Filtrer pour ne garder que les strings valides (base64)
+                mobileActionPhotos = existingAction.photos.filter(p => typeof p === 'string' && p.startsWith('data:'));
+            }
+            renderMobileActionPhotos();
+            
+            // Afficher la modale
+            modal.classList.add('visible');
+            document.body.style.overflow = 'hidden';
+            
+            // Setup autocomplete
+            setupMobileActionAutocomplete();
+        }
+        
+        function closeMobileActionModal() {
+            const modal = document.getElementById('mobile-action-modal');
+            modal.classList.remove('visible');
+            document.body.style.overflow = '';
+            
+            mobileActionCurrentCard = null;
+            mobileActionCurrentCriteriaId = null;
+            mobileActionPhotos = [];
+        }
+        
+        function selectMobileActionType(type) {
+            document.querySelectorAll('.mobile-action-type-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.type === type);
+            });
+        }
+        
+        function setupMobileActionAutocomplete() {
+            const input = document.getElementById('mobile-action-responsable');
+            const suggestions = document.getElementById('mobile-action-suggestions');
+            
+            input.addEventListener('input', function() {
+                const value = this.value.trim().toLowerCase();
+                if (value.length < 2) {
+                    suggestions.classList.remove('visible');
+                    return;
+                }
+                
+                const matches = AUDITEURS.filter(emp => 
+                    emp.nom.toLowerCase().includes(value)
+                ).slice(0, 8);
+                
+                if (matches.length > 0) {
+                    suggestions.innerHTML = matches.map(emp => 
+                        `<div class="autocomplete-item">${emp.nom}</div>`
+                    ).join('');
+                    suggestions.classList.add('visible');
+                    
+                    suggestions.querySelectorAll('.autocomplete-item').forEach(item => {
+                        item.addEventListener('click', function() {
+                            input.value = this.textContent;
+                            suggestions.classList.remove('visible');
+                        });
+                    });
+                } else {
+                    suggestions.classList.remove('visible');
+                }
+            });
+            
+            input.addEventListener('blur', function() {
+                setTimeout(() => suggestions.classList.remove('visible'), 200);
+            });
+        }
+        
+        function renderMobileActionPhotos() {
+            const preview = document.getElementById('mobile-action-photo-preview');
+            const countBadge = document.getElementById('mobile-action-photo-count');
+            
+            // Filtrer les photos invalides
+            mobileActionPhotos = mobileActionPhotos.filter(p => typeof p === 'string' && p.startsWith('data:'));
+            
+            if (mobileActionPhotos.length > 0) {
+                preview.innerHTML = mobileActionPhotos.map((photo, idx) => `
+                    <div class="mobile-action-photo-thumb">
+                        <img src="${photo}" alt="Photo ${idx + 1}">
+                        <button type="button" class="remove-photo" onclick="removeMobileActionPhoto(${idx})">×</button>
+                    </div>
+                `).join('');
+                countBadge.textContent = `${mobileActionPhotos.length}/3`;
+                countBadge.style.display = 'block';
+            } else {
+                preview.innerHTML = '';
+                countBadge.style.display = 'none';
+            }
+        }
+        
+        function removeMobileActionPhoto(idx) {
+            mobileActionPhotos.splice(idx, 1);
+            renderMobileActionPhotos();
+        }
+        
+        // Photo input handler
+        document.getElementById('mobile-action-photo-input')?.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (mobileActionPhotos.length >= 3) {
+                showToast('Maximum 3 photos', 'warning');
+                return;
+            }
+            
+            try {
+                const compressedData = await compressImage(file);
+                mobileActionPhotos.push(compressedData.dataUrl);
+                renderMobileActionPhotos();
+                showToast('Photo ajoutée', 'success');
+            } catch (err) {
+                console.error('Erreur compression photo:', err);
+                showToast('Erreur lors de l\'ajout de la photo', 'error');
+            }
+            
+            // Reset input
+            this.value = '';
+        });
+        
+        function submitMobileAction() {
+            const criteriaId = mobileActionCurrentCriteriaId;
+            const card = mobileActionCurrentCard;
+            
+            if (!criteriaId || !card) return;
+            
+            const selectedTypeBtn = document.querySelector('.mobile-action-type-btn.selected');
+            const type = selectedTypeBtn ? selectedTypeBtn.dataset.type : 'ecart';
+            const actionText = document.getElementById('mobile-action-text').value.trim();
+            const responsable = document.getElementById('mobile-action-responsable').value.trim();
+            
+            // Mettre à jour les données
+            if (actionText || responsable || mobileActionPhotos.length > 0) {
+                auditData.actions[criteriaId] = {
+                    type: type,
+                    action: actionText,
+                    responsable: responsable,
+                    photos: mobileActionPhotos.length > 0 ? [...mobileActionPhotos] : undefined
+                };
+            } else {
+                delete auditData.actions[criteriaId];
+            }
+            
+            // Synchroniser avec le bloc action inline
+            const actionBlock = card.querySelector('.action-block');
+            if (actionBlock) {
+                const actionInput = actionBlock.querySelector('.action-text');
+                const responsableInput = actionBlock.querySelector('.action-responsable');
+                const typeButtons = actionBlock.querySelectorAll('.action-type-btn');
+                
+                if (actionInput) actionInput.value = actionText;
+                if (responsableInput) responsableInput.value = responsable;
+                typeButtons.forEach(btn => {
+                    btn.classList.toggle('selected', btn.dataset.type === type);
+                });
+                
+                // Sync photos
+                syncPhotosToActionBlock(actionBlock, criteriaId);
+            }
+            
+            // Mettre à jour le badge
+            updateActionBadge(card, criteriaId);
+            
+            // Sauvegarder
+            scheduleAutoSave();
+            
+            // Fermer la modale
+            closeMobileActionModal();
+            
+            // Toast de confirmation
+            if (actionText && responsable) {
+                showToast('Action enregistrée', 'success');
+            }
+        }
+        
+        function syncPhotosToActionBlock(actionBlock, criteriaId) {
+            const action = auditData.actions[criteriaId];
+            const preview = actionBlock.querySelector('.action-photo-preview');
+            const photoBtn = actionBlock.querySelector('.action-photo-btn');
+            
+            if (!preview || !photoBtn) return;
+            
+            const photos = action?.photos || [];
+            const countSpan = photoBtn.querySelector('.photo-count');
+            
+            if (countSpan) {
+                countSpan.textContent = `${photos.length}/3`;
+            }
+            
+            preview.innerHTML = photos.map((photo, idx) => `
+                <div class="photo-preview-item">
+                    <img src="${photo}" alt="Photo ${idx + 1}">
+                    <button type="button" class="remove-photo-btn" data-index="${idx}">×</button>
+                </div>
+            `).join('');
         }
         
         function showToast(message, type = 'info') {
@@ -8957,7 +10031,77 @@ Cordialement`);
         document.addEventListener('DOMContentLoaded', function() {
             updatePlanningPreview();
             initDashboard();
+            checkWelcomePopup();
         });
+    </script>
+    
+    <!-- Popup de bienvenue / Nouveautés (Tableau de bord) -->
+    <div class="splash-overlay" id="welcome-popup">
+        <div class="splash-modal" style="max-width: 380px;">
+            <div class="splash-header">
+                <div class="splash-icon" style="background: rgba(0, 170, 70, 0.1);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#00AA46" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                </div>
+                <span class="splash-badge">Nouveau</span>
+            </div>
+            <div class="splash-body">
+                <h2 class="splash-title">Tableau de bord</h2>
+                <p class="splash-text">
+                    Retrouvez l'historique des audits, les scores par zone et l'évolution des performances. 
+                    Vous pouvez aussi clôturer ou mettre à jour les actions directement depuis l'application.
+                </p>
+                <button type="button" class="splash-btn primary" onclick="closeWelcomeAndOpenDashboard()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Découvrir
+                </button>
+                <button type="button" class="splash-skip" onclick="closeWelcomePopup()">Plus tard</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Gestion de la popup de bienvenue (tableau de bord)
+        const WELCOME_POPUP_KEY = 'audit5s_dashboard_intro_count';
+        
+        function checkWelcomePopup() {
+            const visitCount = parseInt(localStorage.getItem(WELCOME_POPUP_KEY) || '0');
+            
+            // Afficher la popup aux 2 premières visites
+            if (visitCount < 2) {
+                localStorage.setItem(WELCOME_POPUP_KEY, (visitCount + 1).toString());
+                
+                // Délai pour laisser la page se charger (et ne pas superposer avec le splash SharePoint mobile)
+                setTimeout(() => {
+                    // Ne pas afficher si le splash SharePoint est visible
+                    const sharepointSplash = document.getElementById('splash-sharepoint');
+                    if (sharepointSplash && sharepointSplash.classList.contains('visible')) {
+                        return;
+                    }
+                    document.getElementById('welcome-popup').classList.add('visible');
+                }, 800);
+            }
+        }
+        
+        function closeWelcomePopup() {
+            document.getElementById('welcome-popup').classList.remove('visible');
+        }
+        
+        function closeWelcomeAndOpenDashboard() {
+            closeWelcomePopup();
+            setTimeout(() => {
+                openDashboard();
+            }, 300);
+        }
     </script>
     
     <!-- Dashboard -->
@@ -8980,12 +10124,20 @@ Cordialement`);
                             <path d="M666.04,320.8h84.33c26.77,0,52.71,20.92,52.71,52.1c0,29.95-23.85,52.51-53.97,52.51h-45.23v37.33l34.46-0.32l55.03,104.52h45.6l-59.43-109.35c31.08-9.44,62.1-41.61,62.1-84.69c0-51.28-36.82-89.43-89.95-89.43h-85.67V320.8z"/>
                         </svg>
                         <span class="dashboard-header-title">Tableau de bord</span>
+                        <span class="dashboard-beta-badge">Beta</span>
                     </div>
                     <div class="dashboard-header-right">
                         <div class="dashboard-header-info">
                             <div class="title">Audit 5S</div>
                             <div class="date" id="dashboard-header-date"></div>
                         </div>
+                        <button class="dashboard-mobile-refresh" id="dashboard-mobile-refresh" onclick="refreshDashboardData()" style="display: none;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <polyline points="1 20 1 14 7 14"></polyline>
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                            </svg>
+                        </button>
                         <div class="dashboard-user-badge" id="dashboard-user-badge" style="display: none;"></div>
                         <button class="dashboard-close" onclick="closeDashboard()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
