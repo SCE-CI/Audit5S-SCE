@@ -4275,6 +4275,18 @@
                 z-index: 20;
             }
             
+            /* Fond jaune pour l'overscroll iOS/Android */
+            .dashboard::before {
+                content: '';
+                position: fixed;
+                top: -100vh;
+                left: 0;
+                right: 0;
+                height: 100vh;
+                background: var(--sartorius-yellow);
+                z-index: 19;
+            }
+            
             .dashboard-header-content {
                 padding: var(--space-sm);
             }
@@ -7218,6 +7230,7 @@
                 
                 // Supprimer le brouillon
                 localStorage.removeItem('audit5s_draft');
+                document.getElementById('draft-indicator').textContent = '';
                 
                 // Message de succès avec lien (toast plus long sur mobile)
                 const actionMsg = pendingExport.nbActions > 0 ? ` — ${pendingExport.nbActions} action${pendingExport.nbActions > 1 ? 's' : ''}` : '';
@@ -9139,6 +9152,18 @@ Cordialement`);
         let autoSaveTimeout = null;
         
         function saveDraft(silent = false) {
+            // Ne pas sauvegarder si aucun score et aucune action
+            const hasScores = Object.keys(auditData.scores).length > 0;
+            const hasActions = Object.keys(auditData.actions).some(key => {
+                const action = auditData.actions[key];
+                return action && (action.action?.trim() || action.responsable?.trim());
+            });
+            
+            if (!hasScores && !hasActions) {
+                // Rien à sauvegarder, ne pas créer de brouillon vide
+                return;
+            }
+            
             const now = new Date();
             const midnight = new Date(now);
             midnight.setHours(23, 59, 59, 999);
@@ -9463,7 +9488,22 @@ Cordialement`);
             const saved = localStorage.getItem('audit5s_draft');
             if (saved) {
                 const draft = JSON.parse(saved);
+                
+                // Vérifier expiration
                 if (draft.expiresAt && new Date() > new Date(draft.expiresAt)) {
+                    localStorage.removeItem('audit5s_draft');
+                    return;
+                }
+                
+                // Vérifier que le brouillon contient des données utiles
+                const hasScores = draft.scores && Object.keys(draft.scores).length > 0;
+                const hasActions = draft.actions && Object.keys(draft.actions).some(key => {
+                    const action = draft.actions[key];
+                    return action && (action.action?.trim() || action.responsable?.trim());
+                });
+                
+                if (!hasScores && !hasActions) {
+                    // Brouillon vide, le supprimer
                     localStorage.removeItem('audit5s_draft');
                     return;
                 }
@@ -9474,12 +9514,23 @@ Cordialement`);
                 const today = new Date();
                 const isToday = savedDate.toDateString() === today.toDateString();
                 
+                // Construire un message informatif
+                const scoreCount = hasScores ? Object.keys(draft.scores).length : 0;
+                const actionCount = hasActions ? Object.keys(draft.actions).filter(key => {
+                    const action = draft.actions[key];
+                    return action && action.action?.trim();
+                }).length : 0;
+                
+                let details = [];
+                if (scoreCount > 0) details.push(`${scoreCount} critère${scoreCount > 1 ? 's' : ''}`);
+                if (actionCount > 0) details.push(`${actionCount} action${actionCount > 1 ? 's' : ''}`);
+                
                 let message;
                 if (isToday) {
-                    message = `Brouillon de ${timeStr} disponible`;
+                    message = `Brouillon de ${timeStr} (${details.join(', ')})`;
                 } else {
                     const dateStr = savedDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-                    message = `Brouillon du ${dateStr} disponible`;
+                    message = `Brouillon du ${dateStr} (${details.join(', ')})`;
                 }
                 
                 // Afficher après un court délai pour laisser la page se charger
