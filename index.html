@@ -1489,6 +1489,51 @@
             gap: 4px;
         }
         
+        /* Pilule connexion planning (dans le header) */
+        .planning-sync-pill {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            height: 26px;
+            padding: 0 10px;
+            background: var(--gray-10);
+            border: none;
+            border-radius: 13px;
+            color: var(--gray-50);
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-right: 8px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .planning-sync-pill:hover {
+            background: var(--sartorius-yellow);
+            color: var(--black);
+        }
+        
+        .planning-sync-pill svg {
+            width: 12px;
+            height: 12px;
+        }
+        
+        .planning-sync-pill.synced {
+            background: var(--traffic-green);
+            color: var(--white);
+            cursor: default;
+            padding: 0 8px;
+        }
+        
+        .planning-sync-pill.synced svg {
+            width: 12px;
+            height: 12px;
+        }
+        
+        #planning-sync-container {
+            margin-left: auto;
+        }
+        
         /* Clignotement rouge pour action incomplète */
         @keyframes incompleteBlink {
             0%, 100% { background: var(--traffic-red); transform: scale(1); }
@@ -6609,6 +6654,7 @@
                     </svg>
                     Planning Audits
                 </h3>
+                <div id="planning-sync-container"></div>
                 <button class="planning-modal-close" onclick="closePlanningModal()">✕</button>
             </div>
             <div class="planning-modal-body" id="planning-modal-body">
@@ -9883,8 +9929,23 @@ Cordialement`);
         
         async function loadPlanningAudits() {
             try {
-                // Utiliser les mêmes fonctions que le dashboard
-                const token = await acquireToken();
+                // Utiliser getAccessToken pour obtenir le token silencieusement
+                if (!msalInstance || !msalAccount) return;
+                
+                const tokenRequest = {
+                    scopes: loginRequest.scopes,
+                    account: msalAccount
+                };
+                
+                let token;
+                try {
+                    const response = await msalInstance.acquireTokenSilent(tokenRequest);
+                    token = response.accessToken;
+                } catch (e) {
+                    // Pas de token silencieux disponible, on abandonne (pas de popup pour le planning)
+                    return;
+                }
+                
                 if (!token) return;
                 
                 // Récupérer l'ID du fichier Excel
@@ -9940,6 +10001,31 @@ Cordialement`);
             return found ? true : false;
         }
         
+        // Connexion SharePoint depuis le planning
+        async function connectPlanningToSharePoint() {
+            if (!msalInstance) {
+                showToast('Erreur: MSAL non initialisé', 'error');
+                return;
+            }
+            
+            try {
+                // Login popup
+                const response = await msalInstance.loginPopup(loginRequest);
+                msalAccount = response.account;
+                msalConnected = true;
+                updateMsalStatusDisplay();
+                
+                // Charger les données
+                await loadPlanningAudits();
+                renderPlanningModal();
+                
+                showToast('Connecté à SharePoint', 'success');
+            } catch (err) {
+                console.error('Erreur connexion planning:', err);
+                showToast('Erreur de connexion', 'error');
+            }
+        }
+        
         // Générer le badge de statut
         function getPlanningStatusBadge(weekNum, zone, niveau, year, isPast) {
             const done = checkAuditDone(weekNum, zone, niveau, year);
@@ -9978,6 +10064,7 @@ Cordialement`);
         
         function renderPlanningModal() {
             const body = document.getElementById('planning-modal-body');
+            const syncContainer = document.getElementById('planning-sync-container');
             
             // Toggle de niveau
             let toggleHtml = `
@@ -9987,6 +10074,31 @@ Cordialement`);
                     <button class="planning-level-btn n3" disabled>Niveau 3</button>
                 </div>
             `;
+            
+            // Pilule de connexion dans le header
+            const isConnected = msalInstance && msalAccount;
+            
+            if (planningAuditsLoaded) {
+                syncContainer.innerHTML = `
+                    <div class="planning-sync-pill synced" title="Données synchronisées">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                `;
+            } else if (!isConnected) {
+                syncContainer.innerHTML = `
+                    <button class="planning-sync-pill" onclick="connectPlanningToSharePoint()" title="Synchroniser avec SharePoint">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 4 23 10 17 10"/>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                        </svg>
+                        <span>Sync</span>
+                    </button>
+                `;
+            } else {
+                syncContainer.innerHTML = '';
+            }
             
             let contentHtml = '';
             if (planningModalLevel === 1) {
