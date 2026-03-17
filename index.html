@@ -1448,6 +1448,47 @@
             color: var(--gray-60);
         }
         
+        /* Badges de statut planning */
+        .planning-status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        
+        .planning-status-badge.done {
+            background: var(--traffic-green);
+            color: var(--white);
+        }
+        
+        .planning-status-badge.missed {
+            background: var(--traffic-red);
+            color: var(--white);
+        }
+        
+        .planning-status-badge.pending {
+            background: var(--gray-20);
+            color: var(--gray-60);
+        }
+        
+        .planning-n2-zone .planning-status-badge {
+            margin-top: 0;
+            margin-left: auto;
+        }
+        
+        .planning-n2-zone {
+            position: relative;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        
         /* Clignotement rouge pour action incomplète */
         @keyframes incompleteBlink {
             0%, 100% { background: var(--traffic-red); transform: scale(1); }
@@ -9813,6 +9854,10 @@ Cordialement`);
             }
         }
         
+        // Données des audits pour le planning
+        let planningAuditsData = [];
+        let planningAuditsLoaded = false;
+        
         function openPlanningModal() {
             const niveau = auditData.level || 1;
             if (niveau === 3) return;
@@ -9821,9 +9866,94 @@ Cordialement`);
             planningDisplayMonth = new Date().getMonth();
             planningDisplayYear = new Date().getFullYear();
             
+            // Afficher le planning immédiatement
             renderPlanningModal();
             document.getElementById('planning-modal').classList.add('visible');
             document.body.style.overflow = 'hidden';
+            
+            // Charger les audits en arrière-plan si connecté et pas encore chargés
+            if (isAuthenticated && !planningAuditsLoaded) {
+                loadPlanningAudits().then(() => {
+                    // Re-render avec les badges une fois chargé
+                    renderPlanningModal();
+                });
+            }
+        }
+        
+        async function loadPlanningAudits() {
+            try {
+                // Utiliser les mêmes fonctions que le dashboard
+                const token = await acquireToken();
+                if (!token) return;
+                
+                // Récupérer l'ID du fichier Excel
+                const siteId = 'sartorius.sharepoint.com,ec2b83d2-7066-467c-83e6-fa97ca5db8e3,a833e672-c3d7-4db5-92c0-6169773c2516';
+                const drivesUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives`;
+                const drivesResp = await fetch(drivesUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+                const drivesData = await drivesResp.json();
+                const drive5S = drivesData.value?.find(d => d.name === '5S');
+                if (!drive5S) return;
+                
+                const fileUrl = `https://graph.microsoft.com/v1.0/drives/${drive5S.id}/root:/Audits 5S/Audit 5S.xlsx`;
+                const fileResp = await fetch(fileUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+                const fileData = await fileResp.json();
+                if (!fileData.id) return;
+                
+                // Charger les audits
+                const rowsUrl = `https://graph.microsoft.com/v1.0/drives/${drive5S.id}/items/${fileData.id}/workbook/tables/Tableau24/rows`;
+                const rowsResp = await fetch(rowsUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+                const rowsData = await rowsResp.json();
+                
+                if (rowsData.value) {
+                    planningAuditsData = rowsData.value.map(row => {
+                        const values = row.values[0];
+                        return {
+                            annee: values[0],
+                            semaine: values[1],
+                            date: values[3],
+                            zone: values[5],
+                            niveau: values[6]
+                        };
+                    });
+                    planningAuditsLoaded = true;
+                }
+            } catch (err) {
+                console.warn('Erreur chargement audits planning:', err);
+            }
+        }
+        
+        // Vérifier si un audit a été réalisé
+        function checkAuditDone(weekNum, zone, niveau, year) {
+            if (!planningAuditsLoaded || planningAuditsData.length === 0) {
+                return null; // Données non chargées
+            }
+            
+            // Chercher un audit correspondant
+            const found = planningAuditsData.find(a => 
+                a.annee == year && 
+                a.semaine == weekNum && 
+                a.zone === zone && 
+                a.niveau == niveau
+            );
+            
+            return found ? true : false;
+        }
+        
+        // Générer le badge de statut
+        function getPlanningStatusBadge(weekNum, zone, niveau, year, isPast) {
+            const done = checkAuditDone(weekNum, zone, niveau, year);
+            
+            if (done === null) {
+                return ''; // Pas de données
+            }
+            
+            if (done) {
+                return '<span class="planning-status-badge done" title="Audit réalisé">✓</span>';
+            } else if (isPast) {
+                return '<span class="planning-status-badge missed" title="Non réalisé">✗</span>';
+            } else {
+                return '<span class="planning-status-badge pending" title="À faire">○</span>';
+            }
         }
         
         function closePlanningModal(event) {
@@ -10024,6 +10154,7 @@ Cordialement`);
             weeks.forEach(w => {
                 const past = isPlanningPast(w.date);
                 const current = isPlanningCurrentWeek(w.date);
+                const isPastNotCurrent = past && !current;
                 
                 let cardClass = 'planning-n2-card';
                 if (current) cardClass += ' current';
@@ -10032,6 +10163,10 @@ Cordialement`);
                 const zones = w.zones;
                 const resp1 = planningZoneResponsables[zones[0]];
                 const resp2 = planningZoneResponsables[zones[1]];
+                
+                // Badges de statut pour chaque zone
+                const badge1 = getPlanningStatusBadge(w.weekNum, zones[0], 2, w.date.getFullYear(), isPastNotCurrent);
+                const badge2 = getPlanningStatusBadge(w.weekNum, zones[1], 2, w.date.getFullYear(), isPastNotCurrent);
                 
                 html += `
                     <div class="${cardClass}">
@@ -10043,10 +10178,12 @@ Cordialement`);
                             <div class="planning-n2-zone">
                                 <span class="zone-name">${zones[0]}</span>
                                 <span class="zone-who">HBI + ${resp1.code}</span>
+                                ${badge1}
                             </div>
                             <div class="planning-n2-zone">
                                 <span class="zone-name">${zones[1]}</span>
                                 <span class="zone-who">HBI + ${resp2.code}</span>
+                                ${badge2}
                             </div>
                         </div>
                     </div>
@@ -10084,11 +10221,15 @@ Cordialement`);
                     whoHtml = `<div class="who">HBI + ${resp.code}</div>`;
                 }
                 
+                // Badge de statut
+                const statusBadge = getPlanningStatusBadge(w.weekNum, zone, 1, w.date.getFullYear(), past && !current);
+                
                 rowHtml += `
                     <div class="${cellClass}">
                         <div class="zone">${zone}</div>
                         <div class="date">${dayLabel} ${date.getDate()}/${date.getMonth()+1}</div>
                         ${whoHtml}
+                        ${statusBadge}
                     </div>
                 `;
             });
