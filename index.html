@@ -5233,7 +5233,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: var(--white);
+            background: var(--gray-5);
             z-index: 1001;
             overflow-y: auto;
         }
@@ -5242,9 +5242,42 @@
             display: block;
         }
         
+        /* Desktop : modale centrée avec fond sombre */
+        @media (min-width: 768px) {
+            .audit-detail-modal {
+                background: rgba(0,0,0,0.5);
+                display: none;
+                align-items: flex-start;
+                justify-content: center;
+                padding: 40px 20px;
+            }
+            
+            .audit-detail-modal.visible {
+                display: flex;
+            }
+            
+            .audit-detail-container {
+                background: var(--white);
+                border-radius: var(--radius-lg);
+                max-width: 600px;
+                width: 100%;
+                max-height: calc(100vh - 80px);
+                overflow-y: auto;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            }
+        }
+        
+        /* Mobile : plein écran */
+        @media (max-width: 767px) {
+            .audit-detail-container {
+                background: var(--white);
+                min-height: 100%;
+            }
+        }
+        
         .audit-detail-header {
             background: var(--sartorius-yellow);
-            padding: var(--space-sm) var(--space-md);
+            padding: var(--space-md) var(--space-lg);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -5253,17 +5286,24 @@
             z-index: 10;
         }
         
+        @media (min-width: 768px) {
+            .audit-detail-header {
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+                padding: var(--space-lg) var(--space-xl);
+            }
+        }
+        
         .audit-detail-header-left {
             display: flex;
             align-items: center;
-            gap: var(--space-sm);
+            gap: var(--space-md);
         }
         
         .audit-detail-back {
             background: none;
             border: none;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -5277,20 +5317,26 @@
         }
         
         .audit-detail-back svg {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
         }
         
         .audit-detail-id {
-            font-size: var(--font-size-base);
-            font-weight: 600;
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-id {
+                font-size: var(--font-size-xl);
+            }
         }
         
         .audit-detail-close {
             background: none;
             border: none;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -5304,8 +5350,8 @@
         }
         
         .audit-detail-close svg {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
         }
         
         .audit-detail-body {
@@ -5314,35 +5360,55 @@
         
         /* Section infos principales */
         .audit-detail-info {
-            padding: var(--space-md);
+            padding: var(--space-lg);
             border-bottom: 1px solid var(--gray-10);
+            background: var(--white);
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-info {
+                padding: var(--space-xl);
+            }
         }
         
         .audit-detail-info-row {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: var(--space-md);
+            margin-bottom: var(--space-lg);
         }
         
         .audit-detail-zone {
-            font-size: var(--font-size-lg);
-            font-weight: 600;
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-zone {
+                font-size: var(--font-size-2xl);
+            }
         }
         
         .audit-detail-meta {
             font-size: var(--font-size-sm);
             color: var(--gray-60);
-            margin-top: 4px;
+            margin-top: 6px;
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-meta {
+                font-size: var(--font-size-base);
+                margin-top: 8px;
+            }
         }
         
         .audit-detail-niveau {
             background: var(--sartorius-yellow);
             color: var(--black);
-            font-size: var(--font-size-xs);
+            font-size: var(--font-size-sm);
             font-weight: 600;
-            padding: 4px 12px;
-            border-radius: 12px;
+            padding: 6px 14px;
+            border-radius: 16px;
         }
         
         .audit-detail-niveau.n1 {
@@ -5353,14 +5419,26 @@
         /* Score global */
         .audit-detail-score-box {
             background: var(--gray-5);
-            border-radius: var(--radius-md);
-            padding: var(--space-md);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
             text-align: center;
         }
         
+        @media (min-width: 768px) {
+            .audit-detail-score-box {
+                padding: var(--space-xl);
+            }
+        }
+        
         .audit-detail-score-value {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 700;
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-score-value {
+                font-size: 3rem;
+            }
         }
         
         .audit-detail-score-value.excellent { color: var(--traffic-green); }
@@ -5369,38 +5447,102 @@
         .audit-detail-score-value.critical { color: var(--traffic-red); }
         
         .audit-detail-score-label {
-            font-size: var(--font-size-xs);
+            font-size: var(--font-size-sm);
             color: var(--gray-50);
-            margin-top: 4px;
+            margin-top: 8px;
         }
         
-        /* Accordéon scores */
-        .audit-detail-section {
+        /* Mini barres S résumé */
+        .audit-detail-s-bars {
+            display: flex;
+            gap: 10px;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--white);
             border-bottom: 1px solid var(--gray-10);
         }
         
+        @media (min-width: 768px) {
+            .audit-detail-s-bars {
+                gap: 16px;
+                padding: var(--space-lg) var(--space-xl);
+            }
+        }
+        
+        .audit-detail-s-bar {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .audit-detail-s-bar-fill {
+            height: 6px;
+            border-radius: 3px;
+            margin-bottom: 6px;
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-s-bar-fill {
+                height: 8px;
+                border-radius: 4px;
+                margin-bottom: 8px;
+            }
+        }
+        
+        .audit-detail-s-bar-label {
+            font-size: 11px;
+            color: var(--gray-50);
+            font-weight: 500;
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-s-bar-label {
+                font-size: 12px;
+            }
+        }
+        
+        /* Accordéon sections */
+        .audit-detail-section {
+            border-bottom: 1px solid var(--gray-10);
+            background: var(--white);
+        }
+        
         .audit-detail-section-header {
-            padding: var(--space-sm) var(--space-md);
+            padding: var(--space-md) var(--space-lg);
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            background: var(--gray-5);
+            background: var(--white);
             transition: background 0.15s;
         }
         
+        @media (min-width: 768px) {
+            .audit-detail-section-header {
+                padding: var(--space-lg) var(--space-xl);
+            }
+        }
+        
         .audit-detail-section-header:hover {
+            background: var(--gray-5);
+        }
+        
+        .audit-detail-section-header:active {
             background: var(--gray-10);
         }
         
         .audit-detail-section-title {
-            font-size: var(--font-size-sm);
+            font-size: var(--font-size-base);
             font-weight: 600;
         }
         
+        @media (min-width: 768px) {
+            .audit-detail-section-title {
+                font-size: var(--font-size-lg);
+            }
+        }
+        
         .audit-detail-section-toggle {
-            font-size: var(--font-size-xs);
-            color: var(--gray-50);
+            font-size: var(--font-size-sm);
+            color: var(--gray-40);
             transition: transform 0.2s;
         }
         
@@ -5410,40 +5552,25 @@
         
         .audit-detail-section-content {
             display: none;
-            padding: var(--space-sm) var(--space-md) var(--space-md);
+            padding: 0 var(--space-lg) var(--space-lg);
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-section-content {
+                padding: 0 var(--space-xl) var(--space-xl);
+            }
         }
         
         .audit-detail-section.open .audit-detail-section-content {
             display: block;
         }
         
-        /* Mini barres S résumé */
-        .audit-detail-s-bars {
-            display: flex;
-            gap: 6px;
-            margin-top: var(--space-sm);
-            padding: 0 var(--space-md) var(--space-sm);
-        }
-        
-        .audit-detail-s-bar {
-            flex: 1;
-            text-align: center;
-        }
-        
-        .audit-detail-s-bar-fill {
-            height: 4px;
-            border-radius: 2px;
-            margin-bottom: 4px;
-        }
-        
-        .audit-detail-s-bar-label {
-            font-size: 10px;
-            color: var(--gray-50);
-        }
-        
         /* Groupe S (S1, S2, etc.) */
         .audit-detail-s-group {
+            background: var(--gray-5);
+            border-radius: var(--radius-md);
             margin-bottom: var(--space-md);
+            overflow: hidden;
         }
         
         .audit-detail-s-group:last-child {
@@ -5454,27 +5581,54 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--space-sm);
             cursor: pointer;
-            padding: 4px 0;
+            padding: var(--space-md);
+            transition: background 0.15s;
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-s-header {
+                padding: var(--space-md) var(--space-lg);
+            }
+        }
+        
+        .audit-detail-s-header:hover {
+            background: var(--gray-10);
         }
         
         .audit-detail-s-name {
             font-size: var(--font-size-sm);
-            font-weight: 500;
+            font-weight: 600;
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-s-name {
+                font-size: var(--font-size-base);
+            }
         }
         
         .audit-detail-s-score {
             font-size: var(--font-size-sm);
-            font-weight: 600;
+            font-weight: 700;
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-s-score {
+                font-size: var(--font-size-base);
+            }
         }
         
         /* Critères liste */
         .audit-detail-criteria-list {
-            margin-left: 8px;
-            border-left: 2px solid var(--gray-20);
-            padding-left: 10px;
             display: none;
+            padding: 0 var(--space-md) var(--space-md);
+            border-top: 1px solid var(--gray-20);
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-criteria-list {
+                padding: 0 var(--space-lg) var(--space-lg);
+            }
         }
         
         .audit-detail-s-group.open .audit-detail-criteria-list {
@@ -5485,24 +5639,57 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 4px 0;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--gray-10);
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-criteria-item {
+                padding: var(--space-md) 0;
+            }
+        }
+        
+        .audit-detail-criteria-item:first-child {
+            padding-top: var(--space-md);
+        }
+        
+        .audit-detail-criteria-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
         }
         
         .audit-detail-criteria-label {
-            font-size: var(--font-size-xs);
-            color: var(--gray-60);
+            font-size: var(--font-size-sm);
+            color: var(--gray-70);
+            flex: 1;
+            padding-right: var(--space-md);
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-criteria-label {
+                font-size: var(--font-size-base);
+            }
         }
         
         .audit-detail-criteria-score {
-            width: 22px;
-            height: 22px;
-            border-radius: 4px;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
-            font-weight: 600;
+            font-size: var(--font-size-sm);
+            font-weight: 700;
             color: var(--white);
+            flex-shrink: 0;
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-criteria-score {
+                width: 32px;
+                height: 32px;
+                font-size: var(--font-size-base);
+            }
         }
         
         .audit-detail-criteria-score.score-0 { background: var(--traffic-red); }
@@ -5522,18 +5709,24 @@
         .audit-detail-actions-count {
             background: var(--traffic-orange);
             color: var(--white);
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 10px;
+            padding: 3px 10px;
+            border-radius: 12px;
         }
         
         .audit-detail-action-card {
             background: var(--gray-5);
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 8px;
-            border-left: 3px solid var(--traffic-orange);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            border-left: 4px solid var(--traffic-orange);
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-action-card {
+                padding: var(--space-lg);
+            }
         }
         
         .audit-detail-action-card:last-child {
@@ -5555,12 +5748,12 @@
         .audit-detail-action-row {
             display: flex;
             align-items: flex-start;
-            gap: 8px;
+            gap: var(--space-md);
         }
         
         .audit-detail-action-status {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             margin-top: 5px;
             flex-shrink: 0;
@@ -5572,31 +5765,56 @@
         
         .audit-detail-action-text {
             font-size: var(--font-size-sm);
+            line-height: 1.4;
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-action-text {
+                font-size: var(--font-size-base);
+            }
         }
         
         .audit-detail-action-meta {
-            font-size: 11px;
+            font-size: var(--font-size-xs);
             color: var(--gray-50);
-            margin-top: 4px;
+            margin-top: 6px;
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-action-meta {
+                font-size: var(--font-size-sm);
+                margin-top: 8px;
+            }
         }
         
         /* Section photos */
         .audit-detail-photos-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: var(--space-sm);
+            gap: var(--space-md);
+        }
+        
+        @media (min-width: 768px) {
+            .audit-detail-photos-grid {
+                gap: var(--space-lg);
+            }
         }
         
         .audit-detail-photo {
             aspect-ratio: 1;
             background: var(--gray-10);
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             overflow: hidden;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        
+        .audit-detail-photo:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         
         .audit-detail-photo img {
@@ -5610,27 +5828,27 @@
         }
         
         .audit-detail-photo-placeholder svg {
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
         }
         
         .audit-detail-photos-hint {
-            font-size: 11px;
+            font-size: var(--font-size-xs);
             color: var(--gray-50);
             text-align: center;
-            margin-top: var(--space-sm);
+            margin-top: var(--space-md);
         }
         
         .audit-detail-photos-loading {
             text-align: center;
-            padding: var(--space-md);
+            padding: var(--space-xl);
             color: var(--gray-50);
             font-size: var(--font-size-sm);
         }
         
         .audit-detail-empty {
             text-align: center;
-            padding: var(--space-md);
+            padding: var(--space-xl);
             color: var(--gray-50);
             font-size: var(--font-size-sm);
         }
@@ -5643,10 +5861,11 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 1002;
             align-items: center;
             justify-content: center;
+            padding: var(--space-lg);
         }
         
         .audit-detail-lightbox.visible {
@@ -5654,29 +5873,31 @@
         }
         
         .audit-detail-lightbox img {
-            max-width: 90%;
-            max-height: 90%;
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
+            border-radius: var(--radius-md);
         }
         
         .audit-detail-lightbox-close {
             position: absolute;
-            top: var(--space-md);
-            right: var(--space-md);
-            background: none;
+            top: var(--space-lg);
+            right: var(--space-lg);
+            background: rgba(255,255,255,0.1);
             border: none;
             color: var(--white);
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             border-radius: 50%;
+            transition: background 0.15s;
         }
         
         .audit-detail-lightbox-close:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.2);
         }
         
         .audit-detail-lightbox-close svg {
@@ -5690,7 +5911,6 @@
         }
         
         .dashboard-table tbody tr.clickable-row:hover td {
-            background: var(--sartorius-yellow);
             background: rgba(255, 237, 0, 0.15);
         }
         
@@ -11574,78 +11794,80 @@ Cordialement`);
         </div>
         
         <!-- Modal détail audit -->
-        <div class="audit-detail-modal" id="audit-detail-modal">
-            <!-- Header jaune -->
-            <div class="audit-detail-header">
-                <div class="audit-detail-header-left">
-                    <button class="audit-detail-back" onclick="closeAuditDetailModal()">
+        <div class="audit-detail-modal" id="audit-detail-modal" onclick="closeAuditDetailModal()">
+            <div class="audit-detail-container" onclick="event.stopPropagation()">
+                <!-- Header jaune -->
+                <div class="audit-detail-header">
+                    <div class="audit-detail-header-left">
+                        <button class="audit-detail-back" onclick="closeAuditDetailModal()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <span class="audit-detail-id" id="audit-detail-id">-</span>
+                    </div>
+                    <button class="audit-detail-close" onclick="closeAuditDetailModal()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
                         </svg>
                     </button>
-                    <span class="audit-detail-id" id="audit-detail-id">-</span>
                 </div>
-                <button class="audit-detail-close" onclick="closeAuditDetailModal()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            
-            <!-- Body -->
-            <div class="audit-detail-body">
-                <!-- Infos principales -->
-                <div class="audit-detail-info">
-                    <div class="audit-detail-info-row">
-                        <div>
-                            <div class="audit-detail-zone" id="audit-detail-zone">-</div>
-                            <div class="audit-detail-meta" id="audit-detail-meta">-</div>
+                
+                <!-- Body -->
+                <div class="audit-detail-body">
+                    <!-- Infos principales -->
+                    <div class="audit-detail-info">
+                        <div class="audit-detail-info-row">
+                            <div>
+                                <div class="audit-detail-zone" id="audit-detail-zone">-</div>
+                                <div class="audit-detail-meta" id="audit-detail-meta">-</div>
+                            </div>
+                            <span class="audit-detail-niveau" id="audit-detail-niveau">-</span>
                         </div>
-                        <span class="audit-detail-niveau" id="audit-detail-niveau">-</span>
+                        <!-- Score global -->
+                        <div class="audit-detail-score-box">
+                            <div class="audit-detail-score-value" id="audit-detail-score">-</div>
+                            <div class="audit-detail-score-label">Performance globale</div>
+                        </div>
                     </div>
-                    <!-- Score global -->
-                    <div class="audit-detail-score-box">
-                        <div class="audit-detail-score-value" id="audit-detail-score">-</div>
-                        <div class="audit-detail-score-label">Performance globale</div>
-                    </div>
-                </div>
-                
-                <!-- Mini barres S (toujours visible) -->
-                <div class="audit-detail-s-bars" id="audit-detail-s-bars">
-                    <!-- Rempli dynamiquement -->
-                </div>
-                
-                <!-- Section Scores détaillés (accordéon) -->
-                <div class="audit-detail-section" id="audit-detail-scores-section">
-                    <div class="audit-detail-section-header" onclick="toggleAuditDetailSection('scores')">
-                        <span class="audit-detail-section-title">Scores détaillés</span>
-                        <span class="audit-detail-section-toggle">▼</span>
-                    </div>
-                    <div class="audit-detail-section-content" id="audit-detail-scores-content">
+                    
+                    <!-- Mini barres S (toujours visible) -->
+                    <div class="audit-detail-s-bars" id="audit-detail-s-bars">
                         <!-- Rempli dynamiquement -->
                     </div>
-                </div>
-                
-                <!-- Section Actions -->
-                <div class="audit-detail-section" id="audit-detail-actions-section">
-                    <div class="audit-detail-section-header" onclick="toggleAuditDetailSection('actions')">
-                        <span class="audit-detail-section-title">Actions</span>
-                        <span class="audit-detail-section-toggle">▼</span>
+                    
+                    <!-- Section Scores détaillés (accordéon) -->
+                    <div class="audit-detail-section" id="audit-detail-scores-section">
+                        <div class="audit-detail-section-header" onclick="toggleAuditDetailSection('scores')">
+                            <span class="audit-detail-section-title">Scores détaillés</span>
+                            <span class="audit-detail-section-toggle">▼</span>
+                        </div>
+                        <div class="audit-detail-section-content" id="audit-detail-scores-content">
+                            <!-- Rempli dynamiquement -->
+                        </div>
                     </div>
-                    <div class="audit-detail-section-content" id="audit-detail-actions-content">
-                        <!-- Rempli dynamiquement -->
+                    
+                    <!-- Section Actions -->
+                    <div class="audit-detail-section" id="audit-detail-actions-section">
+                        <div class="audit-detail-section-header" onclick="toggleAuditDetailSection('actions')">
+                            <span class="audit-detail-section-title">Actions</span>
+                            <span class="audit-detail-section-toggle">▼</span>
+                        </div>
+                        <div class="audit-detail-section-content" id="audit-detail-actions-content">
+                            <!-- Rempli dynamiquement -->
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Section Photos -->
-                <div class="audit-detail-section" id="audit-detail-photos-section">
-                    <div class="audit-detail-section-header" onclick="toggleAuditDetailSection('photos')">
-                        <span class="audit-detail-section-title">Photos</span>
-                        <span class="audit-detail-section-toggle">▼</span>
-                    </div>
-                    <div class="audit-detail-section-content" id="audit-detail-photos-content">
-                        <!-- Rempli dynamiquement -->
+                    
+                    <!-- Section Photos -->
+                    <div class="audit-detail-section" id="audit-detail-photos-section">
+                        <div class="audit-detail-section-header" onclick="toggleAuditDetailSection('photos')">
+                            <span class="audit-detail-section-title">Photos</span>
+                            <span class="audit-detail-section-toggle">▼</span>
+                        </div>
+                        <div class="audit-detail-section-content" id="audit-detail-photos-content">
+                            <!-- Rempli dynamiquement -->
+                        </div>
                     </div>
                 </div>
             </div>
