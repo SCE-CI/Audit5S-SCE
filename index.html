@@ -5222,6 +5222,478 @@
             animation: shake 0.3s ease;
         }
         
+        /* ═══════════════════════════════════════════════════════════════
+           MODAL DÉTAIL AUDIT
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .audit-detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--white);
+            z-index: 1001;
+            overflow-y: auto;
+        }
+        
+        .audit-detail-modal.visible {
+            display: block;
+        }
+        
+        .audit-detail-header {
+            background: var(--sartorius-yellow);
+            padding: var(--space-sm) var(--space-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .audit-detail-header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .audit-detail-back {
+            background: none;
+            border: none;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.15s;
+        }
+        
+        .audit-detail-back:hover {
+            background: rgba(0,0,0,0.1);
+        }
+        
+        .audit-detail-back svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .audit-detail-id {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+        }
+        
+        .audit-detail-close {
+            background: none;
+            border: none;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.15s;
+        }
+        
+        .audit-detail-close:hover {
+            background: rgba(0,0,0,0.1);
+        }
+        
+        .audit-detail-close svg {
+            width: 22px;
+            height: 22px;
+        }
+        
+        .audit-detail-body {
+            padding: 0;
+        }
+        
+        /* Section infos principales */
+        .audit-detail-info {
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--gray-10);
+        }
+        
+        .audit-detail-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-md);
+        }
+        
+        .audit-detail-zone {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+        }
+        
+        .audit-detail-meta {
+            font-size: var(--font-size-sm);
+            color: var(--gray-60);
+            margin-top: 4px;
+        }
+        
+        .audit-detail-niveau {
+            background: var(--sartorius-yellow);
+            color: var(--black);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+        
+        .audit-detail-niveau.n1 {
+            background: var(--gray-20);
+            color: var(--gray-70);
+        }
+        
+        /* Score global */
+        .audit-detail-score-box {
+            background: var(--gray-5);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            text-align: center;
+        }
+        
+        .audit-detail-score-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .audit-detail-score-value.excellent { color: var(--traffic-green); }
+        .audit-detail-score-value.good { color: var(--gray-80); }
+        .audit-detail-score-value.warning { color: var(--traffic-orange); }
+        .audit-detail-score-value.critical { color: var(--traffic-red); }
+        
+        .audit-detail-score-label {
+            font-size: var(--font-size-xs);
+            color: var(--gray-50);
+            margin-top: 4px;
+        }
+        
+        /* Accordéon scores */
+        .audit-detail-section {
+            border-bottom: 1px solid var(--gray-10);
+        }
+        
+        .audit-detail-section-header {
+            padding: var(--space-sm) var(--space-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            background: var(--gray-5);
+            transition: background 0.15s;
+        }
+        
+        .audit-detail-section-header:hover {
+            background: var(--gray-10);
+        }
+        
+        .audit-detail-section-title {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+        
+        .audit-detail-section-toggle {
+            font-size: var(--font-size-xs);
+            color: var(--gray-50);
+            transition: transform 0.2s;
+        }
+        
+        .audit-detail-section.open .audit-detail-section-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .audit-detail-section-content {
+            display: none;
+            padding: var(--space-sm) var(--space-md) var(--space-md);
+        }
+        
+        .audit-detail-section.open .audit-detail-section-content {
+            display: block;
+        }
+        
+        /* Mini barres S résumé */
+        .audit-detail-s-bars {
+            display: flex;
+            gap: 6px;
+            margin-top: var(--space-sm);
+            padding: 0 var(--space-md) var(--space-sm);
+        }
+        
+        .audit-detail-s-bar {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .audit-detail-s-bar-fill {
+            height: 4px;
+            border-radius: 2px;
+            margin-bottom: 4px;
+        }
+        
+        .audit-detail-s-bar-label {
+            font-size: 10px;
+            color: var(--gray-50);
+        }
+        
+        /* Groupe S (S1, S2, etc.) */
+        .audit-detail-s-group {
+            margin-bottom: var(--space-md);
+        }
+        
+        .audit-detail-s-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .audit-detail-s-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-sm);
+            cursor: pointer;
+            padding: 4px 0;
+        }
+        
+        .audit-detail-s-name {
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+        }
+        
+        .audit-detail-s-score {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+        
+        /* Critères liste */
+        .audit-detail-criteria-list {
+            margin-left: 8px;
+            border-left: 2px solid var(--gray-20);
+            padding-left: 10px;
+            display: none;
+        }
+        
+        .audit-detail-s-group.open .audit-detail-criteria-list {
+            display: block;
+        }
+        
+        .audit-detail-criteria-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+        }
+        
+        .audit-detail-criteria-label {
+            font-size: var(--font-size-xs);
+            color: var(--gray-60);
+        }
+        
+        .audit-detail-criteria-score {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--white);
+        }
+        
+        .audit-detail-criteria-score.score-0 { background: var(--traffic-red); }
+        .audit-detail-criteria-score.score-1 { background: var(--traffic-red); }
+        .audit-detail-criteria-score.score-2 { background: var(--traffic-orange); }
+        .audit-detail-criteria-score.score-3 { background: var(--sartorius-yellow); color: var(--black); }
+        .audit-detail-criteria-score.score-4 { background: var(--traffic-green); }
+        
+        /* Section actions liées */
+        .audit-detail-actions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .audit-detail-actions-count {
+            background: var(--traffic-orange);
+            color: var(--white);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        .audit-detail-action-card {
+            background: var(--gray-5);
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-left: 3px solid var(--traffic-orange);
+        }
+        
+        .audit-detail-action-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .audit-detail-action-card.inprogress {
+            border-left-color: var(--teal);
+        }
+        
+        .audit-detail-action-card.closed {
+            border-left-color: var(--traffic-green);
+        }
+        
+        .audit-detail-action-card.overdue {
+            border-left-color: var(--traffic-red);
+        }
+        
+        .audit-detail-action-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .audit-detail-action-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+        
+        .audit-detail-action-content {
+            flex: 1;
+        }
+        
+        .audit-detail-action-text {
+            font-size: var(--font-size-sm);
+        }
+        
+        .audit-detail-action-meta {
+            font-size: 11px;
+            color: var(--gray-50);
+            margin-top: 4px;
+        }
+        
+        /* Section photos */
+        .audit-detail-photos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: var(--space-sm);
+        }
+        
+        .audit-detail-photo {
+            aspect-ratio: 1;
+            background: var(--gray-10);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .audit-detail-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .audit-detail-photo-placeholder {
+            color: var(--gray-40);
+        }
+        
+        .audit-detail-photo-placeholder svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .audit-detail-photos-hint {
+            font-size: 11px;
+            color: var(--gray-50);
+            text-align: center;
+            margin-top: var(--space-sm);
+        }
+        
+        .audit-detail-photos-loading {
+            text-align: center;
+            padding: var(--space-md);
+            color: var(--gray-50);
+            font-size: var(--font-size-sm);
+        }
+        
+        .audit-detail-empty {
+            text-align: center;
+            padding: var(--space-md);
+            color: var(--gray-50);
+            font-size: var(--font-size-sm);
+        }
+        
+        /* Lightbox photo */
+        .audit-detail-lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1002;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .audit-detail-lightbox.visible {
+            display: flex;
+        }
+        
+        .audit-detail-lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        
+        .audit-detail-lightbox-close {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            background: none;
+            border: none;
+            color: var(--white);
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        
+        .audit-detail-lightbox-close:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .audit-detail-lightbox-close svg {
+            width: 28px;
+            height: 28px;
+        }
+        
+        /* Ligne tableau cliquable */
+        .dashboard-table tbody tr.clickable-row {
+            cursor: pointer;
+        }
+        
+        .dashboard-table tbody tr.clickable-row:hover td {
+            background: var(--sartorius-yellow);
+            background: rgba(255, 237, 0, 0.15);
+        }
+        
         /* Bouton clôturer dans le tableau */
         .dashboard-action-close-btn {
             padding: 4px 8px;
@@ -11100,6 +11572,95 @@ Cordialement`);
                 </div>
             </div>
         </div>
+        
+        <!-- Modal détail audit -->
+        <div class="audit-detail-modal" id="audit-detail-modal">
+            <!-- Header jaune -->
+            <div class="audit-detail-header">
+                <div class="audit-detail-header-left">
+                    <button class="audit-detail-back" onclick="closeAuditDetailModal()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <span class="audit-detail-id" id="audit-detail-id">-</span>
+                </div>
+                <button class="audit-detail-close" onclick="closeAuditDetailModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="audit-detail-body">
+                <!-- Infos principales -->
+                <div class="audit-detail-info">
+                    <div class="audit-detail-info-row">
+                        <div>
+                            <div class="audit-detail-zone" id="audit-detail-zone">-</div>
+                            <div class="audit-detail-meta" id="audit-detail-meta">-</div>
+                        </div>
+                        <span class="audit-detail-niveau" id="audit-detail-niveau">-</span>
+                    </div>
+                    <!-- Score global -->
+                    <div class="audit-detail-score-box">
+                        <div class="audit-detail-score-value" id="audit-detail-score">-</div>
+                        <div class="audit-detail-score-label">Performance globale</div>
+                    </div>
+                </div>
+                
+                <!-- Mini barres S (toujours visible) -->
+                <div class="audit-detail-s-bars" id="audit-detail-s-bars">
+                    <!-- Rempli dynamiquement -->
+                </div>
+                
+                <!-- Section Scores détaillés (accordéon) -->
+                <div class="audit-detail-section" id="audit-detail-scores-section">
+                    <div class="audit-detail-section-header" onclick="toggleAuditDetailSection('scores')">
+                        <span class="audit-detail-section-title">Scores détaillés</span>
+                        <span class="audit-detail-section-toggle">▼</span>
+                    </div>
+                    <div class="audit-detail-section-content" id="audit-detail-scores-content">
+                        <!-- Rempli dynamiquement -->
+                    </div>
+                </div>
+                
+                <!-- Section Actions -->
+                <div class="audit-detail-section" id="audit-detail-actions-section">
+                    <div class="audit-detail-section-header" onclick="toggleAuditDetailSection('actions')">
+                        <span class="audit-detail-section-title">Actions</span>
+                        <span class="audit-detail-section-toggle">▼</span>
+                    </div>
+                    <div class="audit-detail-section-content" id="audit-detail-actions-content">
+                        <!-- Rempli dynamiquement -->
+                    </div>
+                </div>
+                
+                <!-- Section Photos -->
+                <div class="audit-detail-section" id="audit-detail-photos-section">
+                    <div class="audit-detail-section-header" onclick="toggleAuditDetailSection('photos')">
+                        <span class="audit-detail-section-title">Photos</span>
+                        <span class="audit-detail-section-toggle">▼</span>
+                    </div>
+                    <div class="audit-detail-section-content" id="audit-detail-photos-content">
+                        <!-- Rempli dynamiquement -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lightbox pour les photos -->
+        <div class="audit-detail-lightbox" id="audit-detail-lightbox" onclick="closeAuditLightbox()">
+            <button class="audit-detail-lightbox-close" onclick="closeAuditLightbox()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <img id="audit-detail-lightbox-img" src="" alt="Photo audit">
+        </div>
     </div>
     
     <script>
@@ -11506,9 +12067,10 @@ Cordialement`);
             
             // Parser les données
             // Colonnes: 0-6 métadonnées, 7-21 scores critères, 22-26 scores S, 27 (AB) = Score moyen, 28 (AC) = Performance
-            dashboardData.audits = data.value.map((row) => {
+            dashboardData.audits = data.value.map((row, idx) => {
                 const values = row.values[0];
                 return {
+                    rowIndex: idx,
                     annee: values[0],
                     semaine: values[1],
                     auditId: values[2],
@@ -11516,6 +12078,24 @@ Cordialement`);
                     auditeur: values[4],
                     zone: values[5],
                     niveau: values[6],
+                    // Scores par critère (colonnes H-V, indices 7-21)
+                    scores: {
+                        seiri_1: values[7],
+                        seiri_2: values[8],
+                        seiri_3: values[9],
+                        seiton_1: values[10],
+                        seiton_2: values[11],
+                        seiton_3: values[12],
+                        seiso_1: values[13],
+                        seiso_2: values[14],
+                        seiso_3: values[15],
+                        seiketsu_1: values[16],
+                        seiketsu_2: values[17],
+                        seiketsu_3: values[18],
+                        shitsuke_1: values[19],
+                        shitsuke_2: values[20],
+                        shitsuke_3: values[21]
+                    },
                     // Scores par S (colonnes 22-26, indices W à AA)
                     scoreS1: values[22],  // Seiri - Trier
                     scoreS2: values[23],  // Seiton - Ranger
@@ -12152,7 +12732,7 @@ Cordialement`);
                 const dateFormatted = formatExcelDate(audit.date);
                 
                 return `
-                    <tr>
+                    <tr class="clickable-row" onclick="openAuditDetailModal(${audit.rowIndex})">
                         <td>${dateFormatted}</td>
                         <td><span class="dashboard-badge ${audit.niveau === 'N2' ? 'n2' : 'n1'}">${audit.niveau}</span></td>
                         <td><span class="score-${scoreClass}">${score}%</span></td>
@@ -12269,7 +12849,7 @@ Cordialement`);
                 const niveauClass = audit.niveau === 'N2' ? 'n2' : 'n1';
                 
                 return `
-                    <tr>
+                    <tr class="clickable-row" onclick="openAuditDetailModal(${audit.rowIndex})">
                         <td>${dateFormatted}</td>
                         <td>${audit.zone || '-'}</td>
                         <td><span class="dashboard-badge ${niveauClass}">${audit.niveau || '-'}</span></td>
@@ -12471,6 +13051,382 @@ Cordialement`);
                     throw new Error(error.error?.message || 'Erreur mise à jour commentaire');
                 }
             }
+        }
+        
+        // ═══════════════════════════════════════════════════════════════
+        // MODAL DÉTAIL AUDIT
+        // ═══════════════════════════════════════════════════════════════
+        
+        // Labels des critères
+        const AUDIT_CRITERIA_LABELS = {
+            seiri_1: 'Distinction utile/inutile',
+            seiri_2: 'Objets inutiles retirés',
+            seiri_3: 'Pas de rebuts visibles',
+            seiton_1: 'Place définie pour chaque chose',
+            seiton_2: 'Identification claire et cohérente',
+            seiton_3: 'Accès facile et rangement logique',
+            seiso_1: 'Propreté générale',
+            seiso_2: 'Équipements et outils propres',
+            seiso_3: 'Sources de salissures maîtrisées',
+            seiketsu_1: 'Standards et consignes affichés',
+            seiketsu_2: 'Management visuel efficace',
+            seiketsu_3: 'Respect des règles 5S',
+            shitsuke_1: 'Implication de l\'équipe',
+            shitsuke_2: 'Audits réguliers et suivi',
+            shitsuke_3: 'Actions d\'amélioration réalisées'
+        };
+        
+        // Configuration des S
+        const S_CONFIG = [
+            { key: 'S1', name: 'Trier', prefix: 'seiri', criteria: ['seiri_1', 'seiri_2', 'seiri_3'] },
+            { key: 'S2', name: 'Ranger', prefix: 'seiton', criteria: ['seiton_1', 'seiton_2', 'seiton_3'] },
+            { key: 'S3', name: 'Nettoyer', prefix: 'seiso', criteria: ['seiso_1', 'seiso_2', 'seiso_3'] },
+            { key: 'S4', name: 'Standardiser', prefix: 'seiketsu', criteria: ['seiketsu_1', 'seiketsu_2', 'seiketsu_3'] },
+            { key: 'S5', name: 'Respecter', prefix: 'shitsuke', criteria: ['shitsuke_1', 'shitsuke_2', 'shitsuke_3'] }
+        ];
+        
+        let currentAuditDetail = null;
+        
+        function openAuditDetailModal(rowIndex) {
+            const audit = dashboardData.audits.find(a => a.rowIndex === rowIndex);
+            if (!audit) return;
+            
+            currentAuditDetail = audit;
+            
+            // Remplir les infos de base
+            document.getElementById('audit-detail-id').textContent = audit.auditId || '-';
+            document.getElementById('audit-detail-zone').textContent = audit.zone || '-';
+            document.getElementById('audit-detail-meta').textContent = `${formatExcelDate(audit.date)} • ${audit.auditeur || '-'}`;
+            
+            const niveauEl = document.getElementById('audit-detail-niveau');
+            niveauEl.textContent = audit.niveau || '-';
+            niveauEl.className = 'audit-detail-niveau' + (audit.niveau === 'N1' ? ' n1' : '');
+            
+            // Score global
+            const score = Math.round(parseScorePercent(audit.performance));
+            const scoreClass = getScoreClass(score);
+            const scoreEl = document.getElementById('audit-detail-score');
+            scoreEl.textContent = score + '%';
+            scoreEl.className = 'audit-detail-score-value ' + scoreClass;
+            
+            // Mini barres S
+            renderAuditDetailSBars(audit);
+            
+            // Scores détaillés
+            renderAuditDetailScores(audit);
+            
+            // Actions liées
+            renderAuditDetailActions(audit);
+            
+            // Photos - on essaie de les charger
+            loadAuditDetailPhotos(audit);
+            
+            // Ouvrir la modale
+            document.getElementById('audit-detail-modal').classList.add('visible');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeAuditDetailModal() {
+            document.getElementById('audit-detail-modal').classList.remove('visible');
+            document.body.style.overflow = 'hidden'; // Dashboard toujours ouvert
+            currentAuditDetail = null;
+            
+            // Fermer toutes les sections
+            document.querySelectorAll('.audit-detail-section').forEach(s => s.classList.remove('open'));
+            document.querySelectorAll('.audit-detail-s-group').forEach(g => g.classList.remove('open'));
+        }
+        
+        function toggleAuditDetailSection(sectionId) {
+            const section = document.getElementById('audit-detail-' + sectionId + '-section');
+            if (section) {
+                section.classList.toggle('open');
+            }
+        }
+        
+        function toggleAuditDetailSGroup(sKey) {
+            const group = document.getElementById('audit-detail-s-' + sKey.toLowerCase());
+            if (group) {
+                group.classList.toggle('open');
+            }
+        }
+        
+        // Obtenir la couleur pour un score
+        function getScoreColor(score) {
+            const s = parseFloat(score) || 0;
+            if (s >= 4) return 'var(--traffic-green)';
+            if (s >= 3) return 'var(--sartorius-yellow)';
+            if (s >= 2) return 'var(--traffic-orange)';
+            return 'var(--traffic-red)';
+        }
+        
+        // Obtenir la classe pour un score critère (0-4)
+        function getCriteriaScoreClass(score) {
+            const s = parseInt(score) || 0;
+            return 'score-' + Math.min(4, Math.max(0, s));
+        }
+        
+        // Rendre les mini barres S
+        function renderAuditDetailSBars(audit) {
+            const container = document.getElementById('audit-detail-s-bars');
+            
+            const bars = S_CONFIG.map((s, idx) => {
+                const scoreKey = 'scoreS' + (idx + 1);
+                const score = parseFloat(audit[scoreKey]) || 0;
+                const color = getScoreColor(score);
+                
+                return `
+                    <div class="audit-detail-s-bar">
+                        <div class="audit-detail-s-bar-fill" style="background: ${color};"></div>
+                        <span class="audit-detail-s-bar-label">${s.key}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = bars;
+        }
+        
+        // Rendre les scores détaillés (accordéon)
+        function renderAuditDetailScores(audit) {
+            const container = document.getElementById('audit-detail-scores-content');
+            
+            if (!audit.scores) {
+                container.innerHTML = '<div class="audit-detail-empty">Scores détaillés non disponibles</div>';
+                return;
+            }
+            
+            let html = '';
+            
+            S_CONFIG.forEach((s, idx) => {
+                const scoreKey = 'scoreS' + (idx + 1);
+                const sScore = parseFloat(audit[scoreKey]) || 0;
+                const scoreColor = getScoreColor(sScore);
+                
+                html += `
+                    <div class="audit-detail-s-group" id="audit-detail-s-${s.key.toLowerCase()}">
+                        <div class="audit-detail-s-header" onclick="toggleAuditDetailSGroup('${s.key}')">
+                            <span class="audit-detail-s-name">${s.key} — ${s.name}</span>
+                            <span class="audit-detail-s-score" style="color: ${scoreColor};">${sScore.toFixed(1)}/4</span>
+                        </div>
+                        <div class="audit-detail-criteria-list">
+                `;
+                
+                s.criteria.forEach((criteriaKey, cIdx) => {
+                    const criteriaScore = parseInt(audit.scores[criteriaKey]) || 0;
+                    const criteriaLabel = AUDIT_CRITERIA_LABELS[criteriaKey] || criteriaKey;
+                    const scoreClass = getCriteriaScoreClass(criteriaScore);
+                    
+                    html += `
+                        <div class="audit-detail-criteria-item">
+                            <span class="audit-detail-criteria-label">${criteriaLabel}</span>
+                            <span class="audit-detail-criteria-score ${scoreClass}">${criteriaScore}</span>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Rendre les actions liées à l'audit
+        function renderAuditDetailActions(audit) {
+            const container = document.getElementById('audit-detail-actions-content');
+            
+            // Trouver les actions liées via auditId (préfixe de actionId)
+            const relatedActions = dashboardData.actions.filter(a => {
+                if (!a.actionId || !audit.auditId) return false;
+                // actionId format: A5S_2026-1_A1 → auditId: A5S_2026-1
+                const auditIdFromAction = a.actionId.replace(/_A\d+$/, '');
+                return auditIdFromAction === audit.auditId;
+            });
+            
+            if (relatedActions.length === 0) {
+                container.innerHTML = '<div class="audit-detail-empty">Aucune action liée à cet audit</div>';
+                // Masquer le badge count si présent
+                const section = document.getElementById('audit-detail-actions-section');
+                const header = section.querySelector('.audit-detail-section-header');
+                header.innerHTML = `
+                    <span class="audit-detail-section-title">Actions</span>
+                    <span class="audit-detail-section-toggle">▼</span>
+                `;
+                return;
+            }
+            
+            // Mettre à jour le header avec le count
+            const section = document.getElementById('audit-detail-actions-section');
+            const header = section.querySelector('.audit-detail-section-header');
+            const openCount = relatedActions.filter(a => {
+                const status = getActionStatus(a);
+                return status === 'open' || status === 'overdue' || status === 'inprogress';
+            }).length;
+            
+            header.innerHTML = `
+                <div class="audit-detail-actions-header" style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                    <span class="audit-detail-section-title">Actions</span>
+                    ${openCount > 0 ? `<span class="audit-detail-actions-count">${openCount}</span>` : ''}
+                </div>
+                <span class="audit-detail-section-toggle">▼</span>
+            `;
+            
+            // Rendre les actions
+            let html = '';
+            
+            relatedActions.forEach(action => {
+                const status = getActionStatus(action);
+                const statusColor = {
+                    'open': 'var(--traffic-orange)',
+                    'overdue': 'var(--traffic-red)',
+                    'inprogress': 'var(--teal)',
+                    'closed': 'var(--traffic-green)',
+                    'cancelled': 'var(--gray-40)'
+                }[status] || 'var(--gray-40)';
+                
+                const statusLabel = {
+                    'open': 'Ouverte',
+                    'overdue': 'En retard',
+                    'inprogress': 'En cours',
+                    'closed': 'Clôturée',
+                    'cancelled': 'Annulée'
+                }[status] || status;
+                
+                html += `
+                    <div class="audit-detail-action-card ${status}">
+                        <div class="audit-detail-action-row">
+                            <span class="audit-detail-action-status" style="background: ${statusColor};"></span>
+                            <div class="audit-detail-action-content">
+                                <div class="audit-detail-action-text">${action.action || '-'}</div>
+                                <div class="audit-detail-action-meta">${action.responsable || '-'} • ${statusLabel}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Charger les photos depuis le JSON SharePoint
+        async function loadAuditDetailPhotos(audit) {
+            const container = document.getElementById('audit-detail-photos-content');
+            container.innerHTML = '<div class="audit-detail-photos-loading">Chargement des photos...</div>';
+            
+            try {
+                // Construire le chemin du fichier JSON
+                // Format attendu: Audits 5S/2026/Semaine 01/A5S_2026-01_Zone_N1.json
+                if (!audit.auditId || !msalConnected) {
+                    container.innerHTML = '<div class="audit-detail-empty">Photos non disponibles</div>';
+                    return;
+                }
+                
+                const accessToken = await getAccessToken();
+                
+                // Extraire les infos du auditId (format: A5S_2026-15)
+                const match = audit.auditId.match(/A5S_(\d{4})-(\d+)/);
+                if (!match) {
+                    container.innerHTML = '<div class="audit-detail-empty">Photos non disponibles</div>';
+                    return;
+                }
+                
+                const year = match[1];
+                const week = match[2].padStart(2, '0');
+                const zone = (audit.zone || '').replace(/[\/\s]+/g, '_');
+                const niveau = audit.niveau || 'N1';
+                
+                // Construire le chemin
+                const jsonFileName = `A5S_${year}-${week}_${zone}_${niveau}.json`;
+                const folderPath = `Audits 5S/${year}/Semaine ${week}`;
+                const fullPath = `${folderPath}/${jsonFileName}`;
+                
+                // Chercher le fichier
+                const searchUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/root:/${encodeURI(fullPath)}`;
+                
+                const fileResponse = await fetch(searchUrl, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                
+                if (!fileResponse.ok) {
+                    container.innerHTML = '<div class="audit-detail-empty">Aucune photo trouvée</div>';
+                    return;
+                }
+                
+                const fileData = await fileResponse.json();
+                
+                // Télécharger le contenu JSON
+                const contentUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${fileData.id}/content`;
+                const contentResponse = await fetch(contentUrl, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                
+                if (!contentResponse.ok) {
+                    container.innerHTML = '<div class="audit-detail-empty">Erreur lecture photos</div>';
+                    return;
+                }
+                
+                const jsonContent = await contentResponse.json();
+                
+                // Extraire les photos
+                const photos = [];
+                
+                // Photos dans les actions
+                if (jsonContent.actions) {
+                    Object.values(jsonContent.actions).forEach(action => {
+                        if (action.photos && Array.isArray(action.photos)) {
+                            action.photos.forEach(photo => {
+                                if (typeof photo === 'string' && photo.startsWith('data:')) {
+                                    photos.push(photo);
+                                }
+                            });
+                        }
+                    });
+                }
+                
+                if (photos.length === 0) {
+                    container.innerHTML = '<div class="audit-detail-empty">Aucune photo dans cet audit</div>';
+                    return;
+                }
+                
+                // Afficher les photos
+                let html = '<div class="audit-detail-photos-grid">';
+                photos.forEach((photo, idx) => {
+                    html += `
+                        <div class="audit-detail-photo" onclick="openAuditLightbox('${idx}')">
+                            <img src="${photo}" alt="Photo ${idx + 1}" data-photo-index="${idx}">
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                html += '<div class="audit-detail-photos-hint">Cliquer pour agrandir</div>';
+                
+                container.innerHTML = html;
+                
+                // Stocker les photos pour la lightbox
+                currentAuditDetail.loadedPhotos = photos;
+                
+            } catch (error) {
+                console.error('Erreur chargement photos:', error);
+                container.innerHTML = '<div class="audit-detail-empty">Erreur chargement photos</div>';
+            }
+        }
+        
+        // Ouvrir la lightbox photo
+        function openAuditLightbox(photoIndex) {
+            if (!currentAuditDetail || !currentAuditDetail.loadedPhotos) return;
+            
+            const photo = currentAuditDetail.loadedPhotos[photoIndex];
+            if (!photo) return;
+            
+            document.getElementById('audit-detail-lightbox-img').src = photo;
+            document.getElementById('audit-detail-lightbox').classList.add('visible');
+        }
+        
+        // Fermer la lightbox
+        function closeAuditLightbox() {
+            document.getElementById('audit-detail-lightbox').classList.remove('visible');
+            document.getElementById('audit-detail-lightbox-img').src = '';
         }
     </script>
 </body>
