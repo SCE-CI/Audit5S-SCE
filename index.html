@@ -13552,7 +13552,7 @@ Cordialement`);
                     .trim();
                 
                 // Le dossier des audits traités
-                const traitesFolderPath = `Audits 5S/Audits traites/${zoneFolderName}`;
+                const traitesFolderPath = `Audits 5S/Audits traités/${zoneFolderName}`;
                 
                 // Lister les fichiers avec métadonnées SharePoint (dont Auditeur)
                 const folderUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/root:/${encodeURI(traitesFolderPath)}:/children?$select=id,name,lastModifiedDateTime&$expand=listItem($select=fields)&$top=200`;
