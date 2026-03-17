@@ -9872,7 +9872,8 @@ Cordialement`);
             document.body.style.overflow = 'hidden';
             
             // Charger les audits en arrière-plan si connecté et pas encore chargés
-            if (isAuthenticated && !planningAuditsLoaded) {
+            const hasAccount = msalInstance && msalInstance.getAllAccounts().length > 0;
+            if (hasAccount && !planningAuditsLoaded) {
                 loadPlanningAudits().then(() => {
                     // Re-render avec les badges une fois chargé
                     renderPlanningModal();
