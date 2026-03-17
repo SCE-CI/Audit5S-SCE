@@ -1496,6 +1496,25 @@
             margin-left: auto;
         }
         
+        .planning-status-badge.small {
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+            margin-left: 4px;
+            margin-top: 0;
+        }
+        
+        .planning-status-badge.small svg {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .preview-badges {
+            display: inline-flex;
+            gap: 2px;
+            margin-left: 4px;
+        }
+        
         .planning-n2-zone {
             position: relative;
             display: flex;
@@ -9848,6 +9867,7 @@ Cordialement`);
             const preview = document.getElementById('planning-preview');
             const today = new Date();
             const currentWeekNum = getPlanningWeekNumber(today);
+            const currentYear = today.getFullYear();
             
             preview.className = 'planning-preview';
             
@@ -9856,6 +9876,9 @@ Cordialement`);
                 const auditeur = planningRotationN1[today.getMonth()];
                 const mercredi = getDayOfCurrentWeek(3);
                 
+                // Badge de statut si données chargées
+                const statusBadge = getPlanningPreviewBadge(currentWeekNum, zone, 1, currentYear);
+                
                 preview.classList.add('n1');
                 preview.innerHTML = `
                     <div class="preview-icon">
@@ -9863,7 +9886,7 @@ Cordialement`);
                         <div class="day-name">Mercredi</div>
                     </div>
                     <div class="preview-content">
-                        <div class="preview-title">Cette semaine (Sem ${currentWeekNum})</div>
+                        <div class="preview-title">Cette semaine (Sem ${currentWeekNum}) ${statusBadge}</div>
                         <div class="preview-zone">${zone}</div>
                         <div class="preview-details">08h45 • ${auditeur.nom}</div>
                     </div>
@@ -9879,13 +9902,19 @@ Cordialement`);
                 if (isEvenWeek && zones.length === 2) {
                     const resp1 = planningZoneResponsables[zones[0]];
                     const resp2 = planningZoneResponsables[zones[1]];
+                    
+                    // Badges pour les 2 zones
+                    const badge1 = getPlanningPreviewBadge(currentWeekNum, zones[0], 2, currentYear);
+                    const badge2 = getPlanningPreviewBadge(currentWeekNum, zones[1], 2, currentYear);
+                    const statusBadges = (badge1 || badge2) ? `<span class="preview-badges">${badge1}${badge2}</span>` : '';
+                    
                     preview.innerHTML = `
                         <div class="preview-icon">
                             <div class="day-num">${jeudi.getDate()}</div>
                             <div class="day-name">Jeudi</div>
                         </div>
                         <div class="preview-content">
-                            <div class="preview-title">Cette semaine (S${currentWeekNum})</div>
+                            <div class="preview-title">Cette semaine (S${currentWeekNum}) ${statusBadges}</div>
                             <div class="preview-zone">${zones[0]} + ${zones[1]}</div>
                             <div class="preview-details">09h30 • HBI + ${resp1.code} / ${resp2.code}</div>
                         </div>
@@ -10022,6 +10051,9 @@ Cordialement`);
                     // Filtrer les audits 2026
                     const audits2026 = planningAuditsData.filter(a => a.annee == 2026);
                     console.log('Audits 2026:', audits2026.length, audits2026);
+                    
+                    // Mettre à jour la preview avec les badges
+                    updatePlanningPreview();
                 }
             } catch (err) {
                 console.warn('Erreur chargement audits planning:', err);
@@ -10116,7 +10148,7 @@ Cordialement`);
                     </svg>
                 </span>`;
             } else if (isPast) {
-                // Croix rouge
+                // Croix rouge seulement si semaine passée
                 return `<span class="planning-status-badge missed" title="Non réalisé">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                         <line x1="18" y1="6" x2="6" y2="18"/>
@@ -10124,13 +10156,23 @@ Cordialement`);
                     </svg>
                 </span>`;
             } else {
-                // Sablier orange/gris pour à faire
-                return `<span class="planning-status-badge pending" title="À faire">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 2h12v6l-4 4 4 4v6H6v-6l4-4-4-4V2z"/>
+                // Pas de badge pour les semaines futures
+                return '';
+            }
+        }
+        
+        // Badge simplifié pour la preview (seulement si fait)
+        function getPlanningPreviewBadge(weekNum, zone, niveau, year) {
+            const done = checkAuditDone(weekNum, zone, niveau, year);
+            
+            if (done === true) {
+                return `<span class="planning-status-badge done small" title="Audit réalisé">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12"/>
                     </svg>
                 </span>`;
             }
+            return '';
         }
         
         function closePlanningModal(event) {
