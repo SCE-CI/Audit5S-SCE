@@ -7016,6 +7016,9 @@
                         msalConnected = true;
                         console.log('MSAL: Retour redirect réussi, account:', msalAccount.username);
                         
+                        // Charger les audits pour la preview
+                        loadPlanningAudits();
+                        
                         // Vérifier si on revient d'un redirect mobile avec un upload en attente
                         const hasPending = sessionStorage.getItem('pendingSharePointUpload');
                         const savedData = sessionStorage.getItem('pendingExportData');
@@ -7079,6 +7082,9 @@
                     msalConnected = true;
                     console.log('MSAL: SSO silencieux réussi', msalAccount.username);
                     updateMsalStatusDisplay();
+                    
+                    // Charger les audits pour la preview
+                    loadPlanningAudits();
                 }
             } catch (error) {
                 // Échec silencieux attendu si pas de session Microsoft active
@@ -7097,6 +7103,9 @@
                 };
                 await msalInstance.acquireTokenSilent(tokenRequest);
                 msalConnected = true;
+                
+                // Charger les audits pour la preview
+                loadPlanningAudits();
             } catch (error) {
                 msalConnected = false;
             }
