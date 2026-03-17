@@ -11506,8 +11506,15 @@ Cordialement`);
             
             // Parser les données
             // Colonnes: 0-6 métadonnées, 7-21 scores critères, 22-26 scores S, 27 (AB) = Score moyen, 28 (AC) = Performance
-            dashboardData.audits = data.value.map(row => {
+            dashboardData.audits = data.value.map((row, idx) => {
                 const values = row.values[0];
+                
+                // Debug : afficher les premières lignes
+                if (idx < 3) {
+                    console.log(`Audit row ${idx} - colonnes W-AA (22-26):`, values[22], values[23], values[24], values[25], values[26]);
+                    console.log(`Audit row ${idx} - toutes valeurs:`, values);
+                }
+                
                 return {
                     annee: values[0],
                     semaine: values[1],
@@ -12099,6 +12106,7 @@ Cordialement`);
             let labelsHtml = '<div class="dashboard-radar-labels">';
             for (let i = 0; i < n; i++) {
                 const p = getPoint(i, labelRadius);
+                const score = avgScoresPerS[i];
                 const pct = avgPercentsPerS[i];
                 const color = pct >= 85 ? 'var(--traffic-green)' : 
                               pct >= 70 ? 'var(--gray-70)' : 
@@ -12107,17 +12115,18 @@ Cordialement`);
                 labelsHtml += `
                     <div class="dashboard-radar-label" style="left: ${p.x}px; top: ${p.y}px;">
                         <span class="dashboard-radar-label-name">${sLabels[i]}</span>
-                        <span class="dashboard-radar-label-value" style="color: ${color};">${pct}%</span>
+                        <span class="dashboard-radar-label-value" style="color: ${color};">${score.toFixed(1)}/${maxScore}</span>
                     </div>
                 `;
             }
             labelsHtml += '</div>';
             
-            // Footer avec légende des niveaux
-            const globalAvg = Math.round(avgPercentsPerS.reduce((a, b) => a + b, 0) / n);
-            const globalColor = globalAvg >= 85 ? 'var(--traffic-green)' : 
-                               globalAvg >= 70 ? 'var(--sartorius-yellow)' : 
-                               globalAvg >= 50 ? 'var(--traffic-orange)' : 'var(--traffic-red)';
+            // Footer avec légende des niveaux - score total sur 60
+            const globalScore = avgScoresPerS.reduce((a, b) => a + b, 0);
+            const globalPct = Math.round((globalScore / (maxScore * 5)) * 100);
+            const globalColor = globalPct >= 85 ? 'var(--traffic-green)' : 
+                               globalPct >= 70 ? 'var(--sartorius-yellow)' : 
+                               globalPct >= 50 ? 'var(--traffic-orange)' : 'var(--traffic-red)';
             
             let legendHtml = activeLevels.map(level => 
                 `<span class="radar-legend-item" style="color: ${levelColors[level]};">● N${level}</span>`
@@ -12129,7 +12138,7 @@ Cordialement`);
                     ${labelsHtml}
                 </div>
                 <div class="dashboard-radar-footer">
-                    <div class="dashboard-radar-score" style="color: ${globalColor};">${globalAvg}%</div>
+                    <div class="dashboard-radar-score" style="color: ${globalColor};">${globalScore.toFixed(1)}/60</div>
                     <div class="dashboard-radar-meta">${legendHtml}</div>
                 </div>
             `;
