@@ -13534,66 +13534,155 @@ Cordialement`);
         // Charger les photos depuis le JSON SharePoint
         async function loadAuditDetailPhotos(audit) {
             const container = document.getElementById('audit-detail-photos-content');
-            container.innerHTML = '<div class="audit-detail-photos-loading">Chargement des photos...</div>';
+            container.innerHTML = '<div class="audit-detail-photos-loading">Recherche des photos...</div>';
             
             try {
-                // Construire le chemin du fichier JSON
-                // Format attendu: Audits 5S/2026/Semaine 01/A5S_2026-01_Zone_N1.json
-                if (!audit.auditId || !msalConnected) {
+                if (!audit.date || !audit.zone || !msalConnected) {
                     container.innerHTML = '<div class="audit-detail-empty">Photos non disponibles</div>';
                     return;
                 }
                 
                 const accessToken = await getAccessToken();
                 
-                // Extraire les infos du auditId (format: A5S_2026-15)
-                const match = audit.auditId.match(/A5S_(\d{4})-(\d+)/);
-                if (!match) {
-                    container.innerHTML = '<div class="audit-detail-empty">Photos non disponibles</div>';
-                    return;
-                }
+                // Convertir le nom de zone pour le chemin de dossier
+                // "Process / Entrée" -> "Process Entrée" (garder accents, supprimer /)
+                const zoneFolderName = (audit.zone || '')
+                    .replace(/\s*\/\s*/g, ' ')  // Remplacer "/" par espace
+                    .replace(/\s+/g, ' ')        // Normaliser espaces multiples
+                    .trim();
                 
-                const year = match[1];
-                const week = match[2].padStart(2, '0');
-                const zone = (audit.zone || '').replace(/[\/\s]+/g, '_');
-                const niveau = audit.niveau || 'N1';
+                // Le dossier des audits traités
+                const traitesFolderPath = `Audits 5S/Audits traites/${zoneFolderName}`;
                 
-                // Construire le chemin
-                const jsonFileName = `A5S_${year}-${week}_${zone}_${niveau}.json`;
-                const folderPath = `Audits 5S/${year}/Semaine ${week}`;
-                const fullPath = `${folderPath}/${jsonFileName}`;
+                // Lister les fichiers avec métadonnées SharePoint (dont Auditeur)
+                const folderUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/root:/${encodeURI(traitesFolderPath)}:/children?$select=id,name,lastModifiedDateTime&$expand=listItem($select=fields)&$top=200`;
                 
-                // Chercher le fichier
-                const searchUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/root:/${encodeURI(fullPath)}`;
-                
-                const fileResponse = await fetch(searchUrl, {
+                const folderResponse = await fetch(folderUrl, {
                     headers: { 'Authorization': `Bearer ${accessToken}` }
                 });
                 
-                if (!fileResponse.ok) {
-                    container.innerHTML = '<div class="audit-detail-empty">Aucune photo trouvée</div>';
+                if (!folderResponse.ok) {
+                    console.log('Dossier non trouvé:', traitesFolderPath);
+                    container.innerHTML = '<div class="audit-detail-empty">Dossier non trouvé</div>';
                     return;
                 }
                 
-                const fileData = await fileResponse.json();
+                const folderData = await folderResponse.json();
+                const files = folderData.value || [];
+                
+                if (files.length === 0) {
+                    container.innerHTML = '<div class="audit-detail-empty">Aucun fichier trouvé</div>';
+                    return;
+                }
+                
+                // Parser la date de l'audit
+                const auditDate = parseExcelDate(audit.date);
+                if (!auditDate) {
+                    container.innerHTML = '<div class="audit-detail-empty">Date audit invalide</div>';
+                    return;
+                }
+                
+                const auditDay = auditDate.getDate();
+                const auditMonth = auditDate.getMonth();
+                const auditYear = auditDate.getFullYear();
+                
+                // Mois en français abrégé pour le pattern de nom de fichier
+                const monthsFr = ['jan', 'fev', 'mar', 'avr', 'mai', 'juin', 'juil', 'aout', 'sep', 'oct', 'nov', 'dec'];
+                const auditMonthFr = monthsFr[auditMonth];
+                
+                // Pattern de date dans le nom: "11 mar 2026"
+                const datePattern = `${auditDay} ${auditMonthFr} ${auditYear}`;
+                
+                // Normaliser le nom de l'auditeur pour comparaison
+                // Excel: "Delavault Guillaume" ou "DELAVAULT Guillaume"
+                // SharePoint: "Delavault, Guillaume" ou "Hacquin, Thibaut"
+                const normalizeAuditor = (name) => {
+                    if (!name) return '';
+                    return name
+                        .toLowerCase()
+                        .replace(/,/g, '')           // Supprimer virgules
+                        .replace(/\s+/g, ' ')        // Normaliser espaces
+                        .trim()
+                        .split(' ')
+                        .sort()                      // Trier pour comparer indépendamment de l'ordre
+                        .join(' ');
+                };
+                
+                const auditAuditorNorm = normalizeAuditor(audit.auditeur);
+                
+                // Filtrer les fichiers JSON
+                const jsonFiles = files.filter(f => f.name.endsWith('.json'));
+                
+                // Étape 1: Filtrer par date dans le nom du fichier
+                let candidates = jsonFiles.filter(file => {
+                    const nameLower = file.name.toLowerCase();
+                    return nameLower.includes(datePattern.toLowerCase());
+                });
+                
+                console.log(`Photos: ${candidates.length} fichier(s) trouvé(s) pour la date ${datePattern}`);
+                
+                // Étape 2: Si plusieurs candidats, filtrer par auditeur (métadonnée SharePoint)
+                if (candidates.length > 1 && auditAuditorNorm) {
+                    const withAuditor = candidates.filter(file => {
+                        const fields = file.listItem?.fields;
+                        const fileAuditor = fields?.Auditeur || fields?.auditeur || '';
+                        const fileAuditorNorm = normalizeAuditor(fileAuditor);
+                        return fileAuditorNorm === auditAuditorNorm;
+                    });
+                    
+                    if (withAuditor.length > 0) {
+                        candidates = withAuditor;
+                        console.log(`Photos: ${candidates.length} fichier(s) après filtre auditeur "${audit.auditeur}"`);
+                    }
+                }
+                
+                // Fallback: si aucun candidat par date, chercher par date de modification
+                if (candidates.length === 0) {
+                    console.log('Photos: Fallback sur date de modification');
+                    const auditDateStart = new Date(auditYear, auditMonth, auditDay, 0, 0, 0);
+                    const auditDateEnd = new Date(auditYear, auditMonth, auditDay, 23, 59, 59);
+                    
+                    candidates = jsonFiles.filter(file => {
+                        const fileDate = new Date(file.lastModifiedDateTime);
+                        return fileDate >= auditDateStart && fileDate <= auditDateEnd;
+                    });
+                    
+                    // Filtrer aussi par auditeur si possible
+                    if (candidates.length > 1 && auditAuditorNorm) {
+                        const withAuditor = candidates.filter(file => {
+                            const fields = file.listItem?.fields;
+                            const fileAuditor = fields?.Auditeur || fields?.auditeur || '';
+                            return normalizeAuditor(fileAuditor) === auditAuditorNorm;
+                        });
+                        if (withAuditor.length > 0) candidates = withAuditor;
+                    }
+                }
+                
+                if (candidates.length === 0) {
+                    container.innerHTML = '<div class="audit-detail-empty">Aucun fichier correspondant trouvé</div>';
+                    return;
+                }
+                
+                // Prendre le premier candidat (devrait être unique avec date + auditeur)
+                const matchingFile = candidates[0];
+                console.log('Photos: Fichier sélectionné:', matchingFile.name);
                 
                 // Télécharger le contenu JSON
-                const contentUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${fileData.id}/content`;
+                const contentUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${matchingFile.id}/content`;
                 const contentResponse = await fetch(contentUrl, {
                     headers: { 'Authorization': `Bearer ${accessToken}` }
                 });
                 
                 if (!contentResponse.ok) {
-                    container.innerHTML = '<div class="audit-detail-empty">Erreur lecture photos</div>';
+                    container.innerHTML = '<div class="audit-detail-empty">Erreur lecture du fichier</div>';
                     return;
                 }
                 
                 const jsonContent = await contentResponse.json();
                 
-                // Extraire les photos
+                // Extraire les photos des actions
                 const photos = [];
                 
-                // Photos dans les actions
                 if (jsonContent.actions) {
                     Object.values(jsonContent.actions).forEach(action => {
                         if (action.photos && Array.isArray(action.photos)) {
