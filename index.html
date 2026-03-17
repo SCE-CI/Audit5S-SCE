@@ -1545,6 +1545,21 @@
             height: 12px;
         }
         
+        .planning-sync-pill.loading {
+            background: var(--gray-20);
+            color: var(--gray-60);
+            cursor: wait;
+        }
+        
+        .planning-sync-pill .spin {
+            animation: spinSync 1s linear infinite;
+        }
+        
+        @keyframes spinSync {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
         #planning-sync-container {
             margin-left: auto;
         }
@@ -9918,6 +9933,7 @@ Cordialement`);
         // Données des audits pour le planning
         let planningAuditsData = [];
         let planningAuditsLoaded = false;
+        let planningAuditsLoading = false;
         
         function openPlanningModal() {
             const niveau = auditData.level || 1;
@@ -9934,9 +9950,15 @@ Cordialement`);
             
             // Charger les audits en arrière-plan si connecté et pas encore chargés
             const hasAccount = msalInstance && msalInstance.getAllAccounts().length > 0;
-            if (hasAccount && !planningAuditsLoaded) {
+            if (hasAccount && !planningAuditsLoaded && !planningAuditsLoading) {
+                planningAuditsLoading = true;
+                renderPlanningModal(); // Afficher le spinner
                 loadPlanningAudits().then(() => {
+                    planningAuditsLoading = false;
                     // Re-render avec les badges une fois chargé
+                    renderPlanningModal();
+                }).catch(() => {
+                    planningAuditsLoading = false;
                     renderPlanningModal();
                 });
             }
@@ -9994,7 +10016,12 @@ Cordialement`);
                     });
                     planningAuditsLoaded = true;
                     console.log('Planning audits chargés:', planningAuditsData.length, 'audits');
-                    console.log('Exemple:', planningAuditsData.slice(0, 3));
+                    console.log('Premiers:', planningAuditsData.slice(0, 3));
+                    console.log('Derniers:', planningAuditsData.slice(-5));
+                    
+                    // Filtrer les audits 2026
+                    const audits2026 = planningAuditsData.filter(a => a.annee == 2026);
+                    console.log('Audits 2026:', audits2026.length, audits2026);
                 }
             } catch (err) {
                 console.warn('Erreur chargement audits planning:', err);
@@ -10017,22 +10044,26 @@ Cordialement`);
                     .replace(/à/g, 'a');
             };
             
+            // Normaliser le niveau (extraire le chiffre)
+            const normalizeNiveau = (n) => {
+                if (!n) return 0;
+                const str = n.toString();
+                const match = str.match(/\d+/);
+                return match ? parseInt(match[0]) : 0;
+            };
+            
             const targetZone = normalizeZone(zone);
+            const targetNiveau = normalizeNiveau(niveau);
             
             // Chercher un audit correspondant
             const found = planningAuditsData.find(a => {
                 const matchYear = a.annee == year;
                 const matchWeek = a.semaine == weekNum;
                 const matchZone = normalizeZone(a.zone) === targetZone;
-                const matchNiveau = a.niveau == niveau;
+                const matchNiveau = normalizeNiveau(a.niveau) === targetNiveau;
                 
                 return matchYear && matchWeek && matchZone && matchNiveau;
             });
-            
-            // Debug en console
-            if (!found) {
-                console.log(`Planning check: S${weekNum} ${zone} N${niveau} ${year} → non trouvé`);
-            }
             
             return found ? true : false;
         }
@@ -10044,6 +10075,10 @@ Cordialement`);
                 return;
             }
             
+            // Afficher le spinner
+            planningAuditsLoading = true;
+            renderPlanningModal();
+            
             try {
                 // Login popup
                 const response = await msalInstance.loginPopup(loginRequest);
@@ -10053,11 +10088,14 @@ Cordialement`);
                 
                 // Charger les données
                 await loadPlanningAudits();
+                planningAuditsLoading = false;
                 renderPlanningModal();
                 
                 showToast('Connecté à SharePoint', 'success');
             } catch (err) {
                 console.error('Erreur connexion planning:', err);
+                planningAuditsLoading = false;
+                renderPlanningModal();
                 showToast('Erreur de connexion', 'error');
             }
         }
@@ -10130,7 +10168,17 @@ Cordialement`);
             // Pilule de connexion dans le header
             const isConnected = msalInstance && msalAccount;
             
-            if (planningAuditsLoaded) {
+            if (planningAuditsLoading) {
+                // En cours de chargement
+                syncContainer.innerHTML = `
+                    <div class="planning-sync-pill loading" title="Synchronisation en cours...">
+                        <svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                        </svg>
+                        <span>Sync...</span>
+                    </div>
+                `;
+            } else if (planningAuditsLoaded) {
                 syncContainer.innerHTML = `
                     <div class="planning-sync-pill synced" title="Données synchronisées">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
