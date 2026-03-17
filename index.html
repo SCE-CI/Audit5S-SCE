@@ -10133,7 +10133,7 @@ Cordialement`);
         }
         
         // Générer le badge de statut
-        function getPlanningStatusBadge(weekNum, zone, niveau, year, isPast) {
+        function getPlanningStatusBadge(weekNum, zone, niveau, year, isPast, isCurrent) {
             const done = checkAuditDone(weekNum, zone, niveau, year);
             
             if (done === null) {
@@ -10148,11 +10148,18 @@ Cordialement`);
                     </svg>
                 </span>`;
             } else if (isPast) {
-                // Croix rouge seulement si semaine passée
+                // Croix rouge si semaine passée
                 return `<span class="planning-status-badge missed" title="Non réalisé">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                         <line x1="18" y1="6" x2="6" y2="18"/>
                         <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </span>`;
+            } else if (isCurrent) {
+                // Sablier orange pour la semaine en cours
+                return `<span class="planning-status-badge pending" title="À faire">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2h12v6l-4 4 4 4v6H6v-6l4-4-4-4V2z"/>
                     </svg>
                 </span>`;
             } else {
@@ -10161,7 +10168,7 @@ Cordialement`);
             }
         }
         
-        // Badge simplifié pour la preview (seulement si fait)
+        // Badge simplifié pour la preview (fait = coche, en cours = sablier)
         function getPlanningPreviewBadge(weekNum, zone, niveau, year) {
             const done = checkAuditDone(weekNum, zone, niveau, year);
             
@@ -10169,6 +10176,13 @@ Cordialement`);
                 return `<span class="planning-status-badge done small" title="Audit réalisé">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                         <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                </span>`;
+            } else if (done === false) {
+                // Semaine en cours, pas encore fait = sablier
+                return `<span class="planning-status-badge pending small" title="À faire">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2h12v6l-4 4 4 4v6H6v-6l4-4-4-4V2z"/>
                     </svg>
                 </span>`;
             }
@@ -10420,8 +10434,8 @@ Cordialement`);
                 const resp2 = planningZoneResponsables[zones[1]];
                 
                 // Badges de statut pour chaque zone
-                const badge1 = getPlanningStatusBadge(w.weekNum, zones[0], 2, w.date.getFullYear(), isPastNotCurrent);
-                const badge2 = getPlanningStatusBadge(w.weekNum, zones[1], 2, w.date.getFullYear(), isPastNotCurrent);
+                const badge1 = getPlanningStatusBadge(w.weekNum, zones[0], 2, w.date.getFullYear(), isPastNotCurrent, current);
+                const badge2 = getPlanningStatusBadge(w.weekNum, zones[1], 2, w.date.getFullYear(), isPastNotCurrent, current);
                 
                 html += `
                     <div class="${cardClass}">
@@ -10477,7 +10491,7 @@ Cordialement`);
                 }
                 
                 // Badge de statut
-                const statusBadge = getPlanningStatusBadge(w.weekNum, zone, 1, w.date.getFullYear(), past && !current);
+                const statusBadge = getPlanningStatusBadge(w.weekNum, zone, 1, w.date.getFullYear(), past && !current, current);
                 
                 rowHtml += `
                     <div class="${cellClass}">
