@@ -4880,41 +4880,66 @@
         
         /* Radar chart 5S */
         .dashboard-radar-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--space-xl);
-            flex-wrap: wrap;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+        }
+        
+        .dashboard-radar-wrapper {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto;
         }
         
         .dashboard-radar {
-            width: 200px;
-            height: 200px;
+            width: 100%;
+            height: 100%;
         }
         
         .dashboard-radar-labels {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-sm);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
         }
         
         .dashboard-radar-label {
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-            font-size: var(--font-size-sm);
+            position: absolute;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            white-space: nowrap;
         }
         
-        .dashboard-radar-label-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--sartorius-yellow);
+        .dashboard-radar-label-name {
+            display: block;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--gray-70);
         }
         
         .dashboard-radar-label-value {
-            font-weight: 600;
-            margin-left: auto;
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        
+        .dashboard-radar-footer {
+            margin-top: var(--space-md);
+            text-align: center;
+        }
+        
+        .dashboard-radar-score {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .dashboard-radar-meta {
+            font-size: var(--font-size-xs);
+            color: var(--gray-50);
+            margin-top: 2px;
         }
         
         /* Modal clôture action */
@@ -5170,6 +5195,7 @@
         
         .dashboard-action-status.open { background: var(--traffic-orange); }
         .dashboard-action-status.overdue { background: var(--traffic-red); }
+        .dashboard-action-status.inprogress { background: var(--teal); }
         .dashboard-action-status.closed { background: var(--traffic-green); }
         .dashboard-action-status.cancelled { background: var(--gray-40); }
         
@@ -10846,6 +10872,7 @@ Cordialement`);
                     <div class="dashboard-filters">
                         <button class="dashboard-filter-btn active" data-filter="all">Toutes</button>
                         <button class="dashboard-filter-btn" data-filter="open">Ouvertes</button>
+                        <button class="dashboard-filter-btn" data-filter="inprogress">En cours</button>
                         <button class="dashboard-filter-btn" data-filter="overdue">&gt; 30 jours</button>
                         <button class="dashboard-filter-btn" data-filter="closed">Clôturées</button>
                     </div>
@@ -11343,7 +11370,7 @@ Cordialement`);
             const data = await response.json();
             
             // Parser les données
-            // Colonnes: 0-6 métadonnées, 27 (AB) = Score moyen, 28 (AC) = Performance
+            // Colonnes: 0-6 métadonnées, 7-21 scores critères, 22-26 scores S, 27 (AB) = Score moyen, 28 (AC) = Performance
             dashboardData.audits = data.value.map(row => {
                 const values = row.values[0];
                 return {
@@ -11354,6 +11381,12 @@ Cordialement`);
                     auditeur: values[4],
                     zone: values[5],
                     niveau: values[6],
+                    // Scores par S (colonnes 22-26, indices W à AA)
+                    scoreS1: values[22],  // Seiri - Trier
+                    scoreS2: values[23],  // Seiton - Ranger
+                    scoreS3: values[24],  // Seiso - Nettoyer
+                    scoreS4: values[25],  // Seiketsu - Standardiser
+                    scoreS5: values[26],  // Shitsuke - Respecter
                     scoreMoyen: values[27],    // Colonne AB (index 27)
                     performance: values[28]    // Colonne AC (index 28)
                 };
@@ -11399,7 +11432,9 @@ Cordialement`);
         // Calculer le statut d'une action
         function getActionStatus(action) {
             const isClosed = action.dateCloture && action.dateCloture !== '';
-            const isCancelled = action.commentaire?.toLowerCase().includes('annulé');
+            const comment = action.commentaire?.toLowerCase() || '';
+            const isCancelled = comment.includes('annulé');
+            const isInProgress = comment.includes('en cours') || comment.includes('encours') || comment.includes('wip') || comment.includes('commencé');
             
             if (isClosed) return 'closed';
             if (isCancelled) return 'cancelled';
@@ -11412,6 +11447,8 @@ Cordialement`);
                     if (daysDiff > 30) return 'overdue';
                 }
             }
+            
+            if (isInProgress) return 'inprogress';
             
             return 'open';
         }
@@ -11519,10 +11556,22 @@ Cordialement`);
                 const scoreClass = getScoreClass(score);
                 const dateFormatted = formatExcelDate(lastAudit.date);
                 
-                // Compter les actions ouvertes pour cette zone
-                const openActions = dashboardData.actions.filter(a => {
-                    return a.zone === zoneName && ['open', 'overdue'].includes(getActionStatus(a));
-                }).length;
+                // Compter les actions par statut pour cette zone
+                const zoneActions = dashboardData.actions.filter(a => a.zone === zoneName);
+                const openActions = zoneActions.filter(a => getActionStatus(a) === 'open').length;
+                const overdueActions = zoneActions.filter(a => getActionStatus(a) === 'overdue').length;
+                const inprogressActions = zoneActions.filter(a => getActionStatus(a) === 'inprogress').length;
+                
+                let actionsHtml = '';
+                if (overdueActions > 0) {
+                    actionsHtml = ` - <span style="color: var(--traffic-red); font-weight: 600;">${overdueActions} en retard</span>`;
+                }
+                if (inprogressActions > 0) {
+                    actionsHtml += `${actionsHtml ? ', ' : ' - '}<span style="color: var(--teal);">${inprogressActions} en cours</span>`;
+                }
+                if (openActions > 0) {
+                    actionsHtml += `${actionsHtml ? ', ' : ' - '}<span style="color: var(--traffic-orange);">${openActions} ouverte${openActions > 1 ? 's' : ''}</span>`;
+                }
                 
                 return `
                     <div class="dashboard-zone-card ${scoreClass}">
@@ -11531,8 +11580,7 @@ Cordialement`);
                             <div class="dashboard-zone-score ${scoreClass}">${Math.round(score)}%</div>
                         </div>
                         <div class="dashboard-zone-meta">
-                            ${lastAudit.niveau} - ${dateFormatted} - ${lastAudit.auditeur}
-                            ${openActions > 0 ? ` - <span style="color: var(--traffic-orange);">${openActions} action${openActions > 1 ? 's' : ''}</span>` : ''}
+                            ${lastAudit.niveau} - ${dateFormatted} - ${lastAudit.auditeur}${actionsHtml}
                         </div>
                         <div class="dashboard-zone-bar">
                             <div class="dashboard-zone-bar-fill ${scoreClass}" style="width: ${Math.round(score)}%;"></div>
@@ -11751,50 +11799,119 @@ Cordialement`);
             }
             
             const lastAudit = audits[audits.length - 1];
-            
-            // Les 5S - colonnes 7 à 11 (Seiri, Seiton, Seiso, Seiketsu, Shitsuke)
-            // On prend les scores moyens par S (colonnes après les 15 critères)
-            // En fait on va utiliser les colonnes Score 1S à 5S (indices 17-21 normalement, mais on a 27-28 pour perf)
-            // Simplifions : affichons la performance globale avec un radar simplifié
-            
-            const score = Math.round(parseScorePercent(lastAudit.performance));
             const dateFormatted = formatExcelDate(lastAudit.date);
             
-            // Radar simplifié - cercle avec score
-            const size = 160;
+            // Les 5S avec leurs scores (sur 12 points max chacun = 3 critères x 4 points)
+            const sLabels = ['Trier', 'Ranger', 'Nettoyer', 'Standardiser', 'Respecter'];
+            const sScores = [
+                parseFloat(lastAudit.scoreS1) || 0,
+                parseFloat(lastAudit.scoreS2) || 0,
+                parseFloat(lastAudit.scoreS3) || 0,
+                parseFloat(lastAudit.scoreS4) || 0,
+                parseFloat(lastAudit.scoreS5) || 0
+            ];
+            
+            // Convertir en pourcentage (max 12 points par S)
+            const maxScore = 12;
+            const sPercents = sScores.map(s => Math.round((s / maxScore) * 100));
+            
+            // Paramètres du radar
+            const size = 220;
             const center = size / 2;
-            const radius = 60;
-            const scoreRadius = (score / 100) * radius;
+            const radius = 80;
+            const labelRadius = radius + 25;
+            const n = 5;
+            const angleOffset = -Math.PI / 2; // Commencer en haut
+            
+            // Calculer les points du pentagone
+            const getPoint = (index, r) => {
+                const angle = angleOffset + (2 * Math.PI * index) / n;
+                return {
+                    x: center + r * Math.cos(angle),
+                    y: center + r * Math.sin(angle)
+                };
+            };
             
             let svg = `<svg class="dashboard-radar" viewBox="0 0 ${size} ${size}">`;
             
-            // Cercles de référence
-            [25, 50, 75, 100].forEach(val => {
-                const r = (val / 100) * radius;
-                svg += `<circle cx="${center}" cy="${center}" r="${r}" fill="none" stroke="var(--gray-20)" stroke-width="1"/>`;
+            // Grille de fond (pentagones à 25%, 50%, 75%, 100%)
+            [25, 50, 75, 100].forEach(pct => {
+                const r = (pct / 100) * radius;
+                let points = '';
+                for (let i = 0; i < n; i++) {
+                    const p = getPoint(i, r);
+                    points += `${p.x},${p.y} `;
+                }
+                svg += `<polygon points="${points.trim()}" fill="none" stroke="var(--gray-20)" stroke-width="1"/>`;
             });
             
-            // Seuil 85%
+            // Lignes du centre vers chaque sommet
+            for (let i = 0; i < n; i++) {
+                const p = getPoint(i, radius);
+                svg += `<line x1="${center}" y1="${center}" x2="${p.x}" y2="${p.y}" stroke="var(--gray-20)" stroke-width="1"/>`;
+            }
+            
+            // Seuil 85% (ligne pointillée)
             const threshold85 = (85 / 100) * radius;
-            svg += `<circle cx="${center}" cy="${center}" r="${threshold85}" fill="none" stroke="var(--gray-40)" stroke-width="1" stroke-dasharray="4 4"/>`;
+            let thresholdPoints = '';
+            for (let i = 0; i < n; i++) {
+                const p = getPoint(i, threshold85);
+                thresholdPoints += `${p.x},${p.y} `;
+            }
+            svg += `<polygon points="${thresholdPoints.trim()}" fill="none" stroke="var(--traffic-green)" stroke-width="1.5" stroke-dasharray="4 2" opacity="0.6"/>`;
             
-            // Score actuel
-            const scoreColor = getScoreClass(score) === 'excellent' ? 'var(--traffic-green)' : 
-                               getScoreClass(score) === 'good' ? 'var(--sartorius-yellow)' : 
-                               getScoreClass(score) === 'warning' ? 'var(--traffic-orange)' : 'var(--traffic-red)';
+            // Zone de score (polygon coloré)
+            let scorePoints = '';
+            for (let i = 0; i < n; i++) {
+                const pct = sPercents[i];
+                const r = (pct / 100) * radius;
+                const p = getPoint(i, r);
+                scorePoints += `${p.x},${p.y} `;
+            }
             
-            svg += `<circle cx="${center}" cy="${center}" r="${scoreRadius}" fill="${scoreColor}" fill-opacity="0.2" stroke="${scoreColor}" stroke-width="2"/>`;
-            svg += `<text x="${center}" y="${center}" text-anchor="middle" dominant-baseline="middle" font-size="24" font-weight="700" fill="${scoreColor}">${score}%</text>`;
+            const avgScore = Math.round(sPercents.reduce((a, b) => a + b, 0) / n);
+            const scoreColor = avgScore >= 85 ? 'var(--traffic-green)' : 
+                               avgScore >= 70 ? 'var(--sartorius-yellow)' : 
+                               avgScore >= 50 ? 'var(--traffic-orange)' : 'var(--traffic-red)';
+            
+            svg += `<polygon points="${scorePoints.trim()}" fill="${scoreColor}" fill-opacity="0.25" stroke="${scoreColor}" stroke-width="2"/>`;
+            
+            // Points sur les sommets
+            for (let i = 0; i < n; i++) {
+                const pct = sPercents[i];
+                const r = (pct / 100) * radius;
+                const p = getPoint(i, r);
+                svg += `<circle cx="${p.x}" cy="${p.y}" r="4" fill="${scoreColor}" stroke="var(--white)" stroke-width="1.5"/>`;
+            }
             
             svg += '</svg>';
             
-            container.innerHTML = `
-                <div style="text-align: center;">
-                    ${svg}
-                    <div style="font-size: var(--font-size-sm); color: var(--gray-60); margin-top: var(--space-sm);">
-                        ${lastAudit.niveau} - ${dateFormatted}<br>
-                        <span style="font-size: var(--font-size-xs);">Auditeur: ${lastAudit.auditeur}</span>
+            // Labels autour du radar
+            let labelsHtml = '<div class="dashboard-radar-labels">';
+            for (let i = 0; i < n; i++) {
+                const p = getPoint(i, labelRadius);
+                const pct = sPercents[i];
+                const color = pct >= 85 ? 'var(--traffic-green)' : 
+                              pct >= 70 ? 'var(--gray-70)' : 
+                              pct >= 50 ? 'var(--traffic-orange)' : 'var(--traffic-red)';
+                
+                labelsHtml += `
+                    <div class="dashboard-radar-label" style="left: ${p.x}px; top: ${p.y}px;">
+                        <span class="dashboard-radar-label-name">${sLabels[i]}</span>
+                        <span class="dashboard-radar-label-value" style="color: ${color};">${pct}%</span>
                     </div>
+                `;
+            }
+            labelsHtml += '</div>';
+            
+            container.innerHTML = `
+                <div class="dashboard-radar-wrapper">
+                    ${svg}
+                    ${labelsHtml}
+                </div>
+                <div class="dashboard-radar-footer">
+                    <div class="dashboard-radar-score" style="color: ${scoreColor};">${avgScore}%</div>
+                    <div class="dashboard-radar-meta">${lastAudit.niveau} - ${dateFormatted}</div>
                 </div>
             `;
         }
@@ -11834,16 +11951,17 @@ Cordialement`);
                 const status = getActionStatus(a);
                 if (filter === 'all') return true;
                 if (filter === 'open') return status === 'open';
+                if (filter === 'inprogress') return status === 'inprogress';
                 if (filter === 'overdue') return status === 'overdue';
                 if (filter === 'closed') return status === 'closed' || status === 'cancelled';
                 return true;
             });
             
-            // Trier : ouvertes/retard d'abord, puis par date
+            // Trier : retard, puis en cours, puis ouvertes, puis clôturées
             filteredActions.sort((a, b) => {
-                const statusOrder = { overdue: 0, open: 1, closed: 2, cancelled: 3 };
-                const statusA = statusOrder[getActionStatus(a)];
-                const statusB = statusOrder[getActionStatus(b)];
+                const statusOrder = { overdue: 0, inprogress: 1, open: 2, closed: 3, cancelled: 4 };
+                const statusA = statusOrder[getActionStatus(a)] ?? 5;
+                const statusB = statusOrder[getActionStatus(b)] ?? 5;
                 if (statusA !== statusB) return statusA - statusB;
                 return 0;
             });
