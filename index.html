@@ -13551,34 +13551,50 @@ Cordialement`);
                     .replace(/\s+/g, ' ')        // Normaliser espaces multiples
                     .trim();
                 
-                // Le dossier des audits traités
-                const traitesFolderPath = `Audits 5S/Audits traités/${zoneFolderName}`;
+                // Le dossier des audits traités - essayer plusieurs chemins possibles
+                const pathVariants = [
+                    `Audits 5S/Audits traités/${zoneFolderName}`,
+                    `5S/Audits 5S/Audits traités/${zoneFolderName}`,
+                    `Audits traités/${zoneFolderName}`
+                ];
                 
                 // DEBUG: Afficher les infos
                 console.log('=== DEBUG Photos ===');
                 console.log('Zone audit:', audit.zone);
                 console.log('Zone dossier:', zoneFolderName);
-                console.log('Chemin complet:', traitesFolderPath);
-                console.log('Chemin encodé:', encodeURI(traitesFolderPath));
+                console.log('Chemins à tester:', pathVariants);
                 
-                // Lister les fichiers avec métadonnées SharePoint (dont Auditeur)
-                const folderUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/root:/${encodeURI(traitesFolderPath)}:/children?$select=id,name,lastModifiedDateTime&$expand=listItem($select=fields)&$top=200`;
+                let folderData = null;
+                let usedPath = null;
                 
-                console.log('URL Graph API:', folderUrl);
+                for (const testPath of pathVariants) {
+                    // Encoder chaque segment séparément pour éviter les problèmes
+                    const encodedPath = testPath.split('/').map(s => encodeURIComponent(s)).join('/');
+                    const folderUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/root:/${encodedPath}:/children?$select=id,name,lastModifiedDateTime&$expand=listItem($select=fields)&$top=200`;
+                    
+                    console.log('Test chemin:', testPath);
+                    console.log('URL:', folderUrl);
+                    
+                    const folderResponse = await fetch(folderUrl, {
+                        headers: { 'Authorization': `Bearer ${accessToken}` }
+                    });
+                    
+                    if (folderResponse.ok) {
+                        folderData = await folderResponse.json();
+                        usedPath = testPath;
+                        console.log('✅ Chemin trouvé:', testPath);
+                        break;
+                    } else {
+                        const errorText = await folderResponse.text();
+                        console.log('❌ Échec:', folderResponse.status, errorText.substring(0, 200));
+                    }
+                }
                 
-                const folderResponse = await fetch(folderUrl, {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                
-                if (!folderResponse.ok) {
-                    const errorText = await folderResponse.text();
-                    console.log('Erreur API:', folderResponse.status, errorText);
-                    console.log('Dossier non trouvé:', traitesFolderPath);
+                if (!folderData) {
                     container.innerHTML = '<div class="audit-detail-empty">Dossier non trouvé</div>';
                     return;
                 }
                 
-                const folderData = await folderResponse.json();
                 const files = folderData.value || [];
                 
                 if (files.length === 0) {
