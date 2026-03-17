@@ -13560,11 +13560,12 @@ Cordialement`);
                     return;
                 }
                 
-                // Lister les fichiers avec métadonnées SharePoint (dont Auditeur)
-                const folderUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${folderId}/children?$select=id,name,lastModifiedDateTime&$expand=listItem($select=fields)&$top=200`;
+                // Lister les fichiers - version simplifiée sans $expand
+                const folderUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${folderId}/children?$select=id,name,lastModifiedDateTime&$top=200`;
                 
                 console.log('=== DEBUG Photos ===');
                 console.log('Zone:', audit.zone, '-> Folder ID:', folderId);
+                console.log('URL:', folderUrl);
                 
                 const folderResponse = await fetch(folderUrl, {
                     headers: { 'Authorization': `Bearer ${accessToken}` }
