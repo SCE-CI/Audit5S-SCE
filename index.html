@@ -9890,9 +9890,10 @@ Cordialement`);
                 // Badge de statut si données chargées
                 const statusBadge = getPlanningPreviewBadge(currentWeekNum, zone, 1, currentYear);
                 console.log('Preview badge HTML:', statusBadge);
+                console.log('statusBadge length:', statusBadge.length);
                 
                 preview.classList.add('n1');
-                preview.innerHTML = `
+                const htmlContent = `
                     <div class="preview-icon">
                         <div class="day-num">${mercredi.getDate()}</div>
                         <div class="day-name">Mercredi</div>
@@ -9904,6 +9905,9 @@ Cordialement`);
                     </div>
                     <div class="preview-arrow">›</div>
                 `;
+                console.log('HTML to set:', htmlContent.includes('planning-status-badge'));
+                preview.innerHTML = htmlContent;
+                console.log('Preview innerHTML set, zone content:', preview.querySelector('.preview-zone')?.innerHTML);
             } else if (niveau === 2) {
                 const isEvenWeek = currentWeekNum % 2 === 0;
                 const zones = getN2ZonesForWeek(currentWeekNum);
