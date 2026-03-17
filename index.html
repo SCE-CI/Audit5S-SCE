@@ -12069,7 +12069,7 @@ Cordialement`);
             svg += `<polygon points="${thresholdPoints.trim()}" fill="none" stroke="var(--traffic-green)" stroke-width="1.5" stroke-dasharray="4 2" opacity="0.6"/>`;
             
             // Dessiner les polygones pour chaque niveau (du plus bas au plus haut pour la superposition)
-            const maxScore = 12;
+            const maxScore = 4; // Score par S = moyenne de 3 critères sur 4
             activeLevels.forEach(level => {
                 const data = scoresByLevel[level];
                 const sPercents = data.scores.map(s => Math.round((s / maxScore) * 100));
@@ -12138,7 +12138,7 @@ Cordialement`);
                     ${labelsHtml}
                 </div>
                 <div class="dashboard-radar-footer">
-                    <div class="dashboard-radar-score" style="color: ${globalColor};">${globalScore.toFixed(1)}/60</div>
+                    <div class="dashboard-radar-score" style="color: ${globalColor};">${globalPct}%</div>
                     <div class="dashboard-radar-meta">${legendHtml}</div>
                 </div>
             `;
