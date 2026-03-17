@@ -9878,6 +9878,8 @@ Cordialement`);
             const currentWeekNum = getPlanningWeekNumber(today);
             const currentYear = today.getFullYear();
             
+            console.log('updatePlanningPreview called:', { niveau, currentWeekNum, currentYear, planningAuditsLoaded });
+            
             preview.className = 'planning-preview';
             
             if (niveau === 1) {
@@ -10179,7 +10181,10 @@ Cordialement`);
         
         // Badge simplifié pour la preview (fait = coche, en cours = sablier)
         function getPlanningPreviewBadge(weekNum, zone, niveau, year) {
+            console.log('getPlanningPreviewBadge:', { weekNum, zone, niveau, year, loaded: planningAuditsLoaded, dataLength: planningAuditsData.length });
+            
             const done = checkAuditDone(weekNum, zone, niveau, year);
+            console.log('getPlanningPreviewBadge result:', done);
             
             if (done === true) {
                 return `<span class="planning-status-badge done small" title="Audit réalisé">
