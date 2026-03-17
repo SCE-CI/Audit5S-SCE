@@ -4942,6 +4942,116 @@
             margin-top: 2px;
         }
         
+        .dashboard-chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .dashboard-radar-toggle {
+            display: flex;
+            background: var(--gray-10);
+            border-radius: 6px;
+            padding: 2px;
+        }
+        
+        .dashboard-radar-toggle-btn {
+            padding: 4px 10px;
+            border: none;
+            background: none;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--gray-60);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .dashboard-radar-toggle-btn:hover {
+            color: var(--black);
+        }
+        
+        .dashboard-radar-toggle-btn.active {
+            background: var(--white);
+            color: var(--black);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .dashboard-radar-controls {
+            display: flex;
+            gap: var(--space-sm);
+            align-items: center;
+        }
+        
+        .dashboard-radar-levels {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .dashboard-radar-level {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 600;
+            user-select: none;
+            transition: all 0.15s;
+        }
+        
+        .dashboard-radar-level input {
+            display: none;
+        }
+        
+        .dashboard-radar-level .checkmark {
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--gray-30);
+            border-radius: 3px;
+            position: relative;
+            transition: all 0.15s;
+        }
+        
+        .dashboard-radar-level input:checked + .checkmark {
+            border-color: currentColor;
+            background: currentColor;
+        }
+        
+        .dashboard-radar-level input:checked + .checkmark::after {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: 0px;
+            width: 4px;
+            height: 7px;
+            border: solid var(--white);
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        .dashboard-radar-level.n1 {
+            color: var(--teal);
+        }
+        
+        .dashboard-radar-level.n2 {
+            color: var(--traffic-orange);
+        }
+        
+        .dashboard-radar-level.n3 {
+            color: var(--gray-50);
+        }
+        
+        .dashboard-radar-level .level-label {
+            color: var(--gray-70);
+        }
+        
+        .dashboard-radar-level input:checked ~ .level-label {
+            color: currentColor;
+        }
+        
         /* Modal clôture action */
         .dashboard-action-modal {
             display: none;
@@ -5064,12 +5174,12 @@
         }
         
         .dashboard-action-btn.inprogress-action {
-            background: var(--traffic-orange);
+            background: var(--teal);
             color: var(--white);
         }
         
         .dashboard-action-btn.inprogress-action:hover {
-            background: #d97706;
+            background: #0d7377;
         }
         
         .dashboard-action-btn.cancel-action {
@@ -10840,7 +10950,32 @@ Cordialement`);
                     
                     <!-- Radar 5S du dernier audit -->
                     <div class="dashboard-chart-container">
-                        <div class="dashboard-chart-title">Dernier audit - Scores par S</div>
+                        <div class="dashboard-chart-header">
+                            <div class="dashboard-chart-title">Scores par S</div>
+                            <div class="dashboard-radar-controls">
+                                <div class="dashboard-radar-toggle">
+                                    <button class="dashboard-radar-toggle-btn active" data-mode="last" onclick="setRadarMode('last')">Dernier</button>
+                                    <button class="dashboard-radar-toggle-btn" data-mode="average" onclick="setRadarMode('average')">Moyenne</button>
+                                </div>
+                                <div class="dashboard-radar-levels">
+                                    <label class="dashboard-radar-level n1">
+                                        <input type="checkbox" checked onchange="toggleRadarLevel(1, this.checked)">
+                                        <span class="checkmark"></span>
+                                        <span class="level-label">N1</span>
+                                    </label>
+                                    <label class="dashboard-radar-level n2">
+                                        <input type="checkbox" checked onchange="toggleRadarLevel(2, this.checked)">
+                                        <span class="checkmark"></span>
+                                        <span class="level-label">N2</span>
+                                    </label>
+                                    <label class="dashboard-radar-level n3">
+                                        <input type="checkbox" onchange="toggleRadarLevel(3, this.checked)">
+                                        <span class="checkmark"></span>
+                                        <span class="level-label">N3</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                         <div class="dashboard-radar-container" id="dashboard-zone-radar">
                             <!-- Généré dynamiquement -->
                         </div>
@@ -11672,11 +11807,36 @@ Cordialement`);
             // Graphique d'évolution
             renderZoneChart(zoneAudits);
             
-            // Radar 5S (dernier audit)
+            // Radar 5S (dernier audit ou moyenne)
+            currentZoneAudits = zoneAudits;
             renderZoneRadar(zoneAudits);
             
             // Historique
             renderZoneHistory(zoneAudits);
+        }
+        
+        let radarMode = 'last'; // 'last' ou 'average'
+        let currentZoneAudits = [];
+        let radarLevels = { 1: true, 2: true, 3: false }; // Niveaux cochés
+        
+        function setRadarMode(mode) {
+            radarMode = mode;
+            document.querySelectorAll('.dashboard-radar-toggle-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+            renderZoneRadar(currentZoneAudits);
+        }
+        
+        function toggleRadarLevel(level, checked) {
+            radarLevels[level] = checked;
+            renderZoneRadar(currentZoneAudits);
+        }
+        
+        function getRadarFilteredAudits(audits) {
+            return audits.filter(a => {
+                const niveau = parseInt(a.niveau?.toString().replace(/\D/g, '') || '0');
+                return radarLevels[niveau];
+            });
         }
         
         function renderZoneStats(audits, actions) {
@@ -11798,22 +11958,64 @@ Cordialement`);
                 return;
             }
             
-            const lastAudit = audits[audits.length - 1];
-            const dateFormatted = formatExcelDate(lastAudit.date);
+            // Filtrer par niveaux sélectionnés
+            const filteredAudits = getRadarFilteredAudits(audits);
             
-            // Les 5S avec leurs scores (sur 12 points max chacun = 3 critères x 4 points)
+            if (filteredAudits.length === 0) {
+                container.innerHTML = '<div class="dashboard-empty">Aucun audit pour les niveaux sélectionnés</div>';
+                return;
+            }
+            
+            // Grouper par niveau pour la superposition
+            const auditsByLevel = {};
+            filteredAudits.forEach(a => {
+                const niveau = parseInt(a.niveau?.toString().replace(/\D/g, '') || '0');
+                if (!auditsByLevel[niveau]) auditsByLevel[niveau] = [];
+                auditsByLevel[niveau].push(a);
+            });
+            
+            const activeLevels = Object.keys(auditsByLevel).map(Number).sort();
+            const levelColors = {
+                1: 'var(--teal)',
+                2: 'var(--traffic-orange)',
+                3: 'var(--gray-50)'
+            };
+            
+            // Calculer les scores par niveau
+            const scoresByLevel = {};
+            activeLevels.forEach(level => {
+                const levelAudits = auditsByLevel[level];
+                if (radarMode === 'average' && levelAudits.length > 1) {
+                    scoresByLevel[level] = {
+                        scores: [
+                            levelAudits.reduce((sum, a) => sum + (parseFloat(a.scoreS1) || 0), 0) / levelAudits.length,
+                            levelAudits.reduce((sum, a) => sum + (parseFloat(a.scoreS2) || 0), 0) / levelAudits.length,
+                            levelAudits.reduce((sum, a) => sum + (parseFloat(a.scoreS3) || 0), 0) / levelAudits.length,
+                            levelAudits.reduce((sum, a) => sum + (parseFloat(a.scoreS4) || 0), 0) / levelAudits.length,
+                            levelAudits.reduce((sum, a) => sum + (parseFloat(a.scoreS5) || 0), 0) / levelAudits.length
+                        ],
+                        subtitle: `Moyenne N${level} (${levelAudits.length})`
+                    };
+                } else {
+                    const lastAudit = levelAudits[levelAudits.length - 1];
+                    scoresByLevel[level] = {
+                        scores: [
+                            parseFloat(lastAudit.scoreS1) || 0,
+                            parseFloat(lastAudit.scoreS2) || 0,
+                            parseFloat(lastAudit.scoreS3) || 0,
+                            parseFloat(lastAudit.scoreS4) || 0,
+                            parseFloat(lastAudit.scoreS5) || 0
+                        ],
+                        subtitle: `N${level} - ${formatExcelDate(lastAudit.date)}`
+                    };
+                }
+            });
+            
+            // Debug
+            console.log('Radar - levels:', activeLevels, '- scoresByLevel:', scoresByLevel);
+            
+            // Les 5S labels
             const sLabels = ['Trier', 'Ranger', 'Nettoyer', 'Standardiser', 'Respecter'];
-            const sScores = [
-                parseFloat(lastAudit.scoreS1) || 0,
-                parseFloat(lastAudit.scoreS2) || 0,
-                parseFloat(lastAudit.scoreS3) || 0,
-                parseFloat(lastAudit.scoreS4) || 0,
-                parseFloat(lastAudit.scoreS5) || 0
-            ];
-            
-            // Convertir en pourcentage (max 12 points par S)
-            const maxScore = 12;
-            const sPercents = sScores.map(s => Math.round((s / maxScore) * 100));
             
             // Paramètres du radar
             const size = 220;
@@ -11821,9 +12023,8 @@ Cordialement`);
             const radius = 80;
             const labelRadius = radius + 25;
             const n = 5;
-            const angleOffset = -Math.PI / 2; // Commencer en haut
+            const angleOffset = -Math.PI / 2;
             
-            // Calculer les points du pentagone
             const getPoint = (index, r) => {
                 const angle = angleOffset + (2 * Math.PI * index) / n;
                 return {
@@ -11834,7 +12035,7 @@ Cordialement`);
             
             let svg = `<svg class="dashboard-radar" viewBox="0 0 ${size} ${size}">`;
             
-            // Grille de fond (pentagones à 25%, 50%, 75%, 100%)
+            // Grille de fond
             [25, 50, 75, 100].forEach(pct => {
                 const r = (pct / 100) * radius;
                 let points = '';
@@ -11851,7 +12052,7 @@ Cordialement`);
                 svg += `<line x1="${center}" y1="${center}" x2="${p.x}" y2="${p.y}" stroke="var(--gray-20)" stroke-width="1"/>`;
             }
             
-            // Seuil 85% (ligne pointillée)
+            // Seuil 85%
             const threshold85 = (85 / 100) * radius;
             let thresholdPoints = '';
             for (let i = 0; i < n; i++) {
@@ -11860,37 +12061,45 @@ Cordialement`);
             }
             svg += `<polygon points="${thresholdPoints.trim()}" fill="none" stroke="var(--traffic-green)" stroke-width="1.5" stroke-dasharray="4 2" opacity="0.6"/>`;
             
-            // Zone de score (polygon coloré)
-            let scorePoints = '';
-            for (let i = 0; i < n; i++) {
-                const pct = sPercents[i];
-                const r = (pct / 100) * radius;
-                const p = getPoint(i, r);
-                scorePoints += `${p.x},${p.y} `;
-            }
-            
-            const avgScore = Math.round(sPercents.reduce((a, b) => a + b, 0) / n);
-            const scoreColor = avgScore >= 85 ? 'var(--traffic-green)' : 
-                               avgScore >= 70 ? 'var(--sartorius-yellow)' : 
-                               avgScore >= 50 ? 'var(--traffic-orange)' : 'var(--traffic-red)';
-            
-            svg += `<polygon points="${scorePoints.trim()}" fill="${scoreColor}" fill-opacity="0.25" stroke="${scoreColor}" stroke-width="2"/>`;
-            
-            // Points sur les sommets
-            for (let i = 0; i < n; i++) {
-                const pct = sPercents[i];
-                const r = (pct / 100) * radius;
-                const p = getPoint(i, r);
-                svg += `<circle cx="${p.x}" cy="${p.y}" r="4" fill="${scoreColor}" stroke="var(--white)" stroke-width="1.5"/>`;
-            }
+            // Dessiner les polygones pour chaque niveau (du plus bas au plus haut pour la superposition)
+            const maxScore = 12;
+            activeLevels.forEach(level => {
+                const data = scoresByLevel[level];
+                const sPercents = data.scores.map(s => Math.round((s / maxScore) * 100));
+                const color = levelColors[level];
+                
+                let scorePoints = '';
+                for (let i = 0; i < n; i++) {
+                    const pct = sPercents[i];
+                    const r = (pct / 100) * radius;
+                    const p = getPoint(i, r);
+                    scorePoints += `${p.x},${p.y} `;
+                }
+                
+                svg += `<polygon points="${scorePoints.trim()}" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-width="2"/>`;
+                
+                // Points sur les sommets
+                for (let i = 0; i < n; i++) {
+                    const pct = sPercents[i];
+                    const r = (pct / 100) * radius;
+                    const p = getPoint(i, r);
+                    svg += `<circle cx="${p.x}" cy="${p.y}" r="4" fill="${color}" stroke="var(--white)" stroke-width="1.5"/>`;
+                }
+            });
             
             svg += '</svg>';
             
-            // Labels autour du radar
+            // Labels autour du radar (moyenne de tous les niveaux actifs)
+            const allScores = activeLevels.map(l => scoresByLevel[l].scores);
+            const avgScoresPerS = [0, 1, 2, 3, 4].map(i => 
+                allScores.reduce((sum, s) => sum + s[i], 0) / allScores.length
+            );
+            const avgPercentsPerS = avgScoresPerS.map(s => Math.round((s / maxScore) * 100));
+            
             let labelsHtml = '<div class="dashboard-radar-labels">';
             for (let i = 0; i < n; i++) {
                 const p = getPoint(i, labelRadius);
-                const pct = sPercents[i];
+                const pct = avgPercentsPerS[i];
                 const color = pct >= 85 ? 'var(--traffic-green)' : 
                               pct >= 70 ? 'var(--gray-70)' : 
                               pct >= 50 ? 'var(--traffic-orange)' : 'var(--traffic-red)';
@@ -11904,14 +12113,24 @@ Cordialement`);
             }
             labelsHtml += '</div>';
             
+            // Footer avec légende des niveaux
+            const globalAvg = Math.round(avgPercentsPerS.reduce((a, b) => a + b, 0) / n);
+            const globalColor = globalAvg >= 85 ? 'var(--traffic-green)' : 
+                               globalAvg >= 70 ? 'var(--sartorius-yellow)' : 
+                               globalAvg >= 50 ? 'var(--traffic-orange)' : 'var(--traffic-red)';
+            
+            let legendHtml = activeLevels.map(level => 
+                `<span class="radar-legend-item" style="color: ${levelColors[level]};">● N${level}</span>`
+            ).join(' ');
+            
             container.innerHTML = `
                 <div class="dashboard-radar-wrapper">
                     ${svg}
                     ${labelsHtml}
                 </div>
                 <div class="dashboard-radar-footer">
-                    <div class="dashboard-radar-score" style="color: ${scoreColor};">${avgScore}%</div>
-                    <div class="dashboard-radar-meta">${lastAudit.niveau} - ${dateFormatted}</div>
+                    <div class="dashboard-radar-score" style="color: ${globalColor};">${globalAvg}%</div>
+                    <div class="dashboard-radar-meta">${legendHtml}</div>
                 </div>
             `;
         }
