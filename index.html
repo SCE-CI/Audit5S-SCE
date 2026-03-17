@@ -13554,14 +13554,25 @@ Cordialement`);
                 // Le dossier des audits traités
                 const traitesFolderPath = `Audits 5S/Audits traités/${zoneFolderName}`;
                 
+                // DEBUG: Afficher les infos
+                console.log('=== DEBUG Photos ===');
+                console.log('Zone audit:', audit.zone);
+                console.log('Zone dossier:', zoneFolderName);
+                console.log('Chemin complet:', traitesFolderPath);
+                console.log('Chemin encodé:', encodeURI(traitesFolderPath));
+                
                 // Lister les fichiers avec métadonnées SharePoint (dont Auditeur)
                 const folderUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/root:/${encodeURI(traitesFolderPath)}:/children?$select=id,name,lastModifiedDateTime&$expand=listItem($select=fields)&$top=200`;
+                
+                console.log('URL Graph API:', folderUrl);
                 
                 const folderResponse = await fetch(folderUrl, {
                     headers: { 'Authorization': `Bearer ${accessToken}` }
                 });
                 
                 if (!folderResponse.ok) {
+                    const errorText = await folderResponse.text();
+                    console.log('Erreur API:', folderResponse.status, errorText);
                     console.log('Dossier non trouvé:', traitesFolderPath);
                     container.innerHTML = '<div class="audit-detail-empty">Dossier non trouvé</div>';
                     return;
