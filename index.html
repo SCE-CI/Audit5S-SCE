@@ -1456,9 +1456,12 @@
             width: 18px;
             height: 18px;
             border-radius: 50%;
-            font-size: 10px;
-            font-weight: 700;
             margin-top: 4px;
+        }
+        
+        .planning-status-badge svg {
+            width: 10px;
+            height: 10px;
         }
         
         .planning-status-badge.done {
@@ -1466,14 +1469,26 @@
             color: var(--white);
         }
         
+        .planning-status-badge.done svg {
+            stroke: var(--white);
+        }
+        
         .planning-status-badge.missed {
             background: var(--traffic-red);
             color: var(--white);
         }
         
+        .planning-status-badge.missed svg {
+            stroke: var(--white);
+        }
+        
         .planning-status-badge.pending {
-            background: var(--gray-20);
-            color: var(--gray-60);
+            background: var(--traffic-orange);
+            color: var(--white);
+        }
+        
+        .planning-status-badge.pending svg {
+            stroke: var(--white);
         }
         
         .planning-n2-zone .planning-status-badge {
@@ -9978,6 +9993,8 @@ Cordialement`);
                         };
                     });
                     planningAuditsLoaded = true;
+                    console.log('Planning audits chargés:', planningAuditsData.length, 'audits');
+                    console.log('Exemple:', planningAuditsData.slice(0, 3));
                 }
             } catch (err) {
                 console.warn('Erreur chargement audits planning:', err);
@@ -9990,13 +10007,32 @@ Cordialement`);
                 return null; // Données non chargées
             }
             
+            // Normaliser la zone pour la comparaison
+            const normalizeZone = (z) => {
+                if (!z) return '';
+                return z.toString().trim().toLowerCase()
+                    .replace(/é/g, 'e')
+                    .replace(/è/g, 'e')
+                    .replace(/ê/g, 'e')
+                    .replace(/à/g, 'a');
+            };
+            
+            const targetZone = normalizeZone(zone);
+            
             // Chercher un audit correspondant
-            const found = planningAuditsData.find(a => 
-                a.annee == year && 
-                a.semaine == weekNum && 
-                a.zone === zone && 
-                a.niveau == niveau
-            );
+            const found = planningAuditsData.find(a => {
+                const matchYear = a.annee == year;
+                const matchWeek = a.semaine == weekNum;
+                const matchZone = normalizeZone(a.zone) === targetZone;
+                const matchNiveau = a.niveau == niveau;
+                
+                return matchYear && matchWeek && matchZone && matchNiveau;
+            });
+            
+            // Debug en console
+            if (!found) {
+                console.log(`Planning check: S${weekNum} ${zone} N${niveau} ${year} → non trouvé`);
+            }
             
             return found ? true : false;
         }
@@ -10035,11 +10071,27 @@ Cordialement`);
             }
             
             if (done) {
-                return '<span class="planning-status-badge done" title="Audit réalisé">✓</span>';
+                // Coche verte
+                return `<span class="planning-status-badge done" title="Audit réalisé">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                </span>`;
             } else if (isPast) {
-                return '<span class="planning-status-badge missed" title="Non réalisé">✗</span>';
+                // Croix rouge
+                return `<span class="planning-status-badge missed" title="Non réalisé">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </span>`;
             } else {
-                return '<span class="planning-status-badge pending" title="À faire">○</span>';
+                // Sablier orange/gris pour à faire
+                return `<span class="planning-status-badge pending" title="À faire">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2h12v6l-4 4 4 4v6H6v-6l4-4-4-4V2z"/>
+                    </svg>
+                </span>`;
             }
         }
         
