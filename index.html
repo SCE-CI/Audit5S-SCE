@@ -169,13 +169,38 @@
 
     <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
     <script>
-        // Config MSAL - même que l'app principale
+        // Config MSAL - IDENTIQUE à l'app principale
+        const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        
+        const getRedirectUri = () => {
+            if (isLocalDev) {
+                return window.location.origin + '/';
+            }
+            return 'https://sce-ci.github.io/Audit5S-SCE/';
+        };
+        
         const msalConfig = {
             auth: {
                 clientId: 'd97a32d2-865c-480b-96c2-1cfdcea3636c',
                 authority: 'https://login.microsoftonline.com/sartorius.com',
-                redirectUri: window.location.origin + window.location.pathname
+                redirectUri: getRedirectUri(),
+                navigateToLoginRequestUrl: false,
+                postLogoutRedirectUri: getRedirectUri()
+            },
+            cache: {
+                cacheLocation: 'localStorage',
+                storeAuthStateInCookie: true
+            },
+            system: {
+                allowNativeBroker: false,
+                windowHashTimeout: 60000,
+                iframeHashTimeout: 6000,
+                loadFrameTimeout: 0
             }
+        };
+        
+        const loginRequest = {
+            scopes: ['Files.ReadWrite', 'Sites.ReadWrite.All']
         };
         
         const driveId = 'b!0oMr7GZwfEaD5vqXyl2443LmM6jXw7VNksBhaXc8JRZ31jhxZcPFTIJo67mbwfL5';
@@ -206,14 +231,12 @@
                 let account = accounts[0];
                 
                 if (!account) {
-                    const loginResponse = await msalInstance.loginPopup({
-                        scopes: ['Files.Read', 'Files.ReadWrite', 'Sites.Read.All']
-                    });
+                    const loginResponse = await msalInstance.loginPopup(loginRequest);
                     account = loginResponse.account;
                 }
                 
                 const tokenResponse = await msalInstance.acquireTokenSilent({
-                    scopes: ['Files.Read', 'Files.ReadWrite', 'Sites.Read.All'],
+                    scopes: loginRequest.scopes,
                     account: account
                 });
                 
