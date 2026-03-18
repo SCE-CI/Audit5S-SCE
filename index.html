@@ -3906,7 +3906,7 @@
         }
         
         /* ═══════════════════════════════════════════════════════════════
-           DASHBOARD
+           DASHBOARD — REDESIGN V2
         ═══════════════════════════════════════════════════════════════ */
         
         .dashboard-overlay {
@@ -3932,7 +3932,7 @@
             min-height: 100vh;
         }
         
-        /* Header du dashboard - identique à l'app principale */
+        /* Header du dashboard */
         .dashboard-header {
             background: var(--sartorius-yellow);
             color: var(--black);
@@ -4075,7 +4075,7 @@
             color: var(--gray-60);
             cursor: pointer;
             white-space: nowrap;
-            transition: all 0.15s;
+            transition: all 0.2s ease;
         }
         
         .dashboard-nav-tab:hover {
@@ -4181,7 +4181,7 @@
             display: block;
         }
         
-        /* Stats grid */
+        /* Stats grid — Redesign V2 */
         .dashboard-stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -4192,15 +4192,31 @@
         @media (max-width: 600px) {
             .dashboard-stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: var(--space-sm);
             }
         }
         
         .dashboard-stat-card {
             background: var(--white);
             border-radius: var(--radius-lg);
-            padding: var(--space-md);
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: var(--space-md) var(--space-md) calc(var(--space-md) - 2px);
+            border: 1px solid var(--gray-20);
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .dashboard-stat-card:hover {
+            border-color: var(--gray-30);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .dashboard-stat-card.accent {
+            border-left: 3px solid var(--sartorius-yellow);
+        }
+        
+        .dashboard-stat-card.alert {
+            border-left: 3px solid var(--traffic-red);
         }
         
         .dashboard-stat-value {
@@ -4210,13 +4226,37 @@
         }
         
         .dashboard-stat-value.green { color: var(--traffic-green); }
+        .dashboard-stat-value.excellent { color: var(--traffic-green); }
         .dashboard-stat-value.orange { color: var(--traffic-orange); }
+        .dashboard-stat-value.warning { color: var(--traffic-orange); }
         .dashboard-stat-value.red { color: var(--traffic-red); }
+        .dashboard-stat-value.critical { color: var(--traffic-red); }
         
         .dashboard-stat-label {
             font-size: var(--font-size-xs);
+            font-weight: 500;
             color: var(--gray-60);
-            margin-top: var(--space-xs);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .dashboard-stat-trend {
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .dashboard-stat-trend.up { color: var(--traffic-green); }
+        .dashboard-stat-trend.down { color: var(--traffic-red); }
+        .dashboard-stat-trend.neutral { color: var(--gray-50); }
+        
+        .dashboard-stat-trend svg {
+            width: 12px;
+            height: 12px;
         }
         
         /* Sections */
@@ -4225,7 +4265,16 @@
             border-radius: var(--radius-lg);
             padding: var(--space-lg);
             margin-bottom: var(--space-lg);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--gray-20);
+        }
+        
+        .dashboard-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid var(--gray-10);
         }
         
         .dashboard-section-title {
@@ -4236,30 +4285,58 @@
             border-bottom: 2px solid var(--gray-10);
         }
         
-        /* Zones grid */
+        .dashboard-section-link {
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+            color: var(--gray-50);
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+            transition: color 0.15s;
+            white-space: nowrap;
+        }
+        
+        .dashboard-section-link:hover {
+            color: var(--black);
+        }
+        
+        /* Zones grid — Redesign V2 */
         .dashboard-zones-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: var(--space-md);
         }
         
         .dashboard-zone-card {
             padding: var(--space-md);
-            background: var(--gray-5);
-            border-radius: var(--radius-md);
-            border-left: 4px solid var(--gray-30);
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-20);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
         }
         
-        .dashboard-zone-card.excellent { border-left-color: var(--traffic-green); }
-        .dashboard-zone-card.good { border-left-color: var(--traffic-yellow); }
-        .dashboard-zone-card.warning { border-left-color: var(--traffic-orange); }
-        .dashboard-zone-card.critical { border-left-color: var(--traffic-red); }
+        .dashboard-zone-card:hover {
+            border-color: var(--sartorius-yellow);
+            box-shadow: 0 0 0 3px rgba(255, 237, 0, 0.15);
+        }
+        
+        .dashboard-zone-card:active {
+            transform: scale(0.99);
+        }
+        
+        .dashboard-zone-card.excellent { border-left: 3px solid var(--traffic-green); }
+        .dashboard-zone-card.good { border-left: 3px solid var(--sartorius-yellow); }
+        .dashboard-zone-card.warning { border-left: 3px solid var(--traffic-orange); }
+        .dashboard-zone-card.critical { border-left: 3px solid var(--traffic-red); }
         
         .dashboard-zone-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: var(--space-xs);
+            margin-bottom: var(--space-sm);
         }
         
         .dashboard-zone-name {
@@ -4268,7 +4345,7 @@
         }
         
         .dashboard-zone-score {
-            font-size: var(--font-size-lg);
+            font-size: var(--font-size-xl);
             font-weight: 700;
         }
         
@@ -4280,11 +4357,53 @@
         .dashboard-zone-meta {
             font-size: var(--font-size-xs);
             color: var(--gray-50);
+            line-height: 1.4;
+        }
+        
+        .dashboard-zone-actions-summary {
+            display: flex;
+            gap: var(--space-sm);
+            margin-top: var(--space-sm);
+            flex-wrap: wrap;
+        }
+        
+        .dashboard-zone-action-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .dashboard-zone-action-badge.overdue {
+            background: rgba(230, 0, 70, 0.08);
+            color: var(--traffic-red);
+        }
+        
+        .dashboard-zone-action-badge.open {
+            background: rgba(245, 145, 0, 0.08);
+            color: var(--traffic-orange);
+        }
+        
+        .dashboard-zone-action-badge.inprogress {
+            background: rgba(0, 185, 190, 0.08);
+            color: var(--teal);
+        }
+        
+        .dashboard-zone-action-badge::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+            flex-shrink: 0;
         }
         
         .dashboard-zone-bar {
             height: 4px;
-            background: var(--gray-20);
+            background: var(--gray-10);
             border-radius: 2px;
             margin-top: var(--space-sm);
             overflow: hidden;
@@ -4293,12 +4412,12 @@
         .dashboard-zone-bar-fill {
             height: 100%;
             border-radius: 2px;
-            background: var(--gray-40); /* Fallback */
-            transition: width 0.3s ease;
+            background: var(--gray-40);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .dashboard-zone-bar-fill.excellent { background: var(--traffic-green) !important; }
-        .dashboard-zone-bar-fill.good { background: var(--traffic-yellow) !important; }
+        .dashboard-zone-bar-fill.good { background: var(--sartorius-yellow) !important; }
         .dashboard-zone-bar-fill.warning { background: var(--traffic-orange) !important; }
         .dashboard-zone-bar-fill.critical { background: var(--traffic-red) !important; }
         
@@ -5990,9 +6109,11 @@
         
         .dashboard-action-status {
             display: inline-block;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 5px;
         }
         
         .dashboard-action-status.open { background: var(--traffic-orange); }
@@ -6001,17 +6122,30 @@
         .dashboard-action-status.closed { background: var(--traffic-green); }
         .dashboard-action-status.cancelled { background: var(--gray-40); }
         
-        /* Actions urgentes (vue d'ensemble) - format compact */
+        /* Actions urgentes — Redesign V2 avec cards */
         .dashboard-urgent-item {
             display: flex;
             align-items: flex-start;
             gap: var(--space-sm);
-            padding: var(--space-sm) 0;
-            border-bottom: 1px solid var(--gray-10);
+            padding: var(--space-md);
+            border: 1px solid var(--gray-10);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
         
         .dashboard-urgent-item:last-child {
-            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .dashboard-urgent-item:hover {
+            border-color: var(--gray-30);
+            background: var(--gray-5);
+        }
+        
+        .dashboard-urgent-item.is-overdue {
+            border-left: 3px solid var(--traffic-red);
         }
         
         .dashboard-urgent-content {
@@ -6021,43 +6155,78 @@
         
         .dashboard-urgent-text {
             font-size: var(--font-size-sm);
-            margin-bottom: 2px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            line-height: 1.3;
         }
         
         .dashboard-urgent-meta {
             font-size: var(--font-size-xs);
             color: var(--gray-50);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 12px;
         }
         
         .dashboard-urgent-meta span {
-            margin-right: var(--space-md);
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
         }
         
-        /* Filters */
+        .dashboard-urgent-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 1px 8px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        
+        .dashboard-urgent-badge.overdue {
+            background: rgba(230, 0, 70, 0.08);
+            color: var(--traffic-red);
+        }
+        
+        .dashboard-urgent-badge.open {
+            background: rgba(245, 145, 0, 0.08);
+            color: var(--traffic-orange);
+        }
+        
+        /* Filters — Redesign V2 pills */
         .dashboard-filters {
             display: flex;
             gap: var(--space-sm);
             margin-bottom: var(--space-md);
             flex-wrap: wrap;
+            align-items: center;
         }
         
         .dashboard-filter-btn {
-            padding: var(--space-sm) var(--space-md);
-            background: var(--gray-10);
-            border: none;
-            border-radius: 20px;
+            padding: 6px 14px;
+            background: var(--white);
+            border: 1px solid var(--gray-20);
+            border-radius: 100px;
             font-family: inherit;
             font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--gray-70);
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s ease;
         }
         
         .dashboard-filter-btn:hover {
-            background: var(--gray-20);
+            border-color: var(--gray-40);
+            color: var(--black);
         }
         
         .dashboard-filter-btn.active {
-            background: var(--sartorius-yellow);
+            background: var(--black);
+            border-color: var(--black);
+            color: var(--white);
             font-weight: 600;
         }
         
@@ -6110,7 +6279,7 @@
         }
         
         .dashboard-table tr:hover td {
-            background: var(--gray-5);
+            background: rgba(255, 237, 0, 0.08);
         }
         
         .dashboard-table .score-excellent { color: var(--traffic-green); font-weight: 600; }
@@ -11575,27 +11744,32 @@ Cordialement`);
                 <div class="dashboard-tab active" id="tab-overview">
                     <!-- Stats rapides -->
                     <div class="dashboard-stats-grid">
-                        <div class="dashboard-stat-card">
-                            <div class="dashboard-stat-value" id="dash-stat-score">-</div>
+                        <div class="dashboard-stat-card accent">
                             <div class="dashboard-stat-label">Score moyen</div>
+                            <div class="dashboard-stat-value" id="dash-stat-score">-</div>
+                            <div class="dashboard-stat-trend neutral" id="dash-stat-score-trend"></div>
                         </div>
                         <div class="dashboard-stat-card">
-                            <div class="dashboard-stat-value" id="dash-stat-audits">-</div>
                             <div class="dashboard-stat-label">Audits ce mois</div>
+                            <div class="dashboard-stat-value" id="dash-stat-audits">-</div>
+                            <div class="dashboard-stat-trend neutral" id="dash-stat-audits-sub"></div>
                         </div>
                         <div class="dashboard-stat-card">
-                            <div class="dashboard-stat-value" id="dash-stat-actions">-</div>
                             <div class="dashboard-stat-label">Actions ouvertes</div>
+                            <div class="dashboard-stat-value" id="dash-stat-actions">-</div>
                         </div>
-                        <div class="dashboard-stat-card">
-                            <div class="dashboard-stat-value" id="dash-stat-overdue">-</div>
+                        <div class="dashboard-stat-card alert" id="dash-stat-overdue-card" style="display:none;">
                             <div class="dashboard-stat-label">&gt; 30 jours</div>
+                            <div class="dashboard-stat-value red" id="dash-stat-overdue">-</div>
                         </div>
                     </div>
                     
                     <!-- Zones overview -->
                     <div class="dashboard-section">
-                        <h3 class="dashboard-section-title">État des zones</h3>
+                        <div class="dashboard-section-header">
+                            <h3 class="dashboard-section-title" style="margin:0;padding:0;border:none">État des zones</h3>
+                            <button class="dashboard-section-link" onclick="document.querySelector('.dashboard-nav-tab[data-tab=&quot;zones&quot;]').click()">Voir détail →</button>
+                        </div>
                         <div class="dashboard-zones-grid" id="dashboard-zones-grid">
                             <!-- Rempli dynamiquement -->
                         </div>
@@ -11603,7 +11777,10 @@ Cordialement`);
                     
                     <!-- Actions urgentes -->
                     <div class="dashboard-section">
-                        <h3 class="dashboard-section-title">Actions urgentes</h3>
+                        <div class="dashboard-section-header">
+                            <h3 class="dashboard-section-title" style="margin:0;padding:0;border:none">Actions urgentes</h3>
+                            <button class="dashboard-section-link" onclick="document.querySelector('.dashboard-nav-tab[data-tab=&quot;actions&quot;]').click()">Tout voir →</button>
+                        </div>
                         <div id="dashboard-urgent-actions">
                             <!-- Rempli dynamiquement -->
                         </div>
@@ -12443,6 +12620,17 @@ Cordialement`);
                 ? Math.round(dashboardData.audits.reduce((sum, a) => sum + parseScorePercent(a.performance), 0) / dashboardData.audits.length)
                 : 0;
             
+            // Tendance du score (mois précédent vs global)
+            const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+            const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+            const prevMonthAudits = dashboardData.audits.filter(a => {
+                const date = parseExcelDate(a.date);
+                return date && date.getMonth() === prevMonth && date.getFullYear() === prevYear;
+            });
+            const prevAvg = prevMonthAudits.length > 0
+                ? Math.round(prevMonthAudits.reduce((sum, a) => sum + parseScorePercent(a.performance), 0) / prevMonthAudits.length)
+                : null;
+            
             // Actions ouvertes et en retard
             let openCount = 0;
             let overdueCount = 0;
@@ -12457,15 +12645,40 @@ Cordialement`);
             scoreEl.textContent = avgScore + '%';
             scoreEl.className = 'dashboard-stat-value ' + getScoreClass(avgScore);
             
+            // Trend
+            const trendEl = document.getElementById('dash-stat-score-trend');
+            if (prevAvg !== null) {
+                const diff = avgScore - prevAvg;
+                if (diff > 0) {
+                    trendEl.className = 'dashboard-stat-trend up';
+                    trendEl.innerHTML = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3m0 0L3 6m3-3l3 3"/></svg>+' + diff + '% vs mois préc.';
+                } else if (diff < 0) {
+                    trendEl.className = 'dashboard-stat-trend down';
+                    trendEl.innerHTML = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6m0 0l3-3m-3 3L3 6"/></svg>' + diff + '% vs mois préc.';
+                } else {
+                    trendEl.className = 'dashboard-stat-trend neutral';
+                    trendEl.textContent = '= stable vs mois préc.';
+                }
+            } else {
+                trendEl.textContent = '';
+            }
+            
             document.getElementById('dash-stat-audits').textContent = auditsThisMonth.length;
+            const auditsSub = document.getElementById('dash-stat-audits-sub');
+            auditsSub.textContent = dashboardData.audits.length + ' au total';
             
             const actionsEl = document.getElementById('dash-stat-actions');
             actionsEl.textContent = openCount + overdueCount;
             actionsEl.className = 'dashboard-stat-value' + ((openCount + overdueCount) > 0 ? ' orange' : '');
             
-            const overdueEl = document.getElementById('dash-stat-overdue');
-            overdueEl.textContent = overdueCount;
-            overdueEl.className = 'dashboard-stat-value' + (overdueCount > 0 ? ' red' : '');
+            // Afficher la carte "en retard" seulement si > 0
+            const overdueCard = document.getElementById('dash-stat-overdue-card');
+            if (overdueCount > 0) {
+                overdueCard.style.display = '';
+                document.getElementById('dash-stat-overdue').textContent = overdueCount;
+            } else {
+                overdueCard.style.display = 'none';
+            }
         }
         
         // Rendre la grille des zones
@@ -12479,12 +12692,12 @@ Cordialement`);
                 
                 if (!lastAudit) {
                     return `
-                        <div class="dashboard-zone-card">
+                        <div class="dashboard-zone-card" onclick="navigateToZone('${zoneName}')">
                             <div class="dashboard-zone-header">
                                 <div class="dashboard-zone-name">${zoneName}</div>
-                                <div class="dashboard-zone-score">-</div>
+                                <div class="dashboard-zone-score" style="color: var(--gray-40)">—</div>
                             </div>
-                            <div class="dashboard-zone-meta">Aucun audit</div>
+                            <div class="dashboard-zone-meta">Aucun audit réalisé</div>
                         </div>
                     `;
                 }
@@ -12499,26 +12712,32 @@ Cordialement`);
                 const overdueActions = zoneActions.filter(a => getActionStatus(a) === 'overdue').length;
                 const inprogressActions = zoneActions.filter(a => getActionStatus(a) === 'inprogress').length;
                 
-                let actionsHtml = '';
-                if (overdueActions > 0) {
-                    actionsHtml = ` - <span style="color: var(--traffic-red); font-weight: 600;">${overdueActions} en retard</span>`;
-                }
-                if (inprogressActions > 0) {
-                    actionsHtml += `${actionsHtml ? ', ' : ' - '}<span style="color: var(--teal);">${inprogressActions} en cours</span>`;
-                }
-                if (openActions > 0) {
-                    actionsHtml += `${actionsHtml ? ', ' : ' - '}<span style="color: var(--traffic-orange);">${openActions} ouverte${openActions > 1 ? 's' : ''}</span>`;
+                // Construire les badges d'actions
+                let actionBadgesHtml = '';
+                if (overdueActions > 0 || openActions > 0 || inprogressActions > 0) {
+                    actionBadgesHtml = '<div class="dashboard-zone-actions-summary">';
+                    if (overdueActions > 0) {
+                        actionBadgesHtml += `<span class="dashboard-zone-action-badge overdue">${overdueActions} en retard</span>`;
+                    }
+                    if (inprogressActions > 0) {
+                        actionBadgesHtml += `<span class="dashboard-zone-action-badge inprogress">${inprogressActions} en cours</span>`;
+                    }
+                    if (openActions > 0) {
+                        actionBadgesHtml += `<span class="dashboard-zone-action-badge open">${openActions} ouverte${openActions > 1 ? 's' : ''}</span>`;
+                    }
+                    actionBadgesHtml += '</div>';
                 }
                 
                 return `
-                    <div class="dashboard-zone-card ${scoreClass}">
+                    <div class="dashboard-zone-card ${scoreClass}" onclick="navigateToZone('${zoneName}')">
                         <div class="dashboard-zone-header">
-                            <div class="dashboard-zone-name">${zoneName}</div>
+                            <div>
+                                <div class="dashboard-zone-name">${zoneName}</div>
+                                <div class="dashboard-zone-meta">${lastAudit.niveau} · ${dateFormatted} · ${lastAudit.auditeur}</div>
+                            </div>
                             <div class="dashboard-zone-score ${scoreClass}">${Math.round(score)}%</div>
                         </div>
-                        <div class="dashboard-zone-meta">
-                            ${lastAudit.niveau} - ${dateFormatted} - ${lastAudit.auditeur}${actionsHtml}
-                        </div>
+                        ${actionBadgesHtml}
                         <div class="dashboard-zone-bar">
                             <div class="dashboard-zone-bar-fill ${scoreClass}" style="width: ${Math.round(score)}%;"></div>
                         </div>
@@ -12527,6 +12746,26 @@ Cordialement`);
             }).join('');
             
             container.innerHTML = zonesHtml;
+        }
+        
+        // Naviguer vers l'onglet Zones avec la zone sélectionnée
+        function navigateToZone(zoneName) {
+            // Activer l'onglet Zones
+            document.querySelectorAll('.dashboard-nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.dashboard-nav-tab[data-tab="zones"]').classList.add('active');
+            document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-zones').classList.add('active');
+            
+            // Sélectionner la zone
+            const zoneSelector = document.getElementById('dashboard-zone-selector');
+            zoneSelector.querySelectorAll('.dashboard-zone-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.zone === zoneName);
+            });
+            selectedZone = zoneName;
+            renderZoneDetails(zoneName);
+            
+            // Scroll en haut
+            document.getElementById('dashboard-overlay').scrollTop = 0;
         }
         
         // Rendre les actions urgentes (> 30 jours ou ouvertes récentes)
@@ -12547,16 +12786,21 @@ Cordialement`);
                 .slice(0, 5);
             
             if (urgentActions.length === 0) {
-                container.innerHTML = '<div class="dashboard-empty">Aucune action urgente</div>';
+                container.innerHTML = `
+                    <div class="dashboard-empty" style="padding: var(--space-lg); text-align: center;">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--traffic-green)" stroke-width="1.5" style="margin-bottom: 8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <div style="font-size: var(--font-size-sm); color: var(--gray-60);">Aucune action urgente</div>
+                    </div>`;
                 return;
             }
             
             container.innerHTML = urgentActions.map(action => {
                 const status = getActionStatus(action);
                 const dateFormatted = formatExcelDate(action.dateOuverture);
+                const isOverdue = status === 'overdue';
                 
                 return `
-                    <div class="dashboard-urgent-item">
+                    <div class="dashboard-urgent-item ${isOverdue ? 'is-overdue' : ''}" onclick="openActionModal(${action.rowIndex})">
                         <div class="dashboard-action-status ${status}"></div>
                         <div class="dashboard-urgent-content">
                             <div class="dashboard-urgent-text">${action.action || '-'}</div>
@@ -12566,6 +12810,7 @@ Cordialement`);
                                 <span>${dateFormatted}</span>
                             </div>
                         </div>
+                        <span class="dashboard-urgent-badge ${status}">${isOverdue ? '> 30j' : 'Ouverte'}</span>
                     </div>
                 `;
             }).join('');
