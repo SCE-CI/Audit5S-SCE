@@ -6421,78 +6421,37 @@
         .dashboard-nav-tab.active svg { opacity: 1; }
         .dashboard-nav-tab:hover svg { opacity: 0.8; }
 
-        /* --- Tooltip system v2 --- */
-        .db2-tooltip {
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 50%;
-            transform: translateX(-50%) translateY(4px);
+        /* --- Tooltip v2: FIXED position, appended to body, escapes all overflow --- */
+        #db2-global-tooltip {
+            position: fixed;
             background: var(--gray-90);
             color: var(--white);
             padding: 10px 14px;
-            border-radius: var(--radius-md);
+            border-radius: 6px;
             font-size: 12px;
             line-height: 1.5;
-            min-width: 200px;
-            max-width: 280px;
+            min-width: 160px;
+            max-width: 300px;
             white-space: normal;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.15s, transform 0.15s;
-            z-index: 9999;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            transition: opacity 0.12s;
+            z-index: 99999;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
         }
+        #db2-global-tooltip.visible { opacity: 1; }
+        #db2-global-tooltip .db2-tooltip-row { display: flex; justify-content: space-between; gap: var(--space-md); }
+        #db2-global-tooltip .db2-tooltip-row + .db2-tooltip-row { margin-top: 4px; }
+        #db2-global-tooltip .db2-tooltip-label { color: var(--gray-40); }
+        #db2-global-tooltip .db2-tooltip-divider { height: 1px; background: rgba(255,255,255,0.12); margin: 6px 0; }
+        #db2-global-tooltip .db2-tooltip-title { font-weight: 600; margin-bottom: 4px; }
+        #db2-global-tooltip .db2-sparkline svg { display: block; width: 100%; height: 40px; }
+        #db2-global-tooltip .db2-sparkline-line { fill: none; stroke: var(--sartorius-yellow); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        #db2-global-tooltip .db2-sparkline-dot { fill: var(--sartorius-yellow); }
+        #db2-global-tooltip .db2-sparkline-area { fill: var(--sartorius-yellow); opacity: 0.15; }
+        .db2-tooltip { display: none; }
+        @media (max-width: 600px) { #db2-global-tooltip { display: none !important; } }
 
-        .db2-tooltip::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 5px solid transparent;
-            border-top-color: var(--gray-90);
-        }
-
-        .db2-tooltip.tooltip-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        /* Tooltip below variant (for KPI cards) - HIGH z-index to not be masked */
-        .db2-kpi-card > .db2-tooltip { bottom: auto; top: calc(100% + 8px); transform: translateX(-50%) translateY(-4px); z-index: 9999; }
-        .db2-kpi-card > .db2-tooltip.tooltip-visible { transform: translateX(-50%) translateY(0); }
-        .db2-kpi-card > .db2-tooltip::after { top: auto; bottom: 100%; border: 5px solid transparent; border-bottom-color: var(--gray-90); border-top-color: transparent; }
-        .db2-kpi-grid { position: relative; z-index: 10; }
-
-        /* Zone card tooltips - pointer-events none to prevent flicker */
-        .db2-zone-card > .db2-tooltip { pointer-events: none; }
-        
-        /* Badge tooltips below the badge */
-        .db2-zone-badge.has-tooltip { position: relative; }
-        .db2-zone-badge.has-tooltip > .db2-tooltip { top: calc(100% + 8px); bottom: auto; left: 0; transform: translateX(0) translateY(-4px); min-width: 220px; }
-        .db2-zone-badge.has-tooltip > .db2-tooltip.tooltip-visible { transform: translateX(0) translateY(0); }
-        .db2-zone-badge.has-tooltip > .db2-tooltip::after { top: auto; bottom: 100%; left: 16px; transform: none; border: 5px solid transparent; border-bottom-color: var(--gray-90); border-top-color: transparent; }
-
-        /* Urgent item tooltips above */
-        .db2-urgent-item.has-tooltip { position: relative; overflow: visible; }
-        .db2-urgent-item > .db2-tooltip { pointer-events: none; left: 0; transform: translateX(0) translateY(4px); }
-        .db2-urgent-item > .db2-tooltip.tooltip-visible { transform: translateX(0) translateY(0); }
-        .db2-urgent-item > .db2-tooltip::after { left: 20px; transform: none; }
-
-        /* Zone stat card tooltips (below) */
-        #db2-zone-stats .has-tooltip { position: relative; overflow: visible; }
-        #db2-zone-stats .has-tooltip > .db2-tooltip { bottom: auto; top: calc(100% + 8px); transform: translateX(-50%) translateY(-4px); }
-        #db2-zone-stats .has-tooltip > .db2-tooltip.tooltip-visible { transform: translateX(-50%) translateY(0); }
-        #db2-zone-stats .has-tooltip > .db2-tooltip::after { top: auto; bottom: 100%; border: 5px solid transparent; border-bottom-color: var(--gray-90); border-top-color: transparent; }
-
-        .db2-tooltip-row { display: flex; justify-content: space-between; gap: var(--space-md); }
-        .db2-tooltip-row + .db2-tooltip-row { margin-top: 4px; }
-        .db2-tooltip-label { color: var(--gray-40); }
-        .db2-tooltip-divider { height: 1px; background: rgba(255,255,255,0.12); margin: 6px 0; }
-        .db2-tooltip-title { font-weight: 600; margin-bottom: 4px; }
-
-        /* Sparkline in tooltip */
-        .db2-sparkline svg { display: block; width: 100%; height: 40px; }
-        .db2-sparkline-line { fill: none; stroke: var(--sartorius-yellow); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .db2-sparkline-dot { fill: var(--sartorius-yellow); }
-        .db2-sparkline-area { fill: var(--sartorius-yellow); opacity: 0.15; }
 
         /* --- Score utilities v2 --- */
         .db2-c-green { color: var(--traffic-green); }
@@ -13430,7 +13389,7 @@ Cordialement`);
             var globalPct=Math.round(globalScore/4*100);
             var labelsSvg=sNames.map(function(name,i){var p=labelPositions[i];return '<text x="'+p.x+'" y="'+(p.y-4)+'" text-anchor="middle" style="font-size:11px;font-weight:600;fill:var(--gray-70);font-family:inherit">'+name+'</text>';}).join('');
             
-            var catBars=sKeys.map(function(k,i){var v=primaryScores[i];var bPct=Math.round(v/4*100);var color=v>=3.4?'var(--traffic-green)':v>=2.8?'var(--sartorius-yellow)':v>=2?'var(--traffic-orange)':'var(--traffic-red)';var criteriaNames=S_CONFIG[i].criteria.map(function(c){return AUDIT_CRITERIA_LABELS[c];}).join(' · ');return '<div style="display:flex;align-items:center;gap:12px;cursor:help" title="'+criteriaNames+'"><div style="width:90px;font-size:13px;font-weight:500;color:var(--gray-70);flex-shrink:0">'+sNames[i]+'</div><div style="flex:1;height:8px;background:var(--gray-10);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+bPct+'%;background:'+color+';border-radius:4px;transition:width 0.6s"></div></div><div style="width:44px;font-size:13px;font-weight:600;text-align:right;flex-shrink:0;color:'+color+'">'+v.toFixed(1)+'</div></div>';}).join('');
+            var catBars=sKeys.map(function(k,i){var v=primaryScores[i];var bPct=Math.round(v/4*100);var color=v>=3.4?'var(--traffic-green)':v>=2.8?'var(--sartorius-yellow)':v>=2?'var(--traffic-orange)':'var(--traffic-red)';var criteriaNames=S_CONFIG[i].criteria.map(function(c){return AUDIT_CRITERIA_LABELS[c];}).join(' · ');return '<div style="display:flex;align-items:center;gap:12px;cursor:help" class="has-tooltip"><div class="db2-tooltip">'+criteriaNames+'</div><div style="width:90px;font-size:13px;font-weight:500;color:var(--gray-70);flex-shrink:0">'+sNames[i]+'</div><div style="flex:1;height:8px;background:var(--gray-10);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+bPct+'%;background:'+color+';border-radius:4px;transition:width 0.6s"></div></div><div style="width:44px;font-size:13px;font-weight:600;text-align:right;flex-shrink:0;color:'+color+'">'+v.toFixed(1)+'</div></div>';}).join('');
             
             container.innerHTML='<div style="width:290px;height:300px;margin:0 auto"><svg viewBox="0 0 280 290" width="100%" height="100%">'+gridSvg+axisSvg+shapesSvg+labelsSvg+'</svg></div><div style="display:flex;justify-content:center;gap:var(--space-lg);margin-top:var(--space-sm)">'+legendItems.join('')+'</div><div style="text-align:center;margin-top:var(--space-md)"><div style="font-size:28px;font-weight:700" class="'+getScoreClass(globalPct)+'">'+globalPct+'<span style="font-size:16px;color:var(--gray-40);font-weight:400">%</span></div><div style="font-size:12px;color:var(--gray-50);margin-top:2px">'+primarySubtitle+'</div></div><div style="margin-top:var(--space-lg);display:flex;flex-direction:column;gap:8px">'+catBars+'</div>';
         }
@@ -13733,7 +13692,7 @@ Cordialement`);
                 var bPct=Math.round(v/4*100);
                 var color=v>=3.4?'var(--traffic-green)':v>=2.8?'var(--sartorius-yellow)':v>=2?'var(--traffic-orange)':'var(--traffic-red)';
                 var criteria=S_CONFIG[i].criteria.map(function(c){return AUDIT_CRITERIA_LABELS[c]+': '+(audit.scores[c]||0)+'/4';}).join(' · ');
-                return '<div style="position:relative;display:flex;align-items:center;gap:12px;cursor:help" title="'+criteria+'"><div style="width:100px;font-size:13px;font-weight:500;color:var(--gray-70);flex-shrink:0">'+sNames[i]+'</div><div style="flex:1;height:8px;background:var(--gray-10);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+bPct+'%;background:'+color+';border-radius:4px;transition:width 0.6s"></div></div><div style="width:44px;font-size:13px;font-weight:600;text-align:right;flex-shrink:0;color:'+color+'">'+v.toFixed(1)+'</div></div>';
+                return '<div style="position:relative;display:flex;align-items:center;gap:12px;cursor:help" class="has-tooltip"><div class="db2-tooltip">'+criteria+'</div><div style="width:100px;font-size:13px;font-weight:500;color:var(--gray-70);flex-shrink:0">'+sNames[i]+'</div><div style="flex:1;height:8px;background:var(--gray-10);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+bPct+'%;background:'+color+';border-radius:4px;transition:width 0.6s"></div></div><div style="width:44px;font-size:13px;font-weight:600;text-align:right;flex-shrink:0;color:'+color+'">'+v.toFixed(1)+'</div></div>';
             }).join('');
             
             var linkedHtml='';
@@ -13801,62 +13760,40 @@ Cordialement`);
         // ═══════════════════════════════════════════════════════════════
         
         function initTooltips() {
+            var tip = document.createElement('div');
+            tip.id = 'db2-global-tooltip';
+            document.body.appendChild(tip);
+            
             document.addEventListener('mouseenter', function(e) {
                 if (!e.target || !e.target.closest) return;
                 var badge = e.target.closest('.db2-zone-badge.has-tooltip');
-                var card = e.target.closest('.db2-zone-card.has-tooltip');
-                var kpiCard = e.target.closest('.db2-kpi-card.has-tooltip');
-                var urgentItem = e.target.closest('.db2-urgent-item.has-tooltip');
-                var generic = !badge && !card && !kpiCard && !urgentItem ? e.target.closest('.has-tooltip') : null;
+                var el = badge || e.target.closest('.has-tooltip');
+                if (!el) return;
+                var content = el.querySelector(':scope > .db2-tooltip');
+                if (!content) return;
                 
-                if (badge) {
-                    var badgeTip = badge.querySelector(':scope > .db2-tooltip');
-                    var parentCard = badge.closest('.db2-zone-card.has-tooltip');
-                    if (parentCard) { var cardTip = parentCard.querySelector(':scope > .db2-tooltip'); if (cardTip) cardTip.classList.remove('tooltip-visible'); }
-                    if (badgeTip) badgeTip.classList.add('tooltip-visible');
-                } else if (card) {
-                    var cardTip = card.querySelector(':scope > .db2-tooltip');
-                    card.querySelectorAll('.db2-zone-badge > .db2-tooltip').forEach(function(t) { t.classList.remove('tooltip-visible'); });
-                    if (cardTip) cardTip.classList.add('tooltip-visible');
-                } else if (kpiCard) {
-                    var tip = kpiCard.querySelector(':scope > .db2-tooltip');
-                    if (tip) tip.classList.add('tooltip-visible');
-                } else if (urgentItem) {
-                    var tip2 = urgentItem.querySelector(':scope > .db2-tooltip');
-                    if (tip2) tip2.classList.add('tooltip-visible');
-                } else if (generic) {
-                    var tip3 = generic.querySelector(':scope > .db2-tooltip');
-                    if (tip3) tip3.classList.add('tooltip-visible');
-                }
+                tip.innerHTML = content.innerHTML;
+                var rect = el.getBoundingClientRect();
+                var tipW = Math.min(280, window.innerWidth - 16);
+                var left = rect.left + rect.width / 2 - tipW / 2;
+                var top = rect.bottom + 8;
+                left = Math.max(8, Math.min(left, window.innerWidth - tipW - 8));
+                if (top + 180 > window.innerHeight) top = rect.top - tip.offsetHeight - 8;
+                
+                tip.style.left = left + 'px';
+                tip.style.top = top + 'px';
+                tip.style.maxWidth = tipW + 'px';
+                tip.classList.add('visible');
             }, true);
             
             document.addEventListener('mouseleave', function(e) {
                 if (!e.target || !e.target.closest) return;
                 var badge = e.target.closest('.db2-zone-badge.has-tooltip');
-                var card = e.target.closest('.db2-zone-card.has-tooltip');
-                var kpiCard = e.target.closest('.db2-kpi-card.has-tooltip');
-                var urgentItem = e.target.closest('.db2-urgent-item.has-tooltip');
-                var generic = !badge && !card && !kpiCard && !urgentItem ? e.target.closest('.has-tooltip') : null;
-                
-                if (badge) {
-                    var badgeTip = badge.querySelector(':scope > .db2-tooltip');
-                    if (badgeTip) badgeTip.classList.remove('tooltip-visible');
-                    var parentCard = badge.closest('.db2-zone-card.has-tooltip');
-                    if (parentCard && parentCard.matches(':hover')) { var cardTip = parentCard.querySelector(':scope > .db2-tooltip'); if (cardTip) cardTip.classList.add('tooltip-visible'); }
-                } else if (card) {
-                    var cardTip = card.querySelector(':scope > .db2-tooltip');
-                    if (cardTip) cardTip.classList.remove('tooltip-visible');
-                    card.querySelectorAll('.db2-zone-badge > .db2-tooltip').forEach(function(t) { t.classList.remove('tooltip-visible'); });
-                } else if (kpiCard) {
-                    var tip = kpiCard.querySelector(':scope > .db2-tooltip');
-                    if (tip) tip.classList.remove('tooltip-visible');
-                } else if (urgentItem) {
-                    var tip2 = urgentItem.querySelector(':scope > .db2-tooltip');
-                    if (tip2) tip2.classList.remove('tooltip-visible');
-                } else if (generic) {
-                    var tip3 = generic.querySelector(':scope > .db2-tooltip');
-                    if (tip3) tip3.classList.remove('tooltip-visible');
-                }
+                var el = badge || e.target.closest('.has-tooltip');
+                if (!el) return;
+                var related = e.relatedTarget;
+                if (related && el.contains(related)) return;
+                tip.classList.remove('visible');
             }, true);
         }
         
