@@ -3906,7 +3906,7 @@
         }
         
         /* ═══════════════════════════════════════════════════════════════
-           DASHBOARD — REDESIGN V2
+           DASHBOARD
         ═══════════════════════════════════════════════════════════════ */
         
         .dashboard-overlay {
@@ -3932,7 +3932,7 @@
             min-height: 100vh;
         }
         
-        /* Header du dashboard */
+        /* Header du dashboard - identique à l'app principale */
         .dashboard-header {
             background: var(--sartorius-yellow);
             color: var(--black);
@@ -4075,7 +4075,7 @@
             color: var(--gray-60);
             cursor: pointer;
             white-space: nowrap;
-            transition: all 0.2s ease;
+            transition: all 0.15s;
         }
         
         .dashboard-nav-tab:hover {
@@ -4181,7 +4181,7 @@
             display: block;
         }
         
-        /* Stats grid — Redesign V2 */
+        /* Stats grid */
         .dashboard-stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -4192,31 +4192,15 @@
         @media (max-width: 600px) {
             .dashboard-stats-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: var(--space-sm);
             }
         }
         
         .dashboard-stat-card {
             background: var(--white);
             border-radius: var(--radius-lg);
-            padding: var(--space-md) var(--space-md) calc(var(--space-md) - 2px);
-            border: 1px solid var(--gray-20);
-            position: relative;
-            overflow: hidden;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .dashboard-stat-card:hover {
-            border-color: var(--gray-30);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        
-        .dashboard-stat-card.accent {
-            border-left: 3px solid var(--sartorius-yellow);
-        }
-        
-        .dashboard-stat-card.alert {
-            border-left: 3px solid var(--traffic-red);
+            padding: var(--space-md);
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .dashboard-stat-value {
@@ -4226,37 +4210,13 @@
         }
         
         .dashboard-stat-value.green { color: var(--traffic-green); }
-        .dashboard-stat-value.excellent { color: var(--traffic-green); }
         .dashboard-stat-value.orange { color: var(--traffic-orange); }
-        .dashboard-stat-value.warning { color: var(--traffic-orange); }
         .dashboard-stat-value.red { color: var(--traffic-red); }
-        .dashboard-stat-value.critical { color: var(--traffic-red); }
         
         .dashboard-stat-label {
             font-size: var(--font-size-xs);
-            font-weight: 500;
             color: var(--gray-60);
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-        
-        .dashboard-stat-trend {
-            font-size: 11px;
-            font-weight: 500;
-            margin-top: 4px;
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-        
-        .dashboard-stat-trend.up { color: var(--traffic-green); }
-        .dashboard-stat-trend.down { color: var(--traffic-red); }
-        .dashboard-stat-trend.neutral { color: var(--gray-50); }
-        
-        .dashboard-stat-trend svg {
-            width: 12px;
-            height: 12px;
+            margin-top: var(--space-xs);
         }
         
         /* Sections */
@@ -4265,16 +4225,7 @@
             border-radius: var(--radius-lg);
             padding: var(--space-lg);
             margin-bottom: var(--space-lg);
-            border: 1px solid var(--gray-20);
-        }
-        
-        .dashboard-section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: var(--space-md);
-            padding-bottom: var(--space-sm);
-            border-bottom: 1px solid var(--gray-10);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .dashboard-section-title {
@@ -4285,58 +4236,30 @@
             border-bottom: 2px solid var(--gray-10);
         }
         
-        .dashboard-section-link {
-            font-size: var(--font-size-xs);
-            font-weight: 500;
-            color: var(--gray-50);
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-family: inherit;
-            transition: color 0.15s;
-            white-space: nowrap;
-        }
-        
-        .dashboard-section-link:hover {
-            color: var(--black);
-        }
-        
-        /* Zones grid — Redesign V2 */
+        /* Zones grid */
         .dashboard-zones-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: var(--space-md);
         }
         
         .dashboard-zone-card {
             padding: var(--space-md);
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--gray-20);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
+            background: var(--gray-5);
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--gray-30);
         }
         
-        .dashboard-zone-card:hover {
-            border-color: var(--sartorius-yellow);
-            box-shadow: 0 0 0 3px rgba(255, 237, 0, 0.15);
-        }
-        
-        .dashboard-zone-card:active {
-            transform: scale(0.99);
-        }
-        
-        .dashboard-zone-card.excellent { border-left: 3px solid var(--traffic-green); }
-        .dashboard-zone-card.good { border-left: 3px solid var(--sartorius-yellow); }
-        .dashboard-zone-card.warning { border-left: 3px solid var(--traffic-orange); }
-        .dashboard-zone-card.critical { border-left: 3px solid var(--traffic-red); }
+        .dashboard-zone-card.excellent { border-left-color: var(--traffic-green); }
+        .dashboard-zone-card.good { border-left-color: var(--traffic-yellow); }
+        .dashboard-zone-card.warning { border-left-color: var(--traffic-orange); }
+        .dashboard-zone-card.critical { border-left-color: var(--traffic-red); }
         
         .dashboard-zone-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: var(--space-sm);
+            margin-bottom: var(--space-xs);
         }
         
         .dashboard-zone-name {
@@ -4345,7 +4268,7 @@
         }
         
         .dashboard-zone-score {
-            font-size: var(--font-size-xl);
+            font-size: var(--font-size-lg);
             font-weight: 700;
         }
         
@@ -4357,53 +4280,11 @@
         .dashboard-zone-meta {
             font-size: var(--font-size-xs);
             color: var(--gray-50);
-            line-height: 1.4;
-        }
-        
-        .dashboard-zone-actions-summary {
-            display: flex;
-            gap: var(--space-sm);
-            margin-top: var(--space-sm);
-            flex-wrap: wrap;
-        }
-        
-        .dashboard-zone-action-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 8px;
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-        
-        .dashboard-zone-action-badge.overdue {
-            background: rgba(230, 0, 70, 0.08);
-            color: var(--traffic-red);
-        }
-        
-        .dashboard-zone-action-badge.open {
-            background: rgba(245, 145, 0, 0.08);
-            color: var(--traffic-orange);
-        }
-        
-        .dashboard-zone-action-badge.inprogress {
-            background: rgba(0, 185, 190, 0.08);
-            color: var(--teal);
-        }
-        
-        .dashboard-zone-action-badge::before {
-            content: '';
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: currentColor;
-            flex-shrink: 0;
         }
         
         .dashboard-zone-bar {
             height: 4px;
-            background: var(--gray-10);
+            background: var(--gray-20);
             border-radius: 2px;
             margin-top: var(--space-sm);
             overflow: hidden;
@@ -4412,12 +4293,12 @@
         .dashboard-zone-bar-fill {
             height: 100%;
             border-radius: 2px;
-            background: var(--gray-40);
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--gray-40); /* Fallback */
+            transition: width 0.3s ease;
         }
         
         .dashboard-zone-bar-fill.excellent { background: var(--traffic-green) !important; }
-        .dashboard-zone-bar-fill.good { background: var(--sartorius-yellow) !important; }
+        .dashboard-zone-bar-fill.good { background: var(--traffic-yellow) !important; }
         .dashboard-zone-bar-fill.warning { background: var(--traffic-orange) !important; }
         .dashboard-zone-bar-fill.critical { background: var(--traffic-red) !important; }
         
@@ -6109,11 +5990,9 @@
         
         .dashboard-action-status {
             display: inline-block;
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            flex-shrink: 0;
-            margin-top: 5px;
         }
         
         .dashboard-action-status.open { background: var(--traffic-orange); }
@@ -6122,30 +6001,17 @@
         .dashboard-action-status.closed { background: var(--traffic-green); }
         .dashboard-action-status.cancelled { background: var(--gray-40); }
         
-        /* Actions urgentes — Redesign V2 avec cards */
+        /* Actions urgentes (vue d'ensemble) - format compact */
         .dashboard-urgent-item {
             display: flex;
             align-items: flex-start;
             gap: var(--space-sm);
-            padding: var(--space-md);
-            border: 1px solid var(--gray-10);
-            border-radius: var(--radius-md);
-            margin-bottom: var(--space-sm);
-            cursor: pointer;
-            transition: all 0.2s ease;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--gray-10);
         }
         
         .dashboard-urgent-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .dashboard-urgent-item:hover {
-            border-color: var(--gray-30);
-            background: var(--gray-5);
-        }
-        
-        .dashboard-urgent-item.is-overdue {
-            border-left: 3px solid var(--traffic-red);
+            border-bottom: none;
         }
         
         .dashboard-urgent-content {
@@ -6155,78 +6021,43 @@
         
         .dashboard-urgent-text {
             font-size: var(--font-size-sm);
-            font-weight: 500;
-            margin-bottom: 4px;
-            line-height: 1.3;
+            margin-bottom: 2px;
         }
         
         .dashboard-urgent-meta {
             font-size: var(--font-size-xs);
             color: var(--gray-50);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px 12px;
         }
         
         .dashboard-urgent-meta span {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
+            margin-right: var(--space-md);
         }
         
-        .dashboard-urgent-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 1px 8px;
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 500;
-            margin-left: auto;
-            flex-shrink: 0;
-        }
-        
-        .dashboard-urgent-badge.overdue {
-            background: rgba(230, 0, 70, 0.08);
-            color: var(--traffic-red);
-        }
-        
-        .dashboard-urgent-badge.open {
-            background: rgba(245, 145, 0, 0.08);
-            color: var(--traffic-orange);
-        }
-        
-        /* Filters — Redesign V2 pills */
+        /* Filters */
         .dashboard-filters {
             display: flex;
             gap: var(--space-sm);
             margin-bottom: var(--space-md);
             flex-wrap: wrap;
-            align-items: center;
         }
         
         .dashboard-filter-btn {
-            padding: 6px 14px;
-            background: var(--white);
-            border: 1px solid var(--gray-20);
-            border-radius: 100px;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--gray-10);
+            border: none;
+            border-radius: 20px;
             font-family: inherit;
             font-size: var(--font-size-sm);
-            font-weight: 500;
-            color: var(--gray-70);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s;
         }
         
         .dashboard-filter-btn:hover {
-            border-color: var(--gray-40);
-            color: var(--black);
+            background: var(--gray-20);
         }
         
         .dashboard-filter-btn.active {
-            background: var(--black);
-            border-color: var(--black);
-            color: var(--white);
+            background: var(--sartorius-yellow);
             font-weight: 600;
         }
         
@@ -6279,7 +6110,7 @@
         }
         
         .dashboard-table tr:hover td {
-            background: rgba(255, 237, 0, 0.08);
+            background: var(--gray-5);
         }
         
         .dashboard-table .score-excellent { color: var(--traffic-green); font-weight: 600; }
@@ -6327,6 +6158,345 @@
             height: 48px;
             margin-bottom: var(--space-md);
             opacity: 0.5;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DASHBOARD V2 — Design System additions (Bloc 1)
+           Uses existing CSS variables from the app.
+           New classes prefixed db2- to avoid conflicts.
+        ═══════════════════════════════════════════════════════════════ */
+
+        /* --- Subtle color aliases --- */
+        :root {
+            --s-yellow-subtle: rgba(255, 237, 0, 0.10);
+            --s-yellow-ring: rgba(255, 237, 0, 0.25);
+            --teal-subtle: rgba(0, 185, 190, 0.08);
+            --t-red-subtle: rgba(230, 0, 70, 0.08);
+            --t-orange-subtle: rgba(245, 145, 0, 0.08);
+            --t-green-subtle: rgba(0, 170, 70, 0.08);
+            --radius-pill: 100px;
+            --radius-xl: 12px;
+        }
+
+        /* --- KPI Card v2 --- */
+        .db2-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .db2-kpi-card {
+            background: var(--white);
+            border: 1px solid var(--gray-20);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .db2-kpi-card:hover {
+            border-color: var(--gray-30);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .db2-kpi-card.accent { border-left: 3px solid var(--sartorius-yellow); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+        .db2-kpi-card.alert  { border-left: 3px solid var(--traffic-red); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+        .db2-kpi-card.teal   { border-left: 3px solid var(--teal); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+
+        .db2-kpi-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-60);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
+        }
+
+        .db2-kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+
+        .db2-kpi-value .unit { font-size: 16px; font-weight: 500; color: var(--gray-40); }
+
+        .db2-kpi-trend {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            margin-top: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .db2-kpi-trend svg { width: 12px; height: 12px; }
+        .db2-kpi-trend.up { color: var(--traffic-green); }
+        .db2-kpi-trend.down { color: var(--traffic-red); }
+        .db2-kpi-trend.neutral { color: var(--gray-50); }
+
+        /* --- Section card v2 --- */
+        .db2-section {
+            background: var(--white);
+            border: 1px solid var(--gray-20);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .db2-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-md);
+        }
+
+        .db2-section-title {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .db2-section-link {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--gray-50);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: color 0.15s;
+        }
+
+        .db2-section-link:hover { color: var(--black); }
+
+        /* --- Zone card v2 --- */
+        .db2-zones-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        .db2-zone-card {
+            padding: var(--space-md);
+            background: var(--white);
+            border: 1px solid var(--gray-20);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .db2-zone-card:hover { border-color: var(--gray-30); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .db2-zone-card:active { transform: scale(0.99); }
+
+        .db2-zone-card.excellent { border-left: 3px solid var(--traffic-green); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+        .db2-zone-card.good      { border-left: 3px solid var(--sartorius-yellow); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+        .db2-zone-card.warning   { border-left: 3px solid var(--traffic-orange); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+        .db2-zone-card.critical  { border-left: 3px solid var(--traffic-red); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+        .db2-zone-card.none      { border-left: 3px solid var(--gray-30); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+
+        .db2-zone-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-sm); }
+        .db2-zone-name { font-size: 14px; font-weight: 600; }
+        .db2-zone-meta { font-size: 11px; color: var(--gray-50); margin-top: 2px; }
+        .db2-zone-score { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; flex-shrink: 0; }
+        .db2-zone-score.excellent { color: var(--traffic-green); }
+        .db2-zone-score.good { color: var(--gray-80); }
+        .db2-zone-score.warning { color: var(--traffic-orange); }
+        .db2-zone-score.critical { color: var(--traffic-red); }
+
+        .db2-zone-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: var(--space-sm); }
+
+        .db2-zone-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .db2-zone-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+        .db2-zone-badge.overdue   { background: var(--t-red-subtle); color: var(--traffic-red); }
+        .db2-zone-badge.open      { background: var(--t-orange-subtle); color: var(--traffic-orange); }
+        .db2-zone-badge.inprogress { background: var(--teal-subtle); color: var(--teal); }
+
+        .db2-zone-bar { height: 4px; background: var(--gray-10); border-radius: 2px; overflow: hidden; }
+        .db2-zone-bar-fill { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .db2-zone-bar-fill.excellent { background: var(--traffic-green); }
+        .db2-zone-bar-fill.good { background: var(--sartorius-yellow); }
+        .db2-zone-bar-fill.warning { background: var(--traffic-orange); }
+        .db2-zone-bar-fill.critical { background: var(--traffic-red); }
+
+        /* --- Urgent action items v2 --- */
+        .db2-urgent-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            border: 1px solid var(--gray-10);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-sm);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .db2-urgent-item:last-child { margin-bottom: 0; }
+        .db2-urgent-item:hover { border-color: var(--gray-20); background: rgba(0,0,0,0.015); }
+        .db2-urgent-item.is-overdue { border-left: 3px solid var(--traffic-red); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+
+        .db2-urgent-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+        .db2-urgent-dot.overdue { background: var(--traffic-red); }
+        .db2-urgent-dot.open { background: var(--traffic-orange); }
+
+        .db2-urgent-body { flex: 1; min-width: 0; }
+        .db2-urgent-text { font-size: 13px; font-weight: 500; line-height: 1.3; margin-bottom: 4px; }
+        .db2-urgent-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11px; color: var(--gray-50); }
+
+        .db2-urgent-badge {
+            display: inline-flex;
+            padding: 1px 8px;
+            border-radius: var(--radius-pill);
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .db2-urgent-badge.overdue { background: var(--t-red-subtle); color: var(--traffic-red); }
+        .db2-urgent-badge.open { background: var(--t-orange-subtle); color: var(--traffic-orange); }
+
+        /* --- My actions card v2 --- */
+        .db2-my-actions {
+            background: var(--white);
+            border: 1px solid var(--gray-20);
+            border-left: 3px solid var(--teal);
+            border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+            padding: var(--space-md) var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .db2-my-actions-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-sm); }
+        .db2-my-actions-title { display: flex; align-items: center; gap: var(--space-sm); font-size: 14px; font-weight: 700; }
+        .db2-my-actions-title svg { width: 18px; height: 18px; color: var(--teal); }
+        .db2-my-actions-count { font-size: 12px; font-weight: 600; color: var(--teal); background: var(--teal-subtle); padding: 2px 10px; border-radius: var(--radius-pill); }
+
+        .db2-my-action-item { display: flex; align-items: flex-start; gap: var(--space-sm); padding: var(--space-sm) 0; border-top: 1px solid var(--gray-10); cursor: pointer; }
+        .db2-my-action-item:first-of-type { border-top: none; }
+        .db2-my-action-item:hover { background: var(--gray-5); border-radius: var(--radius-sm); }
+        .db2-my-action-text { flex: 1; font-size: 13px; font-weight: 500; line-height: 1.3; }
+        .db2-my-action-sub { font-size: 11px; color: var(--gray-50); margin-top: 2px; font-weight: 400; }
+
+        /* --- Badge v2 --- */
+        .db2-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .db2-badge-dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .db2-badge-green  { background: var(--t-green-subtle); color: var(--traffic-green); }
+        .db2-badge-orange { background: var(--t-orange-subtle); color: var(--traffic-orange); }
+        .db2-badge-red    { background: var(--t-red-subtle); color: var(--traffic-red); }
+        .db2-badge-teal   { background: var(--teal-subtle); color: var(--teal); }
+        .db2-badge-gray   { background: var(--gray-10); color: var(--gray-70); }
+
+        /* --- Filter chips v2 --- */
+        .db2-filter-chip {
+            padding: 6px 14px;
+            background: var(--white);
+            border: 1px solid var(--gray-20);
+            border-radius: var(--radius-pill);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-70);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .db2-filter-chip:hover { border-color: var(--gray-40); color: var(--black); }
+        .db2-filter-chip.active { background: var(--black); border-color: var(--black); color: var(--white); }
+        .db2-filter-chip .count { font-weight: 400; opacity: 0.6; margin-left: 2px; }
+
+        /* --- Nav tab icons v2 --- */
+        .dashboard-nav-tab svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.5;
+            vertical-align: -2px;
+            margin-right: 4px;
+            transition: opacity 0.2s;
+        }
+
+        .dashboard-nav-tab.active svg { opacity: 1; }
+        .dashboard-nav-tab:hover svg { opacity: 0.8; }
+
+        /* --- Tooltip system v2 --- */
+        .db2-tooltip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background: var(--gray-90);
+            color: var(--white);
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            font-size: 12px;
+            line-height: 1.5;
+            min-width: 200px;
+            max-width: 280px;
+            white-space: normal;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s, transform 0.15s;
+            z-index: 50;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .db2-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: var(--gray-90);
+        }
+
+        .db2-tooltip.tooltip-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .db2-tooltip-row { display: flex; justify-content: space-between; gap: var(--space-md); }
+        .db2-tooltip-row + .db2-tooltip-row { margin-top: 4px; }
+        .db2-tooltip-label { color: var(--gray-40); }
+        .db2-tooltip-divider { height: 1px; background: rgba(255,255,255,0.12); margin: 6px 0; }
+        .db2-tooltip-title { font-weight: 600; margin-bottom: 4px; }
+
+        /* Sparkline in tooltip */
+        .db2-sparkline svg { display: block; width: 100%; height: 40px; }
+        .db2-sparkline-line { fill: none; stroke: var(--sartorius-yellow); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .db2-sparkline-dot { fill: var(--sartorius-yellow); }
+        .db2-sparkline-area { fill: var(--sartorius-yellow); opacity: 0.15; }
+
+        /* --- Score utilities v2 --- */
+        .db2-c-green { color: var(--traffic-green); }
+        .db2-c-orange { color: var(--traffic-orange); }
+        .db2-c-red { color: var(--traffic-red); }
+
+        /* --- Mobile responsive v2 --- */
+        @media (max-width: 600px) {
+            .db2-kpi-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-sm); }
+            .db2-kpi-card { padding: var(--space-sm) var(--space-md); }
+            .db2-kpi-value { font-size: 22px; }
+            .db2-kpi-value .unit { font-size: 13px; }
+            .db2-section { padding: var(--space-md); margin-bottom: var(--space-md); }
+            .db2-zones-grid { grid-template-columns: 1fr; gap: var(--space-sm); }
+            .db2-zone-card { padding: var(--space-sm) var(--space-md); }
+            .db2-zone-score { font-size: 18px; }
+            .db2-tooltip { display: none !important; }
         }
     </style>
 </head>
@@ -11740,71 +11910,38 @@ Cordialement`);
             <!-- Content -->
             <div class="dashboard-content" id="dashboard-content" style="display: none;">
                 
-                <!-- TAB: Vue d'ensemble -->
+                <!-- ═══ TAB: Vue d'ensemble ═══ -->
                 <div class="dashboard-tab active" id="tab-overview">
-                    <!-- Stats rapides -->
-                    <div class="dashboard-stats-grid">
-                        <div class="dashboard-stat-card accent">
-                            <div class="dashboard-stat-label">Score moyen</div>
-                            <div class="dashboard-stat-value" id="dash-stat-score">-</div>
-                            <div class="dashboard-stat-trend neutral" id="dash-stat-score-trend"></div>
-                        </div>
-                        <div class="dashboard-stat-card">
-                            <div class="dashboard-stat-label">Audits ce mois</div>
-                            <div class="dashboard-stat-value" id="dash-stat-audits">-</div>
-                            <div class="dashboard-stat-trend neutral" id="dash-stat-audits-sub"></div>
-                        </div>
-                        <div class="dashboard-stat-card">
-                            <div class="dashboard-stat-label">Actions ouvertes</div>
-                            <div class="dashboard-stat-value" id="dash-stat-actions">-</div>
-                        </div>
-                        <div class="dashboard-stat-card alert" id="dash-stat-overdue-card" style="display:none;">
-                            <div class="dashboard-stat-label">&gt; 30 jours</div>
-                            <div class="dashboard-stat-value red" id="dash-stat-overdue">-</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Zones overview -->
-                    <div class="dashboard-section">
-                        <div class="dashboard-section-header">
-                            <h3 class="dashboard-section-title" style="margin:0;padding:0;border:none">État des zones</h3>
-                            <button class="dashboard-section-link" onclick="document.querySelector('.dashboard-nav-tab[data-tab=&quot;zones&quot;]').click()">Voir détail →</button>
-                        </div>
-                        <div class="dashboard-zones-grid" id="dashboard-zones-grid">
-                            <!-- Rempli dynamiquement -->
-                        </div>
-                    </div>
-                    
-                    <!-- Actions urgentes -->
-                    <div class="dashboard-section">
-                        <div class="dashboard-section-header">
-                            <h3 class="dashboard-section-title" style="margin:0;padding:0;border:none">Actions urgentes</h3>
-                            <button class="dashboard-section-link" onclick="document.querySelector('.dashboard-nav-tab[data-tab=&quot;actions&quot;]').click()">Tout voir →</button>
-                        </div>
-                        <div id="dashboard-urgent-actions">
-                            <!-- Rempli dynamiquement -->
-                        </div>
+                    <div id="overview-content">
+                        <!-- Rempli dynamiquement par renderOverview() -->
                     </div>
                 </div>
                 
-                <!-- TAB: Zones -->
+                <!-- ═══ TAB: Zones ═══ -->
                 <div class="dashboard-tab" id="tab-zones">
-                    <!-- Sélecteur de zone -->
-                    <div class="dashboard-zone-selector" id="dashboard-zone-selector">
-                        <!-- Rempli dynamiquement -->
+                    <div class="db2-zone-selector" id="db2-zone-selector"></div>
+                    <div class="db2-zone-filters" id="db2-zone-filters" style="display:flex;gap:var(--space-lg);margin-bottom:var(--space-md);flex-wrap:wrap;align-items:center">
+                        <div style="display:flex;gap:6px;align-items:center">
+                            <span style="font-size:11px;font-weight:600;color:var(--gray-50);margin-right:2px">Niveau</span>
+                            <button class="db2-filter-chip active" data-zf-niveau="all">Tous</button>
+                            <button class="db2-filter-chip" data-zf-niveau="N1">N1</button>
+                            <button class="db2-filter-chip" data-zf-niveau="N2">N2</button>
+                        </div>
+                        <div style="display:flex;gap:6px;align-items:center">
+                            <span style="font-size:11px;font-weight:600;color:var(--gray-50);margin-right:2px">Période</span>
+                            <button class="db2-filter-chip active" data-zf-period="all">Tout</button>
+                            <button class="db2-filter-chip" data-zf-period="6m">6 mois</button>
+                            <button class="db2-filter-chip" data-zf-period="3m">3 mois</button>
+                            <button class="db2-filter-chip" data-zf-period="1m">Ce mois</button>
+                        </div>
                     </div>
-                    
-                    <!-- Stats de la zone sélectionnée -->
-                    <div class="dashboard-zone-stats" id="dashboard-zone-stats">
-                        <!-- Rempli dynamiquement -->
-                    </div>
-                    
-                    <!-- Graphique d'évolution -->
+                    <div class="db2-zone-stats" id="db2-zone-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-md);margin-bottom:var(--space-lg)"></div>
                     <div class="dashboard-chart-container">
                         <div class="dashboard-chart-title">Évolution de la performance</div>
-                        <div class="dashboard-chart" id="dashboard-zone-chart">
+                        <div class="dashboard-chart" id="dashboard-zone-chart" style="position:relative;height:200px">
                             <!-- SVG généré dynamiquement -->
                         </div>
+                        <div class="chart-tooltip" id="chart-tooltip" style="position:absolute;background:var(--gray-90);color:#fff;padding:5px 10px;border-radius:4px;font-size:11px;pointer-events:none;opacity:0;z-index:50;white-space:nowrap;transition:opacity 0.1s"></div>
                         <div class="dashboard-chart-legend">
                             <div class="dashboard-chart-legend-item">
                                 <div class="dashboard-chart-legend-color" style="background: var(--sartorius-yellow);"></div>
@@ -11816,106 +11953,100 @@ Cordialement`);
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Radar 5S du dernier audit -->
-                    <div class="dashboard-chart-container">
-                        <div class="dashboard-chart-header">
-                            <div class="dashboard-chart-title">Scores par S</div>
-                            <div class="dashboard-radar-controls">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-lg)" id="zone-bottom-grid">
+                        <div class="dashboard-chart-container" style="margin-bottom:0">
+                            <div class="dashboard-chart-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-sm)">
+                                <div class="dashboard-chart-title">Scores par S</div>
                                 <div class="dashboard-radar-toggle">
                                     <button class="dashboard-radar-toggle-btn active" data-mode="last" onclick="setRadarMode('last')">Dernier</button>
                                     <button class="dashboard-radar-toggle-btn" data-mode="average" onclick="setRadarMode('average')">Moyenne</button>
                                 </div>
-                                <div class="dashboard-radar-levels">
-                                    <label class="dashboard-radar-level n1">
-                                        <input type="checkbox" checked onchange="toggleRadarLevel(1, this.checked)">
-                                        <span class="checkmark"></span>
-                                        <span class="level-label">N1</span>
-                                    </label>
-                                    <label class="dashboard-radar-level n2">
-                                        <input type="checkbox" checked onchange="toggleRadarLevel(2, this.checked)">
-                                        <span class="checkmark"></span>
-                                        <span class="level-label">N2</span>
-                                    </label>
-                                    <label class="dashboard-radar-level n3">
-                                        <input type="checkbox" onchange="toggleRadarLevel(3, this.checked)">
-                                        <span class="checkmark"></span>
-                                        <span class="level-label">N3</span>
-                                    </label>
-                                </div>
+                            </div>
+                            <div style="display:flex;justify-content:flex-end;gap:var(--space-md);margin-bottom:var(--space-sm)">
+                                <label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:500;color:var(--gray-70)">
+                                    <input type="checkbox" checked onchange="toggleRadarLevel('N1')" style="accent-color:#00B9BE"> N1
+                                </label>
+                                <label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:500;color:var(--gray-70)">
+                                    <input type="checkbox" checked onchange="toggleRadarLevel('N2')" style="accent-color:#F59100"> N2
+                                </label>
+                            </div>
+                            <div class="dashboard-radar-container" id="dashboard-zone-radar"></div>
+                        </div>
+                        <div class="dashboard-chart-container" style="margin-bottom:0">
+                            <div class="dashboard-chart-title">Historique des audits</div>
+                            <div class="dashboard-table-wrapper" style="margin-top:var(--space-md)">
+                                <table class="dashboard-table">
+                                    <thead><tr><th>Date</th><th>Niv.</th><th>Score</th><th>Auditeur</th></tr></thead>
+                                    <tbody id="dashboard-zone-history-tbody"></tbody>
+                                </table>
                             </div>
                         </div>
-                        <div class="dashboard-radar-container" id="dashboard-zone-radar">
-                            <!-- Généré dynamiquement -->
-                        </div>
-                    </div>
-                    
-                    <!-- Historique des audits de la zone -->
-                    <div class="dashboard-zone-history">
-                        <div class="dashboard-chart-title">Historique des audits</div>
-                        <div class="dashboard-table-wrapper">
-                            <table class="dashboard-table">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Niveau</th>
-                                        <th>Score</th>
-                                        <th>Auditeur</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dashboard-zone-history-tbody">
-                                    <!-- Rempli dynamiquement -->
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
                 </div>
                 
-                <!-- TAB: Actions -->
+                <!-- ═══ TAB: Actions ═══ -->
                 <div class="dashboard-tab" id="tab-actions">
-                    <div class="dashboard-filters">
-                        <button class="dashboard-filter-btn active" data-filter="all">Toutes</button>
-                        <button class="dashboard-filter-btn" data-filter="open">Ouvertes</button>
-                        <button class="dashboard-filter-btn" data-filter="inprogress">En cours</button>
-                        <button class="dashboard-filter-btn" data-filter="overdue">&gt; 30 jours</button>
-                        <button class="dashboard-filter-btn" data-filter="closed">Clôturées</button>
+                    <div id="db2-actions-summary" style="display:flex;gap:var(--space-lg);margin-bottom:var(--space-lg);padding:var(--space-md);background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg)"></div>
+                    <div id="db2-actions-filters" style="display:flex;gap:var(--space-sm);margin-bottom:var(--space-md);flex-wrap:wrap;align-items:center"></div>
+                    <div class="dashboard-table-wrapper" id="db2-actions-table-wrap">
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:32px;text-align:center"></th>
+                                    <th>Description</th>
+                                    <th>Zone</th>
+                                    <th style="width:70px">Type</th>
+                                    <th>Responsable</th>
+                                    <th style="width:80px">Date</th>
+                                    <th style="width:36px"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="db2-actions-tbody"></tbody>
+                        </table>
                     </div>
-                    <div id="dashboard-actions-list">
-                        <!-- Rempli dynamiquement -->
-                    </div>
+                    <div id="db2-actions-mobile" style="display:none"></div>
                 </div>
                 
-                <!-- TAB: Historique -->
+                <!-- ═══ TAB: Historique ═══ -->
                 <div class="dashboard-tab" id="tab-history">
                     <div class="dashboard-search">
-                        <input type="text" class="dashboard-search-input" id="dashboard-search-input" placeholder="Rechercher par zone, auditeur...">
+                        <input type="text" class="dashboard-search-input" id="dashboard-search-input" placeholder="Rechercher par zone, auditeur, ID audit...">
                     </div>
-                    <div class="dashboard-table-wrapper">
+                    <div class="dashboard-table-wrapper" id="db2-history-table-wrap">
                         <table class="dashboard-table" id="dashboard-audits-table">
                             <thead>
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Zone</th>
-                                    <th>Niveau</th>
-                                    <th>Score</th>
-                                    <th>Auditeur</th>
+                                    <th data-sort="date" class="sorted" style="cursor:pointer;user-select:none">Date <span class="sort-arrow" style="font-size:10px;margin-left:2px;color:var(--gray-40)">▼</span></th>
+                                    <th data-sort="zone" style="cursor:pointer;user-select:none">Zone <span class="sort-arrow" style="font-size:10px;margin-left:2px;color:var(--gray-40)">▼</span></th>
+                                    <th data-sort="niveau" style="cursor:pointer;user-select:none">Niv. <span class="sort-arrow" style="font-size:10px;margin-left:2px;color:var(--gray-40)">▼</span></th>
+                                    <th data-sort="score" style="cursor:pointer;user-select:none">Score <span class="sort-arrow" style="font-size:10px;margin-left:2px;color:var(--gray-40)">▼</span></th>
+                                    <th data-sort="auditeur" style="cursor:pointer;user-select:none">Auditeur <span class="sort-arrow" style="font-size:10px;margin-left:2px;color:var(--gray-40)">▼</span></th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="dashboard-audits-tbody">
-                                <!-- Rempli dynamiquement -->
-                            </tbody>
+                            <tbody id="dashboard-audits-tbody"></tbody>
                         </table>
                     </div>
+                    <div id="db2-history-mobile" style="display:none"></div>
                 </div>
                 
             </div>
         </div>
         
-        <!-- Modal clôture action -->
+        <!-- ═══ Modal Action v2 ═══ -->
         <div class="dashboard-action-modal" id="dashboard-action-modal" onclick="closeActionModal()">
+            <button class="modal-nav prev" id="action-nav-prev" onclick="event.stopPropagation(); navAction(-1)" style="position:fixed;top:50%;transform:translateY(-50%);left:calc(50% - 290px);width:40px;height:40px;border:1px solid var(--gray-20);border-radius:50%;background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-60);z-index:600;box-shadow:0 2px 12px rgba(0,0,0,0.1)">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="modal-nav next" id="action-nav-next" onclick="event.stopPropagation(); navAction(1)" style="position:fixed;top:50%;transform:translateY(-50%);right:calc(50% - 290px);width:40px;height:40px;border:1px solid var(--gray-20);border-radius:50%;background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-60);z-index:600;box-shadow:0 2px 12px rgba(0,0,0,0.1)">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
             <div class="dashboard-action-modal-content" onclick="event.stopPropagation()">
                 <div class="dashboard-action-modal-header">
-                    <span class="dashboard-action-modal-title">Gérer l'action</span>
+                    <div>
+                        <span class="dashboard-action-modal-title" id="modal-action-title">Gérer l'action</span>
+                        <div id="modal-action-return"></div>
+                    </div>
                     <button class="dashboard-action-modal-close" onclick="closeActionModal()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -11923,57 +12054,21 @@ Cordialement`);
                         </svg>
                     </button>
                 </div>
-                <div class="dashboard-action-modal-body">
-                    <div class="dashboard-action-modal-info">
-                        <div class="dashboard-action-modal-label">Action</div>
-                        <div class="dashboard-action-modal-value" id="modal-action-text"></div>
-                        
-                        <div class="dashboard-action-modal-label">Zone</div>
-                        <div class="dashboard-action-modal-value" id="modal-action-zone"></div>
-                        
-                        <div class="dashboard-action-modal-label">Responsable</div>
-                        <div class="dashboard-action-modal-value" id="modal-action-resp"></div>
-                        
-                        <div class="dashboard-action-modal-label">Ouvert le</div>
-                        <div class="dashboard-action-modal-value" id="modal-action-date"></div>
-                    </div>
-                    
-                    <!-- Champ commentaire -->
-                    <div class="dashboard-action-modal-comment">
-                        <label class="dashboard-action-modal-label" for="modal-comment">Commentaire <span id="modal-comment-required" style="color: var(--traffic-red); display: none;">*</span></label>
-                        <textarea id="modal-comment" class="dashboard-action-comment-input" rows="2" placeholder="Ajouter un commentaire..."></textarea>
-                    </div>
-                    
-                    <div class="dashboard-action-modal-actions">
-                        <button class="dashboard-action-btn close-action" id="modal-btn-close" onclick="handleAction('close')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                            Clôturer
-                        </button>
-                        <button class="dashboard-action-btn inprogress-action" id="modal-btn-inprogress" onclick="handleAction('inprogress')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                            En cours
-                        </button>
-                        <button class="dashboard-action-btn cancel-action" id="modal-btn-cancel" onclick="handleAction('cancel')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                            Annuler
-                        </button>
-                    </div>
+                <div class="dashboard-action-modal-body" id="modal-action-body">
+                    <!-- Rempli dynamiquement par openActionModal() -->
                 </div>
             </div>
         </div>
         
-        <!-- Modal détail audit -->
+        <!-- ═══ Modal Audit Detail v2 ═══ -->
         <div class="audit-detail-modal" id="audit-detail-modal" onclick="closeAuditDetailModal()">
+            <button class="modal-nav prev" id="audit-nav-prev" onclick="event.stopPropagation(); navAudit(-1)" style="position:fixed;top:50%;transform:translateY(-50%);left:calc(50% - 390px);width:40px;height:40px;border:1px solid var(--gray-20);border-radius:50%;background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-60);z-index:600;box-shadow:0 2px 12px rgba(0,0,0,0.1)">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="modal-nav next" id="audit-nav-next" onclick="event.stopPropagation(); navAudit(1)" style="position:fixed;top:50%;transform:translateY(-50%);right:calc(50% - 390px);width:40px;height:40px;border:1px solid var(--gray-20);border-radius:50%;background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-60);z-index:600;box-shadow:0 2px 12px rgba(0,0,0,0.1)">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
             <div class="audit-detail-container" onclick="event.stopPropagation()">
-                <!-- Header jaune -->
                 <div class="audit-detail-header">
                     <div class="audit-detail-header-left">
                         <button class="audit-detail-back" onclick="closeAuditDetailModal()">
@@ -11990,62 +12085,8 @@ Cordialement`);
                         </svg>
                     </button>
                 </div>
-                
-                <!-- Body -->
-                <div class="audit-detail-body">
-                    <!-- Infos principales -->
-                    <div class="audit-detail-info">
-                        <div class="audit-detail-info-row">
-                            <div>
-                                <div class="audit-detail-zone" id="audit-detail-zone">-</div>
-                                <div class="audit-detail-meta" id="audit-detail-meta">-</div>
-                            </div>
-                            <span class="audit-detail-niveau" id="audit-detail-niveau">-</span>
-                        </div>
-                        <!-- Score global -->
-                        <div class="audit-detail-score-box">
-                            <div class="audit-detail-score-value" id="audit-detail-score">-</div>
-                            <div class="audit-detail-score-label">Performance globale</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Mini barres S (toujours visible) -->
-                    <div class="audit-detail-s-bars" id="audit-detail-s-bars">
-                        <!-- Rempli dynamiquement -->
-                    </div>
-                    
-                    <!-- Section Scores détaillés (accordéon) -->
-                    <div class="audit-detail-section" id="audit-detail-scores-section">
-                        <div class="audit-detail-section-header" onclick="toggleAuditDetailSection('scores')">
-                            <span class="audit-detail-section-title">Scores détaillés</span>
-                            <span class="audit-detail-section-toggle">▼</span>
-                        </div>
-                        <div class="audit-detail-section-content" id="audit-detail-scores-content">
-                            <!-- Rempli dynamiquement -->
-                        </div>
-                    </div>
-                    
-                    <!-- Section Actions -->
-                    <div class="audit-detail-section" id="audit-detail-actions-section">
-                        <div class="audit-detail-section-header" onclick="toggleAuditDetailSection('actions')">
-                            <span class="audit-detail-section-title">Actions</span>
-                            <span class="audit-detail-section-toggle">▼</span>
-                        </div>
-                        <div class="audit-detail-section-content" id="audit-detail-actions-content">
-                            <!-- Rempli dynamiquement -->
-                        </div>
-                    </div>
-                    
-                    <!-- Section Photos -->
-                    <div class="audit-detail-section" id="audit-detail-photos-section">
-                        <div class="audit-detail-section-header" onclick="toggleAuditDetailSection('photos')">
-                            <span class="audit-detail-section-title">Photos</span>
-                            <span class="audit-detail-section-toggle">▼</span>
-                        </div>
-                        <div class="audit-detail-section-content" id="audit-detail-photos-content">
-                            <!-- Rempli dynamiquement -->
-                        </div>
-                    </div>
+                <div class="audit-detail-body" id="audit-detail-body">
+                    <!-- Rempli dynamiquement par openAuditDetailModal() -->
                 </div>
             </div>
         </div>
@@ -12060,7 +12101,6 @@ Cordialement`);
             </button>
             <img id="audit-detail-lightbox-img" src="" alt="Photo audit">
         </div>
-    </div>
     
     <script>
         // ═══════════════════════════════════════════════════════════════
@@ -12108,19 +12148,9 @@ Cordialement`);
                 });
             });
             
-            // Event listeners pour les filtres d'actions
-            document.querySelectorAll('.dashboard-filter-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.dashboard-filter-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    renderActionsList(this.dataset.filter);
-                });
-            });
+            // Event listeners pour les filtres d'actions — géré par initActionsTab()
             
-            // Event listener pour la recherche
-            document.getElementById('dashboard-search-input').addEventListener('input', function() {
-                renderAuditsTable(this.value);
-            });
+            // Event listener pour la recherche — géré par initHistoryTab()
             
             // Event listener pour le bouton connexion
             document.getElementById('dashboard-connect-btn').addEventListener('click', async function() {
@@ -12313,11 +12343,9 @@ Cordialement`);
                 
                 // Rendre les différentes sections
                 renderOverview();
-                renderZonesGrid();
-                renderUrgentActions();
                 initZonesTab();
-                renderActionsList('all');
-                renderAuditsTable('');
+                initActionsTab();
+                initHistoryTab();
                 
                 // Traiter une action en attente depuis l'URL
                 processPendingUrlAction();
@@ -12400,15 +12428,15 @@ Cordialement`);
                 
                 // Re-render
                 renderOverview();
-                renderZonesGrid();
-                renderUrgentActions();
+                renderZoneDetail(selectedZone);
                 
                 // Garder le filtre actuel pour les actions
-                const activeFilter = document.querySelector('.dashboard-filter-btn.active');
-                renderActionsList(activeFilter ? activeFilter.dataset.filter : 'all');
+                renderActionsSummary();
+                renderActionsFilters();
+                renderActionsTable();
                 
                 // Garder la recherche actuelle pour l'historique
-                const searchInput = document.getElementById('dashboard-search-input');
+                var searchInput = document.getElementById('dashboard-search-input');
                 renderAuditsTable(searchInput ? searchInput.value : '');
                 
             } catch (error) {
@@ -12604,925 +12632,669 @@ Cordialement`);
         }
         
         // Rendre la vue d'ensemble
-        function renderOverview() {
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            const currentYear = now.getFullYear();
-            
-            // Audits du mois
-            const auditsThisMonth = dashboardData.audits.filter(a => {
-                const date = parseExcelDate(a.date);
-                return date && date.getMonth() === currentMonth && date.getFullYear() === currentYear;
-            });
-            
-            // Score moyen (tous les audits)
-            const avgScore = dashboardData.audits.length > 0
-                ? Math.round(dashboardData.audits.reduce((sum, a) => sum + parseScorePercent(a.performance), 0) / dashboardData.audits.length)
-                : 0;
-            
-            // Tendance du score (mois précédent vs global)
-            const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-            const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-            const prevMonthAudits = dashboardData.audits.filter(a => {
-                const date = parseExcelDate(a.date);
-                return date && date.getMonth() === prevMonth && date.getFullYear() === prevYear;
-            });
-            const prevAvg = prevMonthAudits.length > 0
-                ? Math.round(prevMonthAudits.reduce((sum, a) => sum + parseScorePercent(a.performance), 0) / prevMonthAudits.length)
-                : null;
-            
-            // Actions ouvertes et en retard
-            let openCount = 0;
-            let overdueCount = 0;
-            dashboardData.actions.forEach(action => {
-                const status = getActionStatus(action);
-                if (status === 'open') openCount++;
-                if (status === 'overdue') overdueCount++;
-            });
-            
-            // Mettre à jour les stats
-            const scoreEl = document.getElementById('dash-stat-score');
-            scoreEl.textContent = avgScore + '%';
-            scoreEl.className = 'dashboard-stat-value ' + getScoreClass(avgScore);
-            
-            // Trend
-            const trendEl = document.getElementById('dash-stat-score-trend');
-            if (prevAvg !== null) {
-                const diff = avgScore - prevAvg;
-                if (diff > 0) {
-                    trendEl.className = 'dashboard-stat-trend up';
-                    trendEl.innerHTML = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3m0 0L3 6m3-3l3 3"/></svg>+' + diff + '% vs mois préc.';
-                } else if (diff < 0) {
-                    trendEl.className = 'dashboard-stat-trend down';
-                    trendEl.innerHTML = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6m0 0l3-3m-3 3L3 6"/></svg>' + diff + '% vs mois préc.';
-                } else {
-                    trendEl.className = 'dashboard-stat-trend neutral';
-                    trendEl.textContent = '= stable vs mois préc.';
-                }
-            } else {
-                trendEl.textContent = '';
-            }
-            
-            document.getElementById('dash-stat-audits').textContent = auditsThisMonth.length;
-            const auditsSub = document.getElementById('dash-stat-audits-sub');
-            auditsSub.textContent = dashboardData.audits.length + ' au total';
-            
-            const actionsEl = document.getElementById('dash-stat-actions');
-            actionsEl.textContent = openCount + overdueCount;
-            actionsEl.className = 'dashboard-stat-value' + ((openCount + overdueCount) > 0 ? ' orange' : '');
-            
-            // Afficher la carte "en retard" seulement si > 0
-            const overdueCard = document.getElementById('dash-stat-overdue-card');
-            if (overdueCount > 0) {
-                overdueCard.style.display = '';
-                document.getElementById('dash-stat-overdue').textContent = overdueCount;
-            } else {
-                overdueCard.style.display = 'none';
-            }
-        }
-        
-        // Rendre la grille des zones
-        function renderZonesGrid() {
-            const container = document.getElementById('dashboard-zones-grid');
-            
-            // Pour chaque zone, trouver le dernier audit
-            const zonesHtml = dashboardZones.map(zoneName => {
-                const zoneAudits = dashboardData.audits.filter(a => a.zone === zoneName);
-                const lastAudit = zoneAudits.length > 0 ? zoneAudits[zoneAudits.length - 1] : null;
-                
-                if (!lastAudit) {
-                    return `
-                        <div class="dashboard-zone-card" onclick="navigateToZone('${zoneName}')">
-                            <div class="dashboard-zone-header">
-                                <div class="dashboard-zone-name">${zoneName}</div>
-                                <div class="dashboard-zone-score" style="color: var(--gray-40)">—</div>
-                            </div>
-                            <div class="dashboard-zone-meta">Aucun audit réalisé</div>
-                        </div>
-                    `;
-                }
-                
-                const score = parseScorePercent(lastAudit.performance) || parseScorePercent(lastAudit.scoreMoyen);
-                const scoreClass = getScoreClass(score);
-                const dateFormatted = formatExcelDate(lastAudit.date);
-                
-                // Compter les actions par statut pour cette zone
-                const zoneActions = dashboardData.actions.filter(a => a.zone === zoneName);
-                const openActions = zoneActions.filter(a => getActionStatus(a) === 'open').length;
-                const overdueActions = zoneActions.filter(a => getActionStatus(a) === 'overdue').length;
-                const inprogressActions = zoneActions.filter(a => getActionStatus(a) === 'inprogress').length;
-                
-                // Construire les badges d'actions
-                let actionBadgesHtml = '';
-                if (overdueActions > 0 || openActions > 0 || inprogressActions > 0) {
-                    actionBadgesHtml = '<div class="dashboard-zone-actions-summary">';
-                    if (overdueActions > 0) {
-                        actionBadgesHtml += `<span class="dashboard-zone-action-badge overdue">${overdueActions} en retard</span>`;
-                    }
-                    if (inprogressActions > 0) {
-                        actionBadgesHtml += `<span class="dashboard-zone-action-badge inprogress">${inprogressActions} en cours</span>`;
-                    }
-                    if (openActions > 0) {
-                        actionBadgesHtml += `<span class="dashboard-zone-action-badge open">${openActions} ouverte${openActions > 1 ? 's' : ''}</span>`;
-                    }
-                    actionBadgesHtml += '</div>';
-                }
-                
-                return `
-                    <div class="dashboard-zone-card ${scoreClass}" onclick="navigateToZone('${zoneName}')">
-                        <div class="dashboard-zone-header">
-                            <div>
-                                <div class="dashboard-zone-name">${zoneName}</div>
-                                <div class="dashboard-zone-meta">${lastAudit.niveau} · ${dateFormatted} · ${lastAudit.auditeur}</div>
-                            </div>
-                            <div class="dashboard-zone-score ${scoreClass}">${Math.round(score)}%</div>
-                        </div>
-                        ${actionBadgesHtml}
-                        <div class="dashboard-zone-bar">
-                            <div class="dashboard-zone-bar-fill ${scoreClass}" style="width: ${Math.round(score)}%;"></div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            container.innerHTML = zonesHtml;
-        }
-        
-        // Naviguer vers l'onglet Zones avec la zone sélectionnée
-        function navigateToZone(zoneName) {
-            // Activer l'onglet Zones
-            document.querySelectorAll('.dashboard-nav-tab').forEach(t => t.classList.remove('active'));
-            document.querySelector('.dashboard-nav-tab[data-tab="zones"]').classList.add('active');
-            document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-zones').classList.add('active');
-            
-            // Sélectionner la zone
-            const zoneSelector = document.getElementById('dashboard-zone-selector');
-            zoneSelector.querySelectorAll('.dashboard-zone-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.zone === zoneName);
-            });
-            selectedZone = zoneName;
-            renderZoneDetails(zoneName);
-            
-            // Scroll en haut
-            document.getElementById('dashboard-overlay').scrollTop = 0;
-        }
-        
-        // Rendre les actions urgentes (> 30 jours ou ouvertes récentes)
-        function renderUrgentActions() {
-            const container = document.getElementById('dashboard-urgent-actions');
-            
-            // Filtrer les actions ouvertes et en retard
-            const urgentActions = dashboardData.actions
-                .filter(a => ['open', 'overdue'].includes(getActionStatus(a)))
-                .sort((a, b) => {
-                    // En retard d'abord
-                    const statusA = getActionStatus(a);
-                    const statusB = getActionStatus(b);
-                    if (statusA === 'overdue' && statusB !== 'overdue') return -1;
-                    if (statusB === 'overdue' && statusA !== 'overdue') return 1;
-                    return 0;
-                })
-                .slice(0, 5);
-            
-            if (urgentActions.length === 0) {
-                container.innerHTML = `
-                    <div class="dashboard-empty" style="padding: var(--space-lg); text-align: center;">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--traffic-green)" stroke-width="1.5" style="margin-bottom: 8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                        <div style="font-size: var(--font-size-sm); color: var(--gray-60);">Aucune action urgente</div>
-                    </div>`;
-                return;
-            }
-            
-            container.innerHTML = urgentActions.map(action => {
-                const status = getActionStatus(action);
-                const dateFormatted = formatExcelDate(action.dateOuverture);
-                const isOverdue = status === 'overdue';
-                
-                return `
-                    <div class="dashboard-urgent-item ${isOverdue ? 'is-overdue' : ''}" onclick="openActionModal(${action.rowIndex})">
-                        <div class="dashboard-action-status ${status}"></div>
-                        <div class="dashboard-urgent-content">
-                            <div class="dashboard-urgent-text">${action.action || '-'}</div>
-                            <div class="dashboard-urgent-meta">
-                                <span>${action.zone || '-'}</span>
-                                <span>${action.responsable || '-'}</span>
-                                <span>${dateFormatted}</span>
-                            </div>
-                        </div>
-                        <span class="dashboard-urgent-badge ${status}">${isOverdue ? '> 30j' : 'Ouverte'}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-        
         // ═══════════════════════════════════════════════════════════════
-        // ONGLET ZONES - Graphiques et historique par zone
+        // DATE PARSING & FORMATTING
         // ═══════════════════════════════════════════════════════════════
         
-        let selectedZone = null;
-        
-        function initZonesTab() {
-            // Créer les boutons de sélection de zone
-            const selectorContainer = document.getElementById('dashboard-zone-selector');
-            selectorContainer.innerHTML = dashboardZones.map((zone, idx) => {
-                return `<button class="dashboard-zone-btn${idx === 0 ? ' active' : ''}" data-zone="${zone}">${zone}</button>`;
-            }).join('');
-            
-            // Event listeners
-            selectorContainer.querySelectorAll('.dashboard-zone-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    selectorContainer.querySelectorAll('.dashboard-zone-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    selectedZone = this.dataset.zone;
-                    renderZoneDetails(selectedZone);
-                });
-            });
-            
-            // Sélectionner la première zone par défaut
-            selectedZone = dashboardZones[0];
-            renderZoneDetails(selectedZone);
-        }
-        
-        function renderZoneDetails(zoneName) {
-            const zoneAudits = dashboardData.audits.filter(a => a.zone === zoneName);
-            const zoneActions = dashboardData.actions.filter(a => a.zone === zoneName);
-            
-            // Stats
-            renderZoneStats(zoneAudits, zoneActions);
-            
-            // Graphique d'évolution
-            renderZoneChart(zoneAudits);
-            
-            // Radar 5S (dernier audit ou moyenne)
-            currentZoneAudits = zoneAudits;
-            renderZoneRadar(zoneAudits);
-            
-            // Historique
-            renderZoneHistory(zoneAudits);
-        }
-        
-        let radarMode = 'last'; // 'last' ou 'average'
-        let currentZoneAudits = [];
-        let radarLevels = { 1: true, 2: true, 3: false }; // Niveaux cochés
-        
-        function setRadarMode(mode) {
-            radarMode = mode;
-            document.querySelectorAll('.dashboard-radar-toggle-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.mode === mode);
-            });
-            renderZoneRadar(currentZoneAudits);
-        }
-        
-        function toggleRadarLevel(level, checked) {
-            radarLevels[level] = checked;
-            renderZoneRadar(currentZoneAudits);
-        }
-        
-        function getRadarFilteredAudits(audits) {
-            return audits.filter(a => {
-                const niveau = parseInt(a.niveau?.toString().replace(/\D/g, '') || '0');
-                return radarLevels[niveau];
-            });
-        }
-        
-        function renderZoneStats(audits, actions) {
-            const container = document.getElementById('dashboard-zone-stats');
-            
-            // Calculs
-            const totalAudits = audits.length;
-            const avgScore = totalAudits > 0 
-                ? Math.round(audits.reduce((sum, a) => sum + parseScorePercent(a.performance), 0) / totalAudits)
-                : 0;
-            const lastAudit = audits.length > 0 ? audits[audits.length - 1] : null;
-            const lastScore = lastAudit ? Math.round(parseScorePercent(lastAudit.performance)) : 0;
-            const openActions = actions.filter(a => ['open', 'overdue'].includes(getActionStatus(a))).length;
-            
-            container.innerHTML = `
-                <div class="dashboard-zone-stat">
-                    <div class="dashboard-zone-stat-value">${totalAudits}</div>
-                    <div class="dashboard-zone-stat-label">Audits total</div>
-                </div>
-                <div class="dashboard-zone-stat">
-                    <div class="dashboard-zone-stat-value ${getScoreClass(avgScore)}">${avgScore}%</div>
-                    <div class="dashboard-zone-stat-label">Moyenne</div>
-                </div>
-                <div class="dashboard-zone-stat">
-                    <div class="dashboard-zone-stat-value ${getScoreClass(lastScore)}">${lastScore}%</div>
-                    <div class="dashboard-zone-stat-label">Dernier audit</div>
-                </div>
-                <div class="dashboard-zone-stat">
-                    <div class="dashboard-zone-stat-value ${openActions > 0 ? 'orange' : ''}">${openActions}</div>
-                    <div class="dashboard-zone-stat-label">Actions ouvertes</div>
-                </div>
-            `;
-        }
-        
-        function renderZoneChart(audits) {
-            const container = document.getElementById('dashboard-zone-chart');
-            
-            if (audits.length < 2) {
-                container.innerHTML = '<div class="dashboard-empty" style="height: 100%; display: flex; align-items: center; justify-content: center;">Pas assez de données pour afficher le graphique</div>';
-                return;
-            }
-            
-            // Prendre les 12 derniers audits max
-            const recentAudits = audits.slice(-12);
-            
-            // Dimensions
-            const width = container.offsetWidth || 600;
-            const height = 200;
-            const padding = { top: 20, right: 30, bottom: 30, left: 40 };
-            const chartWidth = width - padding.left - padding.right;
-            const chartHeight = height - padding.top - padding.bottom;
-            
-            // Échelles
-            const xStep = chartWidth / (recentAudits.length - 1);
-            const yMin = 0;
-            const yMax = 100;
-            
-            // Créer les points
-            const points = recentAudits.map((audit, i) => {
-                const score = parseScorePercent(audit.performance);
-                const x = padding.left + i * xStep;
-                const y = padding.top + chartHeight - (score / yMax * chartHeight);
-                return { x, y, score, date: formatExcelDate(audit.date), niveau: audit.niveau };
-            });
-            
-            // Ligne et aire
-            const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-            const areaPath = linePath + ` L ${points[points.length-1].x} ${padding.top + chartHeight} L ${points[0].x} ${padding.top + chartHeight} Z`;
-            
-            // Seuil 85%
-            const thresholdY = padding.top + chartHeight - (85 / yMax * chartHeight);
-            
-            // SVG
-            let svg = `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">`;
-            
-            // Grille horizontale
-            [0, 25, 50, 75, 100].forEach(val => {
-                const y = padding.top + chartHeight - (val / yMax * chartHeight);
-                svg += `<line class="dashboard-chart-grid-line" x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}"/>`;
-                svg += `<text class="dashboard-chart-axis-label" x="${padding.left - 8}" y="${y + 3}" text-anchor="end">${val}</text>`;
-            });
-            
-            // Seuil 85%
-            svg += `<line class="dashboard-chart-threshold" x1="${padding.left}" y1="${thresholdY}" x2="${width - padding.right}" y2="${thresholdY}"/>`;
-            svg += `<text class="dashboard-chart-threshold-label" x="${width - padding.right + 5}" y="${thresholdY + 3}">85%</text>`;
-            
-            // Aire sous la courbe
-            svg += `<path class="dashboard-chart-area" d="${areaPath}" fill="var(--sartorius-yellow)"/>`;
-            
-            // Ligne
-            svg += `<path class="dashboard-chart-line" d="${linePath}" stroke="var(--sartorius-yellow)"/>`;
-            
-            // Points et labels
-            points.forEach((p, i) => {
-                const scoreClass = getScoreClass(p.score);
-                const color = scoreClass === 'excellent' ? 'var(--traffic-green)' : 
-                              scoreClass === 'good' ? 'var(--sartorius-yellow)' : 
-                              scoreClass === 'warning' ? 'var(--traffic-orange)' : 'var(--traffic-red)';
-                
-                svg += `<circle class="dashboard-chart-dot" cx="${p.x}" cy="${p.y}" r="5" stroke="${color}"/>`;
-                
-                // Label date (tous les 2-3 points selon le nombre)
-                const showLabel = recentAudits.length <= 6 || i % Math.ceil(recentAudits.length / 6) === 0 || i === recentAudits.length - 1;
-                if (showLabel) {
-                    const dateShort = p.date.substring(0, 5); // DD/MM
-                    svg += `<text class="dashboard-chart-axis-label" x="${p.x}" y="${height - 5}" text-anchor="middle">${dateShort}</text>`;
-                }
-            });
-            
-            svg += '</svg>';
-            container.innerHTML = svg;
-        }
-        
-        function renderZoneRadar(audits) {
-            const container = document.getElementById('dashboard-zone-radar');
-            
-            if (audits.length === 0) {
-                container.innerHTML = '<div class="dashboard-empty">Aucun audit disponible</div>';
-                return;
-            }
-            
-            // Filtrer par niveaux sélectionnés
-            const filteredAudits = getRadarFilteredAudits(audits);
-            
-            if (filteredAudits.length === 0) {
-                container.innerHTML = '<div class="dashboard-empty">Aucun audit pour les niveaux sélectionnés</div>';
-                return;
-            }
-            
-            // Grouper par niveau pour la superposition
-            const auditsByLevel = {};
-            filteredAudits.forEach(a => {
-                const niveau = parseInt(a.niveau?.toString().replace(/\D/g, '') || '0');
-                if (!auditsByLevel[niveau]) auditsByLevel[niveau] = [];
-                auditsByLevel[niveau].push(a);
-            });
-            
-            const activeLevels = Object.keys(auditsByLevel).map(Number).sort();
-            const levelColors = {
-                1: 'var(--teal)',
-                2: 'var(--traffic-orange)',
-                3: 'var(--gray-50)'
-            };
-            
-            // Calculer les scores par niveau
-            const scoresByLevel = {};
-            activeLevels.forEach(level => {
-                const levelAudits = auditsByLevel[level];
-                if (radarMode === 'average' && levelAudits.length > 1) {
-                    scoresByLevel[level] = {
-                        scores: [
-                            levelAudits.reduce((sum, a) => sum + (parseFloat(a.scoreS1) || 0), 0) / levelAudits.length,
-                            levelAudits.reduce((sum, a) => sum + (parseFloat(a.scoreS2) || 0), 0) / levelAudits.length,
-                            levelAudits.reduce((sum, a) => sum + (parseFloat(a.scoreS3) || 0), 0) / levelAudits.length,
-                            levelAudits.reduce((sum, a) => sum + (parseFloat(a.scoreS4) || 0), 0) / levelAudits.length,
-                            levelAudits.reduce((sum, a) => sum + (parseFloat(a.scoreS5) || 0), 0) / levelAudits.length
-                        ],
-                        subtitle: `Moyenne N${level} (${levelAudits.length})`
-                    };
-                } else {
-                    const lastAudit = levelAudits[levelAudits.length - 1];
-                    scoresByLevel[level] = {
-                        scores: [
-                            parseFloat(lastAudit.scoreS1) || 0,
-                            parseFloat(lastAudit.scoreS2) || 0,
-                            parseFloat(lastAudit.scoreS3) || 0,
-                            parseFloat(lastAudit.scoreS4) || 0,
-                            parseFloat(lastAudit.scoreS5) || 0
-                        ],
-                        subtitle: `N${level} - ${formatExcelDate(lastAudit.date)}`
-                    };
-                }
-            });
-            
-            // Debug
-            // Les 5S labels
-            const sLabels = ['Trier', 'Ranger', 'Nettoyer', 'Standardiser', 'Respecter'];
-            
-            // Paramètres du radar
-            const size = 220;
-            const center = size / 2;
-            const radius = 80;
-            const labelRadius = radius + 25;
-            const n = 5;
-            const angleOffset = -Math.PI / 2;
-            
-            const getPoint = (index, r) => {
-                const angle = angleOffset + (2 * Math.PI * index) / n;
-                return {
-                    x: center + r * Math.cos(angle),
-                    y: center + r * Math.sin(angle)
-                };
-            };
-            
-            let svg = `<svg class="dashboard-radar" viewBox="0 0 ${size} ${size}">`;
-            
-            // Grille de fond
-            [25, 50, 75, 100].forEach(pct => {
-                const r = (pct / 100) * radius;
-                let points = '';
-                for (let i = 0; i < n; i++) {
-                    const p = getPoint(i, r);
-                    points += `${p.x},${p.y} `;
-                }
-                svg += `<polygon points="${points.trim()}" fill="none" stroke="var(--gray-20)" stroke-width="1"/>`;
-            });
-            
-            // Lignes du centre vers chaque sommet
-            for (let i = 0; i < n; i++) {
-                const p = getPoint(i, radius);
-                svg += `<line x1="${center}" y1="${center}" x2="${p.x}" y2="${p.y}" stroke="var(--gray-20)" stroke-width="1"/>`;
-            }
-            
-            // Seuil 85%
-            const threshold85 = (85 / 100) * radius;
-            let thresholdPoints = '';
-            for (let i = 0; i < n; i++) {
-                const p = getPoint(i, threshold85);
-                thresholdPoints += `${p.x},${p.y} `;
-            }
-            svg += `<polygon points="${thresholdPoints.trim()}" fill="none" stroke="var(--traffic-green)" stroke-width="1.5" stroke-dasharray="4 2" opacity="0.6"/>`;
-            
-            // Dessiner les polygones pour chaque niveau (du plus bas au plus haut pour la superposition)
-            const maxScore = 4; // Score par S = moyenne de 3 critères sur 4
-            activeLevels.forEach(level => {
-                const data = scoresByLevel[level];
-                const sPercents = data.scores.map(s => Math.round((s / maxScore) * 100));
-                const color = levelColors[level];
-                
-                let scorePoints = '';
-                for (let i = 0; i < n; i++) {
-                    const pct = sPercents[i];
-                    const r = (pct / 100) * radius;
-                    const p = getPoint(i, r);
-                    scorePoints += `${p.x},${p.y} `;
-                }
-                
-                svg += `<polygon points="${scorePoints.trim()}" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-width="2"/>`;
-                
-                // Points sur les sommets
-                for (let i = 0; i < n; i++) {
-                    const pct = sPercents[i];
-                    const r = (pct / 100) * radius;
-                    const p = getPoint(i, r);
-                    svg += `<circle cx="${p.x}" cy="${p.y}" r="4" fill="${color}" stroke="var(--white)" stroke-width="1.5"/>`;
-                }
-            });
-            
-            svg += '</svg>';
-            
-            // Labels autour du radar (moyenne de tous les niveaux actifs)
-            const allScores = activeLevels.map(l => scoresByLevel[l].scores);
-            const avgScoresPerS = [0, 1, 2, 3, 4].map(i => 
-                allScores.reduce((sum, s) => sum + s[i], 0) / allScores.length
-            );
-            const avgPercentsPerS = avgScoresPerS.map(s => Math.round((s / maxScore) * 100));
-            
-            let labelsHtml = '<div class="dashboard-radar-labels">';
-            for (let i = 0; i < n; i++) {
-                const p = getPoint(i, labelRadius);
-                const score = avgScoresPerS[i];
-                const pct = avgPercentsPerS[i];
-                const color = pct >= 85 ? 'var(--traffic-green)' : 
-                              pct >= 70 ? 'var(--gray-70)' : 
-                              pct >= 50 ? 'var(--traffic-orange)' : 'var(--traffic-red)';
-                
-                labelsHtml += `
-                    <div class="dashboard-radar-label" style="left: ${p.x}px; top: ${p.y}px;">
-                        <span class="dashboard-radar-label-name">${sLabels[i]}</span>
-                        <span class="dashboard-radar-label-value" style="color: ${color};">${score.toFixed(1)}/${maxScore}</span>
-                    </div>
-                `;
-            }
-            labelsHtml += '</div>';
-            
-            // Footer avec légende des niveaux - score total sur 60
-            const globalScore = avgScoresPerS.reduce((a, b) => a + b, 0);
-            const globalPct = Math.round((globalScore / (maxScore * 5)) * 100);
-            const globalColor = globalPct >= 85 ? 'var(--traffic-green)' : 
-                               globalPct >= 70 ? 'var(--sartorius-yellow)' : 
-                               globalPct >= 50 ? 'var(--traffic-orange)' : 'var(--traffic-red)';
-            
-            let legendHtml = activeLevels.map(level => 
-                `<span class="radar-legend-item" style="color: ${levelColors[level]};">● N${level}</span>`
-            ).join(' ');
-            
-            container.innerHTML = `
-                <div class="dashboard-radar-wrapper">
-                    ${svg}
-                    ${labelsHtml}
-                </div>
-                <div class="dashboard-radar-footer">
-                    <div class="dashboard-radar-score" style="color: ${globalColor};">${globalPct}%</div>
-                    <div class="dashboard-radar-meta">${legendHtml}</div>
-                </div>
-            `;
-        }
-        
-        function renderZoneHistory(audits) {
-            const tbody = document.getElementById('dashboard-zone-history-tbody');
-            
-            if (audits.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--gray-50);">Aucun audit</td></tr>';
-                return;
-            }
-            
-            // Trier par date décroissante
-            const sortedAudits = [...audits].reverse();
-            
-            tbody.innerHTML = sortedAudits.map(audit => {
-                const score = Math.round(parseScorePercent(audit.performance));
-                const scoreClass = getScoreClass(score);
-                const dateFormatted = formatExcelDate(audit.date);
-                
-                return `
-                    <tr class="clickable-row" onclick="openAuditDetailModal(${audit.rowIndex})">
-                        <td>${dateFormatted}</td>
-                        <td><span class="dashboard-badge ${audit.niveau === 'N2' ? 'n2' : 'n1'}">${audit.niveau}</span></td>
-                        <td><span class="score-${scoreClass}">${score}%</span></td>
-                        <td>${audit.auditeur}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-        
-        // Rendre la liste des actions (avec filtre)
-        function renderActionsList(filter) {
-            const container = document.getElementById('dashboard-actions-list');
-            
-            let filteredActions = dashboardData.actions.filter(a => {
-                const status = getActionStatus(a);
-                if (filter === 'all') return true;
-                if (filter === 'open') return status === 'open';
-                if (filter === 'inprogress') return status === 'inprogress';
-                if (filter === 'overdue') return status === 'overdue';
-                if (filter === 'closed') return status === 'closed' || status === 'cancelled';
-                return true;
-            });
-            
-            // Trier : retard, puis en cours, puis ouvertes, puis clôturées
-            filteredActions.sort((a, b) => {
-                const statusOrder = { overdue: 0, inprogress: 1, open: 2, closed: 3, cancelled: 4 };
-                const statusA = statusOrder[getActionStatus(a)] ?? 5;
-                const statusB = statusOrder[getActionStatus(b)] ?? 5;
-                if (statusA !== statusB) return statusA - statusB;
-                return 0;
-            });
-            
-            if (filteredActions.length === 0) {
-                container.innerHTML = '<div class="dashboard-empty">Aucune action</div>';
-                return;
-            }
-            
-            let html = `
-                <div class="dashboard-table-wrapper">
-                    <table class="dashboard-actions-table">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Action</th>
-                                <th>Zone</th>
-                                <th>Responsable</th>
-                                <th>Date</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            filteredActions.forEach((action, idx) => {
-                const status = getActionStatus(action);
-                const dateFormatted = formatExcelDate(action.dateOuverture);
-                const closeDateFormatted = action.dateCloture ? formatExcelDate(action.dateCloture) : '';
-                
-                let dateDisplay = dateFormatted;
-                if (status === 'closed') {
-                    dateDisplay = `<span style="color: var(--traffic-green);">Clôturé ${closeDateFormatted}</span>`;
-                } else if (status === 'cancelled') {
-                    dateDisplay = `<span style="color: var(--gray-50);">Annulé</span>`;
-                }
-                
-                // Bouton gérer pour actions ouvertes/overdue
-                const canManage = status === 'open' || status === 'overdue';
-                const actionBtn = canManage 
-                    ? `<button class="dashboard-action-close-btn" onclick="openActionModal(${action.rowIndex})">Gérer</button>`
-                    : '';
-                
-                html += `
-                    <tr>
-                        <td class="col-status"><span class="dashboard-action-status ${status}"></span></td>
-                        <td class="col-action">${action.action || '-'}</td>
-                        <td class="col-zone">${action.zone || '-'}</td>
-                        <td class="col-resp">${action.responsable || '-'}</td>
-                        <td class="col-date">${dateDisplay}</td>
-                        <td>${actionBtn}</td>
-                    </tr>
-                `;
-            });
-            
-            html += '</tbody></table></div>';
-            container.innerHTML = html;
-        }
-        
-        // Rendre le tableau des audits (avec recherche)
-        function renderAuditsTable(searchQuery) {
-            const tbody = document.getElementById('dashboard-audits-tbody');
-            
-            let filteredAudits = [...dashboardData.audits].reverse(); // Plus récent en premier
-            
-            // Filtrer par recherche
-            if (searchQuery) {
-                const query = searchQuery.toLowerCase();
-                filteredAudits = filteredAudits.filter(a => {
-                    return (a.zone?.toLowerCase().includes(query)) ||
-                           (a.auditeur?.toLowerCase().includes(query)) ||
-                           (a.niveau?.toLowerCase().includes(query)) ||
-                           (a.auditId?.toLowerCase().includes(query));
-                });
-            }
-            
-            if (filteredAudits.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--gray-50);">Aucun audit trouvé</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = filteredAudits.slice(0, 50).map(audit => {
-                const dateFormatted = formatExcelDate(audit.date);
-                const score = parseScorePercent(audit.performance);
-                const scoreClass = getScoreClass(score);
-                const niveauClass = audit.niveau === 'N2' ? 'n2' : 'n1';
-                
-                return `
-                    <tr class="clickable-row" onclick="openAuditDetailModal(${audit.rowIndex})">
-                        <td>${dateFormatted}</td>
-                        <td>${audit.zone || '-'}</td>
-                        <td><span class="dashboard-badge ${niveauClass}">${audit.niveau || '-'}</span></td>
-                        <td class="score-${scoreClass}">${Math.round(score)}%</td>
-                        <td>${audit.auditeur || '-'}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-        
-        // Parser une date Excel (peut être un nombre ou une chaîne)
         function parseExcelDate(value) {
             if (!value) return null;
-            
-            // Si c'est un nombre Excel (jours depuis 1900)
             if (typeof value === 'number') {
-                const excelEpoch = new Date(1899, 11, 30);
+                var excelEpoch = new Date(1899, 11, 30);
                 return new Date(excelEpoch.getTime() + value * 24 * 60 * 60 * 1000);
             }
-            
-            // Si c'est une chaîne de date
             if (typeof value === 'string') {
-                const parsed = new Date(value);
+                var parsed = new Date(value);
                 if (!isNaN(parsed)) return parsed;
-                
-                // Format DD/MM/YYYY
-                const parts = value.split('/');
-                if (parts.length === 3) {
-                    return new Date(parts[2], parts[1] - 1, parts[0]);
-                }
+                var parts = value.split('/');
+                if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
             }
-            
             return null;
         }
         
-        // Formater une date Excel pour l'affichage (DD/MM/YYYY)
         function formatExcelDate(value) {
-            const date = parseExcelDate(value);
+            var date = parseExcelDate(value);
             if (!date) return '-';
-            
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            
-            return `${day}/${month}/${year}`;
+            return String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear();
         }
         
         // ═══════════════════════════════════════════════════════════════
         // GESTION DES ACTIONS (clôture, en cours, annulation)
         // ═══════════════════════════════════════════════════════════════
         
-        let currentActionRowIndex = null;
-        
-        function openActionModal(rowIndex) {
-            currentActionRowIndex = rowIndex;
-            const action = dashboardData.actions.find(a => a.rowIndex === rowIndex);
-            
-            if (!action) return;
-            
-            // Remplir le modal
-            document.getElementById('modal-action-text').textContent = action.action || '-';
-            document.getElementById('modal-action-zone').textContent = action.zone || '-';
-            document.getElementById('modal-action-resp').textContent = action.responsable || '-';
-            document.getElementById('modal-action-date').textContent = formatExcelDate(action.dateOuverture);
-            
-            // Reset du champ commentaire
-            const commentInput = document.getElementById('modal-comment');
-            commentInput.value = '';
-            commentInput.classList.remove('error');
-            document.getElementById('modal-comment-required').style.display = 'none';
-            
-            // Afficher le modal
-            document.getElementById('dashboard-action-modal').classList.add('visible');
-        }
-        
-        function closeActionModal() {
-            document.getElementById('dashboard-action-modal').classList.remove('visible');
-            currentActionRowIndex = null;
-        }
-        
         async function handleAction(actionType) {
             if (currentActionRowIndex === null) return;
             
-            const commentInput = document.getElementById('modal-comment');
-            const comment = commentInput.value.trim();
+            var commentInput = document.getElementById('modal-comment');
+            var comment = commentInput ? commentInput.value.trim() : '';
             
-            // Vérifier si commentaire obligatoire
             if ((actionType === 'cancel' || actionType === 'inprogress') && !comment) {
-                commentInput.classList.add('error');
-                document.getElementById('modal-comment-required').style.display = 'inline';
-                commentInput.focus();
-                setTimeout(() => commentInput.classList.remove('error'), 500);
+                if (commentInput) commentInput.classList.add('error');
+                var reqEl = document.getElementById('modal-comment-required');
+                if (reqEl) reqEl.style.display = 'inline';
+                if (commentInput) commentInput.focus();
+                setTimeout(function() { if (commentInput) commentInput.classList.remove('error'); }, 500);
                 return;
             }
             
-            const btnId = actionType === 'close' ? 'modal-btn-close' : 
-                          actionType === 'inprogress' ? 'modal-btn-inprogress' : 'modal-btn-cancel';
-            const btn = document.getElementById(btnId);
-            const originalHtml = btn.innerHTML;
+            var btnId = actionType === 'close' ? 'modal-btn-close' : actionType === 'inprogress' ? 'modal-btn-inprogress' : 'modal-btn-cancel';
+            var btn = document.getElementById(btnId);
+            var originalHtml = btn ? btn.innerHTML : '';
             
-            btn.disabled = true;
-            btn.innerHTML = '<span class="dashboard-loading-spinner" style="width: 16px; height: 16px; border-width: 2px;"></span>';
-            
-            // Désactiver les autres boutons
-            document.querySelectorAll('.dashboard-action-btn').forEach(b => b.disabled = true);
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="dashboard-loading-spinner" style="width: 16px; height: 16px; border-width: 2px;"></span>';
+            }
+            document.querySelectorAll('.dashboard-action-btn').forEach(function(b) { b.disabled = true; });
             
             try {
                 await updateActionInExcel(currentActionRowIndex, actionType, comment);
-                
-                // Rafraîchir les données
                 await refreshDashboardData();
-                
-                // Fermer le modal
-                closeActionModal();
-                
+                parentAuditRowIndex = null;
+                document.getElementById('dashboard-action-modal').classList.remove('visible');
+                currentActionRowIndex = null;
             } catch (error) {
                 console.error('Erreur action:', error);
                 alert('Erreur: ' + error.message);
             } finally {
-                btn.innerHTML = originalHtml;
-                document.querySelectorAll('.dashboard-action-btn').forEach(b => b.disabled = false);
+                if (btn) btn.innerHTML = originalHtml;
+                document.querySelectorAll('.dashboard-action-btn').forEach(function(b) { b.disabled = false; });
             }
         }
         
         async function updateActionInExcel(rowIndex, actionType, userComment) {
-            const accessToken = await getAccessToken();
-            
-            const action = dashboardData.actions.find(a => a.rowIndex === rowIndex);
+            var accessToken = await getAccessToken();
+            var action = dashboardData.actions.find(function(a) { return a.rowIndex === rowIndex; });
             if (!action) throw new Error('Action non trouvée');
             
-            // La ligne Excel = rowIndex + 2 (1-indexé + header)
-            const excelRow = rowIndex + 2;
+            var excelRow = rowIndex + 2;
+            var today = new Date();
+            var dateValue = Math.floor((today - new Date(1899, 11, 30)) / (24 * 60 * 60 * 1000));
             
-            // Date du jour au format Excel
-            const today = new Date();
-            const dateValue = Math.floor((today - new Date(1899, 11, 30)) / (24 * 60 * 60 * 1000));
-            
-            // Construire le nouveau commentaire
-            let newComment = '';
-            const userName = msalAccount?.name || 'Utilisateur';
+            var newComment = '';
+            var userName = msalAccount ? msalAccount.name : 'Utilisateur';
             
             if (actionType === 'close') {
-                // Clôture : commentaire optionnel
-                if (userComment) {
-                    newComment = userComment;
-                }
-                // Ajouter "Clôturé par X" si ce n'est pas le responsable
+                if (userComment) newComment = userComment;
                 if (userName !== action.responsable) {
-                    newComment = newComment ? `${newComment} | Clôturé par ${userName}` : `Clôturé par ${userName}`;
+                    newComment = newComment ? newComment + ' | Clôturé par ' + userName : 'Clôturé par ' + userName;
                 }
             } else if (actionType === 'inprogress') {
-                // En cours : format "En cours - commentaire"
-                newComment = `En cours - ${userComment}`;
+                newComment = 'En cours - ' + userComment;
             } else if (actionType === 'cancel') {
-                // Annulé : format "Annulé - commentaire"
-                newComment = `Annulé - ${userComment}`;
+                newComment = 'Annulé - ' + userComment;
             }
             
-            // Combiner avec l'ancien commentaire si existant
-            const existingComment = action.commentaire || '';
+            var existingComment = action.commentaire || '';
             if (existingComment && newComment) {
-                newComment = `${existingComment} | ${newComment}`;
+                newComment = existingComment + ' | ' + newComment;
             } else if (existingComment) {
                 newComment = existingComment;
             }
             
-            // Mettre à jour la date de clôture (colonne K) - pour clôture et annulation
             if (actionType === 'close' || actionType === 'cancel') {
-                const dateUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${dashboardData.excelItemId}/workbook/worksheets/${excelConfig.actionsSheet}/range(address='K${excelRow}')`;
-                const dateResponse = await fetch(dateUrl, {
+                var dateUrl = 'https://graph.microsoft.com/v1.0/drives/' + dashboardData.driveId + '/items/' + dashboardData.excelItemId + '/workbook/worksheets/' + excelConfig.actionsSheet + '/range(address=\'K' + excelRow + '\')';
+                var dateResponse = await fetch(dateUrl, {
                     method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ values: [[dateValue]] })
                 });
-                
                 if (!dateResponse.ok) {
-                    const error = await dateResponse.json();
-                    throw new Error(error.error?.message || 'Erreur mise à jour date');
+                    var error = await dateResponse.json();
+                    throw new Error(error.error ? error.error.message : 'Erreur mise à jour date');
                 }
             }
             
-            // Mettre à jour le commentaire (colonne J) si nécessaire
             if (newComment !== action.commentaire) {
-                const commentUrl = `https://graph.microsoft.com/v1.0/drives/${dashboardData.driveId}/items/${dashboardData.excelItemId}/workbook/worksheets/${excelConfig.actionsSheet}/range(address='J${excelRow}')`;
-                const commentResponse = await fetch(commentUrl, {
+                var commentUrl = 'https://graph.microsoft.com/v1.0/drives/' + dashboardData.driveId + '/items/' + dashboardData.excelItemId + '/workbook/worksheets/' + excelConfig.actionsSheet + '/range(address=\'J' + excelRow + '\')';
+                var commentResponse = await fetch(commentUrl, {
                     method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ values: [[newComment]] })
                 });
-                
                 if (!commentResponse.ok) {
-                    const error = await commentResponse.json();
-                    throw new Error(error.error?.message || 'Erreur mise à jour commentaire');
+                    var error2 = await commentResponse.json();
+                    throw new Error(error2.error ? error2.error.message : 'Erreur mise à jour commentaire');
                 }
             }
         }
         
         // ═══════════════════════════════════════════════════════════════
-        // MODAL DÉTAIL AUDIT
+        // DASHBOARD V2 — Render Functions
         // ═══════════════════════════════════════════════════════════════
+        
+        // Helper: format date short (DD/MM)
+        function formatDateShort(value) {
+            const d = parseExcelDate(value);
+            if (!d) return '-';
+            return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
+        }
+        
+        // Helper: get performance as 0-100 from audit
+        function getAuditPerformance(audit) {
+            return Math.round(parseScorePercent(audit.performance));
+        }
+        
+        // Helper: get S scores from audit as {S1: val, S2: val, ...} on /4 scale
+        function getAuditSScores(audit) {
+            return {
+                S1: typeof audit.scoreS1 === 'number' ? audit.scoreS1 : 0,
+                S2: typeof audit.scoreS2 === 'number' ? audit.scoreS2 : 0,
+                S3: typeof audit.scoreS3 === 'number' ? audit.scoreS3 : 0,
+                S4: typeof audit.scoreS4 === 'number' ? audit.scoreS4 : 0,
+                S5: typeof audit.scoreS5 === 'number' ? audit.scoreS5 : 0
+            };
+        }
+        
+        // Helper: get linked actions for an audit
+        function getAuditActions(audit) {
+            return dashboardData.actions.filter(function(a) {
+                if (!a.actionId || !audit.auditId) return false;
+                return a.actionId.replace(/_A\d+$/, '') === audit.auditId;
+            });
+        }
+        
+        // Helper: action days open
+        function getActionDaysOpen(action) {
+            var d = parseExcelDate(action.dateOuverture);
+            if (!d) return 0;
+            return Math.floor((new Date() - d) / 86400000);
+        }
+        
+        // Helper: status label
+        function getStatusLabel(st) {
+            return { open:'Ouverte', overdue:'En retard', inprogress:'En cours', closed:'Clôturée', cancelled:'Annulée' }[st] || st;
+        }
+        
+        // Helper: get user display name
+        function getCurrentUserName() {
+            return msalAccount ? msalAccount.name : '';
+        }
+        
+        // ─── RENDER OVERVIEW ───
+        function renderOverview() {
+            var audits = dashboardData.audits;
+            var actions = dashboardData.actions;
+            if (!audits.length) { document.getElementById('overview-content').innerHTML = '<div class="dashboard-empty"><p>Aucune donnée</p></div>'; return; }
+            
+            var now = new Date();
+            var currentMonth = now.getMonth(), currentYear = now.getFullYear();
+            var auditsThisMonth = audits.filter(function(a) { var d = parseExcelDate(a.date); return d && d.getMonth() === currentMonth && d.getFullYear() === currentYear; });
+            var avgScore = Math.round(audits.reduce(function(s,a) { return s + getAuditPerformance(a); }, 0) / audits.length);
+            
+            var prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+            var prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+            var prevAudits = audits.filter(function(a) { var d = parseExcelDate(a.date); return d && d.getMonth() === prevMonth && d.getFullYear() === prevYear; });
+            var prevAvg = prevAudits.length > 0 ? Math.round(prevAudits.reduce(function(s,a) { return s + getAuditPerformance(a); }, 0) / prevAudits.length) : null;
+            var diff = prevAvg !== null ? avgScore - prevAvg : null;
+            
+            var openCount = 0, overdueCount = 0, inprogressCount = 0;
+            actions.forEach(function(a) { var st = getActionStatus(a); if (st==='open') openCount++; if (st==='overdue') overdueCount++; if (st==='inprogress') inprogressCount++; });
+            
+            var trendHtml = '';
+            if (diff !== null) {
+                var cls = diff > 0 ? 'up' : diff < 0 ? 'down' : 'neutral';
+                var arrow = diff > 0 ? '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3m0 0L3 6m3-3l3 3"/></svg>' : diff < 0 ? '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6m0 0l3-3m-3 3L3 6"/></svg>' : '';
+                var prevMonthNames = ['jan.','fév.','mar.','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
+                trendHtml = '<div class="db2-kpi-trend ' + cls + '">' + arrow + (diff > 0 ? '+' : '') + diff + '% vs ' + prevMonthNames[prevMonth] + '</div>';
+            }
+            
+            // Mes actions
+            var userName = getCurrentUserName().toLowerCase();
+            var myActions = userName ? actions.filter(function(a) {
+                var resp = (a.responsable || '').toLowerCase();
+                return resp.includes(userName.split(' ')[0].toLowerCase()) && !['closed','cancelled'].includes(getActionStatus(a));
+            }) : [];
+            
+            var myActionsHtml = '';
+            if (myActions.length > 0) {
+                myActionsHtml = '<div class="db2-my-actions"><div class="db2-my-actions-header"><div class="db2-my-actions-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mes actions</div><span class="db2-my-actions-count">' + myActions.length + '</span></div>';
+                myActions.forEach(function(a) {
+                    var st = getActionStatus(a);
+                    var days = getActionDaysOpen(a);
+                    var badgeHtml = st === 'overdue' ? '<span class="db2-badge db2-badge-dot db2-badge-red">En retard</span>' : st === 'inprogress' ? '<span class="db2-badge db2-badge-dot db2-badge-teal">En cours</span>' : '<span class="db2-badge db2-badge-dot db2-badge-orange">Ouverte</span>';
+                    myActionsHtml += '<div class="db2-my-action-item" style="cursor:pointer" onclick="openActionFromMyActions(' + a.rowIndex + ')"><div class="db2-urgent-dot ' + st + '" style="margin-top:5px"></div><div style="flex:1;min-width:0"><div class="db2-my-action-text">' + (a.action||'-') + '</div><div class="db2-my-action-sub">' + (a.zone||'-') + ' · ' + formatExcelDate(a.dateOuverture) + ' · ' + days + 'j</div></div>' + badgeHtml + '</div>';
+                });
+                myActionsHtml += '</div>';
+            }
+            
+            // KPI grid
+            var html = myActionsHtml + '<div class="db2-kpi-grid"><div class="db2-kpi-card accent has-tooltip"><div class="db2-kpi-label">Score moyen</div><div class="db2-kpi-value ' + getScoreClass(avgScore) + '">' + avgScore + '<span class="unit">%</span></div>' + trendHtml + '</div><div class="db2-kpi-card has-tooltip"><div class="db2-kpi-label">Audits ce mois</div><div class="db2-kpi-value">' + auditsThisMonth.length + '</div><div class="db2-kpi-trend neutral">' + audits.length + ' au total</div></div><div class="db2-kpi-card' + ((openCount+overdueCount) > 0 ? ' teal' : '') + ' has-tooltip"><div class="db2-kpi-label">Actions ouvertes</div><div class="db2-kpi-value ' + ((openCount+overdueCount) > 0 ? 'db2-c-orange' : '') + '">' + (openCount+overdueCount) + '</div>' + (inprogressCount > 0 ? '<div class="db2-kpi-trend neutral">' + inprogressCount + ' en cours</div>' : '') + '</div>';
+            
+            if (overdueCount > 0) {
+                html += '<div class="db2-kpi-card alert has-tooltip"><div class="db2-kpi-label">> 30 jours</div><div class="db2-kpi-value db2-c-red">' + overdueCount + '</div></div>';
+            } else {
+                var closedCount = actions.filter(function(a) { return getActionStatus(a) === 'closed'; }).length;
+                var closureRate = actions.length > 0 ? Math.round(closedCount / actions.length * 100) : 0;
+                html += '<div class="db2-kpi-card"><div class="db2-kpi-label">Taux clôture</div><div class="db2-kpi-value db2-c-green">' + closureRate + '<span class="unit">%</span></div></div>';
+            }
+            html += '</div>';
+            
+            // Zones grid
+            html += '<div class="db2-section"><div class="db2-section-header"><h3 class="db2-section-title">État des zones</h3><button class="db2-section-link" onclick="switchDashboardTab(\'zones\')">Voir détail →</button></div><div class="db2-zones-grid">';
+            
+            dashboardZones.forEach(function(zoneName) {
+                var zoneAudits = audits.filter(function(a) { return a.zone === zoneName; });
+                var last = zoneAudits.length > 0 ? zoneAudits[zoneAudits.length - 1] : null;
+                if (!last) { html += '<div class="db2-zone-card none"><div class="db2-zone-top"><div><div class="db2-zone-name">' + zoneName + '</div><div class="db2-zone-meta">Aucun audit réalisé</div></div><div class="db2-zone-score" style="color:var(--gray-40)">—</div></div></div>'; return; }
+                
+                var pct = getAuditPerformance(last);
+                var cls = getScoreClass(pct);
+                var zoneActions = actions.filter(function(a) { return a.zone === zoneName; });
+                var ov = zoneActions.filter(function(a) { return getActionStatus(a)==='overdue'; }).length;
+                var op = zoneActions.filter(function(a) { return getActionStatus(a)==='open'; }).length;
+                var ip = zoneActions.filter(function(a) { return getActionStatus(a)==='inprogress'; }).length;
+                
+                var badges = '';
+                if (ov||op||ip) {
+                    badges = '<div class="db2-zone-badges">';
+                    if (ov) badges += '<span class="db2-zone-badge overdue">' + ov + ' en retard</span>';
+                    if (ip) badges += '<span class="db2-zone-badge inprogress">' + ip + ' en cours</span>';
+                    if (op) badges += '<span class="db2-zone-badge open">' + op + ' ouverte' + (op>1?'s':'') + '</span>';
+                    badges += '</div>';
+                }
+                
+                html += '<div class="db2-zone-card ' + cls + '" onclick="onZoneCardClick(\'' + zoneName + '\')" style="cursor:pointer"><div class="db2-zone-top"><div><div class="db2-zone-name">' + zoneName + '</div><div class="db2-zone-meta">' + (last.niveau||'-') + ' · ' + formatExcelDate(last.date) + ' · ' + (last.auditeur||'-') + '</div></div><div class="db2-zone-score ' + cls + '">' + pct + '%</div></div>' + badges + '<div class="db2-zone-bar"><div class="db2-zone-bar-fill ' + cls + '" style="width:' + pct + '%"></div></div></div>';
+            });
+            html += '</div></div>';
+            
+            // Urgent actions
+            var urgentActions = actions.filter(function(a) { return ['open','overdue'].includes(getActionStatus(a)); }).sort(function(a,b) { var sa = getActionStatus(a)==='overdue'?0:1; var sb = getActionStatus(b)==='overdue'?0:1; return sa-sb; }).slice(0,5);
+            
+            html += '<div class="db2-section"><div class="db2-section-header"><h3 class="db2-section-title">Actions urgentes</h3><button class="db2-section-link" onclick="switchDashboardTab(\'actions\')">Voir toutes →</button></div>';
+            
+            if (urgentActions.length === 0) {
+                html += '<div style="text-align:center;padding:var(--space-xl);color:var(--gray-50)"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="var(--traffic-green)" stroke-width="1.5" style="margin-bottom:8px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><div>Aucune action urgente</div></div>';
+            } else {
+                urgentActions.forEach(function(a) {
+                    var st = getActionStatus(a);
+                    html += '<div class="db2-urgent-item ' + (st==='overdue'?'is-overdue':'') + '" onclick="openActionFromOverview(' + a.rowIndex + ')" style="cursor:pointer"><div class="db2-urgent-dot ' + st + '"></div><div class="db2-urgent-body"><div class="db2-urgent-text">' + (a.action||'-') + '</div><div class="db2-urgent-meta"><span>' + (a.zone||'-') + '</span><span>' + (a.responsable||'—') + '</span><span>' + formatExcelDate(a.dateOuverture) + '</span></div></div><span class="db2-urgent-badge ' + st + '">' + (st==='overdue'?'> 30j':'Ouverte') + '</span></div>';
+                });
+            }
+            html += '</div>';
+            
+            document.getElementById('overview-content').innerHTML = html;
+        }
+        
+        // ─── ZONE TAB ───
+        var selectedZone = dashboardZones[0];
+        var radarMode = 'last';
+        var radarLevels = { N1: true, N2: true };
+        var zoneFilterNiveau = 'all';
+        var zoneFilterPeriod = 'all';
+        
+        function getFilteredZoneAudits(zoneName) {
+            var audits = dashboardData.audits.filter(function(a) { return a.zone === zoneName; });
+            if (zoneFilterNiveau !== 'all') audits = audits.filter(function(a) { return a.niveau === zoneFilterNiveau; });
+            if (zoneFilterPeriod !== 'all') {
+                var cutoff = new Date();
+                if (zoneFilterPeriod === '6m') cutoff.setMonth(cutoff.getMonth() - 6);
+                else if (zoneFilterPeriod === '3m') cutoff.setMonth(cutoff.getMonth() - 3);
+                else if (zoneFilterPeriod === '1m') { cutoff = new Date(cutoff.getFullYear(), cutoff.getMonth(), 1); }
+                audits = audits.filter(function(a) { var d = parseExcelDate(a.date); return d && d >= cutoff; });
+            }
+            return audits;
+        }
+        
+        function initZonesTab() {
+            var selector = document.getElementById('db2-zone-selector');
+            if (!selector) return;
+            selector.style.cssText = 'display:flex;gap:var(--space-sm);margin-bottom:var(--space-md);flex-wrap:wrap';
+            selector.innerHTML = dashboardZones.map(function(z) {
+                return '<button class="db2-filter-chip' + (z === selectedZone ? ' active' : '') + '" data-zone="' + z + '">' + z + '</button>';
+            }).join('');
+            
+            selector.querySelectorAll('.db2-filter-chip').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    selector.querySelectorAll('.db2-filter-chip').forEach(function(b) { b.classList.remove('active'); });
+                    btn.classList.add('active');
+                    selectedZone = btn.dataset.zone;
+                    renderZoneDetail(selectedZone);
+                });
+            });
+            
+            // Zone filters
+            document.querySelectorAll('[data-zf-niveau]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    zoneFilterNiveau = this.dataset.zfNiveau;
+                    document.querySelectorAll('[data-zf-niveau]').forEach(function(b) { b.classList.toggle('active', b.dataset.zfNiveau === zoneFilterNiveau); });
+                    renderZoneDetail(selectedZone);
+                });
+            });
+            document.querySelectorAll('[data-zf-period]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    zoneFilterPeriod = this.dataset.zfPeriod;
+                    document.querySelectorAll('[data-zf-period]').forEach(function(b) { b.classList.toggle('active', b.dataset.zfPeriod === zoneFilterPeriod); });
+                    renderZoneDetail(selectedZone);
+                });
+            });
+            
+            renderZoneDetail(selectedZone);
+        }
+        
+        function selectZone(zoneName) {
+            selectedZone = zoneName;
+            var selector = document.getElementById('db2-zone-selector');
+            if (selector) selector.querySelectorAll('.db2-filter-chip').forEach(function(b) { b.classList.toggle('active', b.dataset.zone === zoneName); });
+            renderZoneDetail(zoneName);
+        }
+        
+        function onZoneCardClick(zoneName) {
+            switchDashboardTab('zones');
+            selectZone(zoneName);
+        }
+        
+        function renderZoneDetail(zoneName) {
+            renderZoneStats(zoneName);
+            renderZoneChart(zoneName);
+            renderZoneRadar(zoneName);
+            renderZoneHistory(zoneName);
+        }
+        
+        function renderZoneStats(zoneName) {
+            var audits = getFilteredZoneAudits(zoneName);
+            var actions = dashboardData.actions.filter(function(a) { return a.zone === zoneName; });
+            var total = audits.length;
+            var avg = total > 0 ? Math.round(audits.reduce(function(s,a) { return s + getAuditPerformance(a); }, 0) / total) : 0;
+            var last = audits.length > 0 ? audits[audits.length - 1] : null;
+            var lastPct = last ? getAuditPerformance(last) : 0;
+            var openAct = actions.filter(function(a) { return ['open','overdue','inprogress'].includes(getActionStatus(a)); }).length;
+            
+            var el = document.getElementById('db2-zone-stats');
+            if (!el) return;
+            el.innerHTML = '<div style="background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg);padding:var(--space-md);text-align:center"><div style="font-size:22px;font-weight:700">' + total + '</div><div style="font-size:11px;color:var(--gray-60);margin-top:2px">Audits total</div></div><div style="background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg);padding:var(--space-md);text-align:center"><div style="font-size:22px;font-weight:700" class="' + getScoreClass(avg) + '">' + avg + '%</div><div style="font-size:11px;color:var(--gray-60);margin-top:2px">Moyenne</div></div><div style="background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg);padding:var(--space-md);text-align:center"><div style="font-size:22px;font-weight:700" class="' + getScoreClass(lastPct) + '">' + lastPct + '%</div><div style="font-size:11px;color:var(--gray-60);margin-top:2px">Dernier audit</div></div><div style="background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg);padding:var(--space-md);text-align:center"><div style="font-size:22px;font-weight:700' + (openAct > 0 ? ';color:var(--traffic-orange)' : '') + '">' + openAct + '</div><div style="font-size:11px;color:var(--gray-60);margin-top:2px">Actions ouvertes</div></div>';
+        }
+        
+        function renderZoneChart(zoneName) {
+            var container = document.getElementById('dashboard-zone-chart');
+            var audits = getFilteredZoneAudits(zoneName);
+            if (audits.length < 2) { container.innerHTML = '<div class="dashboard-empty" style="padding:var(--space-xl)"><p>Pas assez de données</p></div>'; return; }
+            
+            var recent = audits.slice(-10);
+            var w = container.offsetWidth || 600, h = 200;
+            var pad = {t:24,r:30,b:30,l:40}, cw = w-pad.l-pad.r, ch = h-pad.t-pad.b;
+            var xStep = cw / (recent.length-1);
+            var pts = recent.map(function(a,i) {
+                var pct = getAuditPerformance(a);
+                return {x:Math.round(pad.l+i*xStep), y:Math.round(pad.t+(1-pct/100)*ch), pct:pct, date:formatDateShort(a.date), dateFull:formatExcelDate(a.date), niveau:a.niveau||'-', auditeur:a.auditeur||'-', id:a.auditId||'-'};
+            });
+            
+            var gridLines='';
+            for (var v=0;v<=100;v+=25) { var y=Math.round(pad.t+(1-v/100)*ch); gridLines+='<line x1="'+pad.l+'" y1="'+y+'" x2="'+(w-pad.r)+'" y2="'+y+'" stroke="var(--gray-10)" stroke-width="1"/><text x="'+(pad.l-6)+'" y="'+(y+3)+'" text-anchor="end" style="font-size:10px;fill:var(--gray-50);font-family:inherit">'+v+'%</text>'; }
+            var threshY=Math.round(pad.t+(1-85/100)*ch);
+            var lineD=pts.map(function(p,i){return(i===0?'M':'L')+p.x+' '+p.y;}).join(' ');
+            var areaD=lineD+' L'+pts[pts.length-1].x+' '+(pad.t+ch)+' L'+pts[0].x+' '+(pad.t+ch)+' Z';
+            var dots=pts.map(function(p,i){ var c=p.pct>=85?'var(--traffic-green)':p.pct>=70?'var(--sartorius-yellow)':p.pct>=50?'var(--traffic-orange)':'var(--traffic-red)'; return '<circle cx="'+p.x+'" cy="'+p.y+'" r="5" fill="var(--white)"/><circle cx="'+p.x+'" cy="'+p.y+'" r="4" fill="'+c+'" stroke="var(--white)" stroke-width="2.5" style="cursor:pointer" data-idx="'+i+'"/><text x="'+p.x+'" y="'+(p.y-10)+'" text-anchor="middle" style="font-size:10px;font-weight:600;fill:var(--gray-70);font-family:inherit">'+p.pct+'</text>';}).join('');
+            var xLabels=pts.map(function(p){return '<text x="'+p.x+'" y="'+(h-6)+'" text-anchor="middle" style="font-size:10px;fill:var(--gray-50);font-family:inherit">'+p.date+'</text>';}).join('');
+            
+            container.innerHTML='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet">'+gridLines+'<line x1="'+pad.l+'" y1="'+threshY+'" x2="'+(w-pad.r)+'" y2="'+threshY+'" stroke="var(--gray-30)" stroke-width="1" stroke-dasharray="4 4"/><text x="'+(w-pad.r+4)+'" y="'+(threshY+3)+'" style="font-size:9px;fill:var(--gray-50);font-family:inherit">85%</text><path d="'+areaD+'" fill="var(--sartorius-yellow)" opacity="0.08"/><path d="'+lineD+'" fill="none" stroke="var(--sartorius-yellow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dots+xLabels+'</svg>';
+            
+            // Chart dot tooltips
+            var tipEl = document.getElementById('chart-tooltip');
+            var svgEl = container.querySelector('svg');
+            if (svgEl && tipEl) {
+                container.querySelectorAll('circle[data-idx]').forEach(function(dot) {
+                    dot.addEventListener('mouseenter', function() {
+                        var idx=parseInt(this.dataset.idx); var p=pts[idx];
+                        var rect=svgEl.getBoundingClientRect(); var scaleX=rect.width/w; var scaleY=rect.height/h;
+                        var dotX=rect.left+p.x*scaleX-container.getBoundingClientRect().left;
+                        var dotY=rect.top+p.y*scaleY-container.getBoundingClientRect().top;
+                        tipEl.textContent=p.niveau+' · '+p.dateFull+' · '+p.auditeur;
+                        tipEl.style.left=(dotX-tipEl.offsetWidth/2)+'px';
+                        tipEl.style.top=(dotY-32)+'px';
+                        tipEl.style.opacity='1';
+                    });
+                    dot.addEventListener('mouseleave', function() { tipEl.style.opacity='0'; });
+                });
+            }
+        }
+        
+        function setRadarMode(mode) {
+            radarMode = mode;
+            document.querySelectorAll('.dashboard-radar-toggle-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.mode === mode); });
+            renderZoneRadar(selectedZone);
+        }
+        
+        function toggleRadarLevel(level) {
+            radarLevels[level] = !radarLevels[level];
+            renderZoneRadar(selectedZone);
+        }
+        
+        function renderZoneRadar(zoneName) {
+            var container = document.getElementById('dashboard-zone-radar');
+            var allAudits = getFilteredZoneAudits(zoneName);
+            if (allAudits.length === 0) { container.innerHTML = '<div class="dashboard-empty" style="padding:var(--space-lg)"><p>Aucun audit</p></div>'; return; }
+            
+            var sNames=['Trier','Ranger','Nettoyer','Standard.','Suivre'], sKeys=['S1','S2','S3','S4','S5'];
+            var cx=120,cy=110,maxR=85,n=5,angleStart=-Math.PI/2;
+            function polar(angle,r){return{x:Math.round(cx+r*Math.cos(angle)),y:Math.round(cy+r*Math.sin(angle))};}
+            
+            var gridSvg='',axisSvg='',labelPositions=[];
+            for(var lv=1;lv<=4;lv++){var r=maxR*lv/4;var gp=[];for(var i=0;i<n;i++){gp.push(polar(angleStart+2*Math.PI*i/n,r));}gridSvg+='<polygon points="'+gp.map(function(p){return p.x+','+p.y;}).join(' ')+'" stroke="var(--gray-20)" stroke-width="0.5" fill="none"/>';}
+            for(var i=0;i<n;i++){var angle=angleStart+2*Math.PI*i/n;var end=polar(angle,maxR);axisSvg+='<line x1="'+cx+'" y1="'+cy+'" x2="'+end.x+'" y2="'+end.y+'" stroke="var(--gray-10)" stroke-width="0.5"/>';labelPositions.push(polar(angle,maxR+22));}
+            
+            var levelConfigs={N1:{color:'var(--teal)',hex:'#00B9BE'},N2:{color:'var(--traffic-orange)',hex:'#F59100'}};
+            var shapesSvg='',legendItems=[],primaryScores=null,primarySubtitle='';
+            
+            Object.keys(levelConfigs).forEach(function(lvl) {
+                if(!radarLevels[lvl])return;
+                var cfg=levelConfigs[lvl];
+                var lvlAudits=allAudits.filter(function(a){return a.niveau===lvl;});
+                if(lvlAudits.length===0)return;
+                var scores;
+                if(radarMode==='last'){var last=lvlAudits[lvlAudits.length-1];var ss=getAuditSScores(last);scores=sKeys.map(function(k){return ss[k];});}
+                else{scores=sKeys.map(function(k){return Math.round(lvlAudits.reduce(function(s,a){return s+getAuditSScores(a)[k];},0)/lvlAudits.length*10)/10;});}
+                var shapePts=scores.map(function(s,i){return polar(angleStart+2*Math.PI*i/n,maxR*s/4);});
+                var str=shapePts.map(function(p){return p.x+','+p.y;}).join(' ');
+                shapesSvg+='<polygon points="'+str+'" fill="'+cfg.color+'" opacity="0.12"/><polygon points="'+str+'" stroke="'+cfg.color+'" fill="none" stroke-width="2" stroke-linejoin="round"/>'+shapePts.map(function(p){return '<circle cx="'+p.x+'" cy="'+p.y+'" r="3" fill="'+cfg.color+'"/>';}).join('');
+                legendItems.push('<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray-60)"><div style="width:14px;height:3px;border-radius:2px;background:'+cfg.color+'"></div>'+lvl+' ('+lvlAudits.length+')</div>');
+                if(!primaryScores){primaryScores=scores;primarySubtitle=radarMode==='last'?lvl+' · '+formatExcelDate(lvlAudits[lvlAudits.length-1].date):'Moyenne '+lvl+' · '+lvlAudits.length+' audits';}
+            });
+            
+            if(!primaryScores){primaryScores=sKeys.map(function(){return 0;});primarySubtitle='Aucun niveau sélectionné';}
+            var globalScore=primaryScores.reduce(function(s,v){return s+v;},0)/primaryScores.length;
+            var globalPct=Math.round(globalScore/4*100);
+            var labelsSvg=sNames.map(function(name,i){var p=labelPositions[i];return '<text x="'+p.x+'" y="'+(p.y-4)+'" text-anchor="middle" style="font-size:11px;font-weight:600;fill:var(--gray-70);font-family:inherit">'+name+'</text>';}).join('');
+            
+            var catBars=sKeys.map(function(k,i){var v=primaryScores[i];var bPct=Math.round(v/4*100);var color=v>=3.4?'var(--traffic-green)':v>=2.8?'var(--sartorius-yellow)':v>=2?'var(--traffic-orange)':'var(--traffic-red)';return '<div style="display:flex;align-items:center;gap:12px"><div style="width:90px;font-size:13px;font-weight:500;color:var(--gray-70);flex-shrink:0">'+sNames[i]+'</div><div style="flex:1;height:8px;background:var(--gray-10);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+bPct+'%;background:'+color+';border-radius:4px;transition:width 0.6s"></div></div><div style="width:44px;font-size:13px;font-weight:600;text-align:right;flex-shrink:0;color:'+color+'">'+v.toFixed(1)+'</div></div>';}).join('');
+            
+            container.innerHTML='<div style="width:240px;height:240px;margin:0 auto"><svg viewBox="0 0 240 220" width="100%" height="100%">'+gridSvg+axisSvg+shapesSvg+labelsSvg+'</svg></div><div style="display:flex;justify-content:center;gap:var(--space-lg);margin-top:var(--space-sm)">'+legendItems.join('')+'</div><div style="text-align:center;margin-top:var(--space-md)"><div style="font-size:28px;font-weight:700" class="'+getScoreClass(globalPct)+'">'+globalPct+'<span style="font-size:16px;color:var(--gray-40);font-weight:400">%</span></div><div style="font-size:12px;color:var(--gray-50);margin-top:2px">'+primarySubtitle+'</div></div><div style="margin-top:var(--space-lg);display:flex;flex-direction:column;gap:8px">'+catBars+'</div>';
+        }
+        
+        function renderZoneHistory(zoneName) {
+            var audits = getFilteredZoneAudits(zoneName).slice().reverse();
+            var tbody = document.getElementById('dashboard-zone-history-tbody');
+            if (!tbody) return;
+            if (audits.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--gray-50);padding:var(--space-lg)">Aucun audit</td></tr>'; return; }
+            tbody.innerHTML = audits.map(function(a) {
+                var pct = getAuditPerformance(a);
+                var color = pct>=85?'var(--traffic-green)':pct>=70?'var(--gray-80)':pct>=50?'var(--traffic-orange)':'var(--traffic-red)';
+                return '<tr style="cursor:pointer" onclick="openAuditFromZone('+a.rowIndex+',\''+zoneName+'\')"><td style="font-weight:500">'+formatExcelDate(a.date)+'</td><td><span class="db2-badge db2-badge-gray">'+(a.niveau||'-')+'</span></td><td style="font-weight:600;color:'+color+'">'+pct+'%</td><td style="color:var(--gray-60)">'+(a.auditeur||'-')+'</td></tr>';
+            }).join('');
+        }
+        
+        // ─── ACTIONS TAB ───
+        var actionsStatusFilter = 'active';
+        var actionsZoneFilter = 'all';
+        
+        function initActionsTab() {
+            renderActionsSummary();
+            renderActionsFilters();
+            renderActionsTable();
+        }
+        
+        function renderActionsSummary() {
+            var counts={open:0,inprogress:0,overdue:0,closed:0,cancelled:0};
+            dashboardData.actions.forEach(function(a){var st=getActionStatus(a);counts[st]=(counts[st]||0)+1;});
+            var activeCount=counts.open+counts.overdue+counts.inprogress;
+            var el=document.getElementById('db2-actions-summary');
+            if(!el)return;
+            el.innerHTML='<div style="text-align:center;flex:1"><div style="font-size:20px;font-weight:700">'+dashboardData.actions.length+'</div><div style="font-size:11px;color:var(--gray-60)">Total</div></div><div style="text-align:center;flex:1"><div style="font-size:20px;font-weight:700;color:var(--traffic-orange)">'+activeCount+'</div><div style="font-size:11px;color:var(--gray-60)">Actives</div></div><div style="text-align:center;flex:1"><div style="font-size:20px;font-weight:700;color:var(--traffic-red)">'+counts.overdue+'</div><div style="font-size:11px;color:var(--gray-60)">> 30 jours</div></div><div style="text-align:center;flex:1"><div style="font-size:20px;font-weight:700;color:var(--teal)">'+counts.inprogress+'</div><div style="font-size:11px;color:var(--gray-60)">En cours</div></div><div style="text-align:center;flex:1"><div style="font-size:20px;font-weight:700;color:var(--traffic-green)">'+counts.closed+'</div><div style="font-size:11px;color:var(--gray-60)">Clôturées</div></div>';
+        }
+        
+        function renderActionsFilters() {
+            var counts={active:0,overdue:0,inprogress:0,closed:0};
+            dashboardData.actions.forEach(function(a){var st=getActionStatus(a);if(['open','overdue','inprogress'].includes(st))counts.active++;if(st==='overdue')counts.overdue++;if(st==='inprogress')counts.inprogress++;if(st==='closed'||st==='cancelled')counts.closed++;});
+            var filters=[{key:'active',label:'Actives',count:counts.active},{key:'overdue',label:'> 30j',count:counts.overdue},{key:'inprogress',label:'En cours',count:counts.inprogress},{key:'closed',label:'Clôturées',count:counts.closed},{key:'all',label:'Toutes',count:dashboardData.actions.length}];
+            
+            var html=filters.map(function(f){return '<button class="db2-filter-chip'+(actionsStatusFilter===f.key?' active':'')+'" data-sfilter="'+f.key+'">'+f.label+' <span class="count">'+f.count+'</span></button>';}).join('');
+            html+='<div style="width:1px;height:20px;background:var(--gray-20);margin:0 4px"></div>';
+            html+='<button class="db2-filter-chip'+(actionsZoneFilter==='all'?' active':'')+'" data-zfilter="all">Toutes zones</button>';
+            dashboardZones.forEach(function(z){html+='<button class="db2-filter-chip'+(actionsZoneFilter===z?' active':'')+'" data-zfilter="'+z+'">'+z.replace('Process / Entrée','Process')+'</button>';});
+            
+            var el=document.getElementById('db2-actions-filters');
+            if(!el)return;
+            el.innerHTML=html;
+            el.querySelectorAll('[data-sfilter]').forEach(function(btn){btn.addEventListener('click',function(){actionsStatusFilter=btn.dataset.sfilter;renderActionsFilters();renderActionsTable();});});
+            el.querySelectorAll('[data-zfilter]').forEach(function(btn){btn.addEventListener('click',function(){actionsZoneFilter=btn.dataset.zfilter;renderActionsFilters();renderActionsTable();});});
+        }
+        
+        function getFilteredActions() {
+            return dashboardData.actions.filter(function(a){var st=getActionStatus(a);if(actionsStatusFilter==='active'&&(st==='closed'||st==='cancelled'))return false;if(actionsStatusFilter==='overdue'&&st!=='overdue')return false;if(actionsStatusFilter==='inprogress'&&st!=='inprogress')return false;if(actionsStatusFilter==='closed'&&st!=='closed'&&st!=='cancelled')return false;if(actionsZoneFilter!=='all'&&a.zone!==actionsZoneFilter)return false;return true;}).sort(function(a,b){var order={overdue:0,open:1,inprogress:2,closed:3,cancelled:4};return(order[getActionStatus(a)]||9)-(order[getActionStatus(b)]||9);});
+        }
+        
+        function renderActionsTable() {
+            var filtered=getFilteredActions();
+            var tbody=document.getElementById('db2-actions-tbody');
+            if(!tbody)return;
+            if(filtered.length===0){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--gray-50);padding:var(--space-xl)">Aucune action trouvée</td></tr>';return;}
+            tbody.innerHTML=filtered.map(function(a){var st=getActionStatus(a);var days=getActionDaysOpen(a);var dotColor={open:'var(--traffic-orange)',overdue:'var(--traffic-red)',inprogress:'var(--teal)',closed:'var(--traffic-green)',cancelled:'var(--gray-40)'}[st]||'var(--gray-40)';return '<tr style="cursor:pointer" onclick="openActionModal('+a.rowIndex+')"><td style="text-align:center;vertical-align:middle"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'+dotColor+'" title="'+getStatusLabel(st)+'"></span></td><td style="font-weight:500;max-width:280px">'+(a.action||'-')+'<div style="font-size:11px;color:var(--gray-50);margin-top:2px;font-weight:400">'+(a.actionId||'-')+'</div></td><td style="white-space:nowrap"><span class="db2-badge db2-badge-gray">'+(a.zone||'-').replace('Process / Entrée','Process')+'</span></td><td><span class="db2-badge '+(a.type==='Écart'?'db2-badge-red':'db2-badge-green')+'">'+(a.type||'-')+'</span></td><td style="white-space:nowrap;color:var(--gray-70)">'+(a.responsable||'—')+'</td><td style="white-space:nowrap;color:var(--gray-60)">'+formatDateShort(a.dateOuverture)+(st==='overdue'?' · '+days+'j':'')+'</td><td><button style="width:30px;height:30px;border:1px solid var(--gray-20);border-radius:var(--radius-sm);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-50)" onclick="event.stopPropagation();openActionModal('+a.rowIndex+')" title="Gérer"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button></td></tr>';}).join('');
+        }
+        
+        // ─── HISTORY TAB ───
+        var historySortKey='date', historySortDir='desc';
+        
+        function initHistoryTab() {
+            var searchInput = document.getElementById('dashboard-search-input');
+            if (searchInput) searchInput.addEventListener('input', function() { renderAuditsTable(this.value); });
+            
+            document.querySelectorAll('#dashboard-audits-table th[data-sort]').forEach(function(th) {
+                th.addEventListener('click', function() {
+                    var key=this.dataset.sort;
+                    if(historySortKey===key){historySortDir=historySortDir==='desc'?'asc':'desc';}else{historySortKey=key;historySortDir='desc';}
+                    document.querySelectorAll('#dashboard-audits-table th').forEach(function(h){h.classList.remove('sorted');});
+                    this.classList.add('sorted');
+                    var arrow=this.querySelector('.sort-arrow');if(arrow)arrow.textContent=historySortDir==='desc'?'▼':'▲';
+                    renderAuditsTable(searchInput?searchInput.value:'');
+                });
+            });
+            
+            renderAuditsTable('');
+        }
+        
+        function getFilteredHistoryAudits(searchQuery) {
+            var query=(searchQuery||'').toLowerCase().trim();
+            var filtered=dashboardData.audits.filter(function(a){if(!query)return true;return(a.zone||'').toLowerCase().includes(query)||(a.auditeur||'').toLowerCase().includes(query)||(a.auditId||'').toLowerCase().includes(query)||(a.niveau||'').toLowerCase().includes(query);});
+            filtered.sort(function(a,b){var va,vb;switch(historySortKey){case'date':va=a.date;vb=b.date;break;case'zone':va=a.zone;vb=b.zone;break;case'niveau':va=a.niveau;vb=b.niveau;break;case'score':va=parseScorePercent(a.performance);vb=parseScorePercent(b.performance);break;case'auditeur':va=a.auditeur;vb=b.auditeur;break;default:va=a.date;vb=b.date;}if(va<vb)return historySortDir==='desc'?1:-1;if(va>vb)return historySortDir==='desc'?-1:1;return 0;});
+            return filtered;
+        }
+        
+        function renderAuditsTable(searchQuery) {
+            var filtered=getFilteredHistoryAudits(searchQuery);
+            var tbody=document.getElementById('dashboard-audits-tbody');
+            if(!tbody)return;
+            if(filtered.length===0){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--gray-50);padding:var(--space-xl)">Aucun audit trouvé</td></tr>';return;}
+            tbody.innerHTML=filtered.map(function(a){var pct=getAuditPerformance(a);var color=pct>=85?'var(--traffic-green)':pct>=70?'var(--gray-80)':pct>=50?'var(--traffic-orange)':'var(--traffic-red)';var auditActions=getAuditActions(a);var ecarts=auditActions.filter(function(ac){return ac.type==='Écart';}).length;var elevations=auditActions.filter(function(ac){return ac.type==='Élévation';}).length;var actStr='';if(ecarts)actStr+=ecarts+' écart'+(ecarts>1?'s':'');if(elevations)actStr+=(actStr?', ':'')+elevations+' élév.';if(!actStr)actStr='—';return '<tr style="cursor:pointer" onclick="openAuditFromHistory('+a.rowIndex+')"><td style="font-weight:500">'+formatExcelDate(a.date)+'</td><td><span class="db2-badge db2-badge-gray">'+(a.zone||'-').replace('Process / Entrée','Process')+'</span></td><td><span class="db2-badge db2-badge-gray">'+(a.niveau||'-')+'</span></td><td style="font-weight:600;color:'+color+'">'+pct+'%</td><td style="color:var(--gray-60)">'+(a.auditeur||'-')+'</td><td style="font-size:12px;color:var(--gray-50)">'+actStr+'</td></tr>';}).join('');
+        }
+        
+        // ─── MODAL NAVIGATION STATE ───
+        var currentActionRowIndex = null;
+        var currentAuditRowIndex = null;
+        var parentAuditRowIndex = null;
+        var actionNavList = [];
+        var auditNavList = [];
+        
+        // ─── CONTEXTUAL OPENERS ───
+        function openActionFromOverview(rowIndex) {
+            actionNavList=dashboardData.actions.filter(function(a){return['open','overdue'].includes(getActionStatus(a));}).sort(function(a,b){var sa=getActionStatus(a)==='overdue'?0:1;var sb=getActionStatus(b)==='overdue'?0:1;return sa-sb;}).map(function(a){return a.rowIndex;});
+            parentAuditRowIndex=null;
+            openActionModal(rowIndex);
+        }
+        
+        function openActionFromMyActions(rowIndex) {
+            var userName=getCurrentUserName().toLowerCase();
+            actionNavList=dashboardData.actions.filter(function(a){var resp=(a.responsable||'').toLowerCase();return resp.includes(userName.split(' ')[0].toLowerCase())&&!['closed','cancelled'].includes(getActionStatus(a));}).map(function(a){return a.rowIndex;});
+            parentAuditRowIndex=null;
+            openActionModal(rowIndex);
+        }
+        
+        function openAuditFromHistory(rowIndex) {
+            var query=document.getElementById('dashboard-search-input')?document.getElementById('dashboard-search-input').value:'';
+            auditNavList=getFilteredHistoryAudits(query).map(function(a){return a.rowIndex;});
+            openAuditDetailModal(rowIndex);
+        }
+        
+        function openAuditFromZone(rowIndex, zoneName) {
+            auditNavList=getFilteredZoneAudits(zoneName).map(function(a){return a.rowIndex;});
+            openAuditDetailModal(rowIndex);
+        }
+        
+        // ─── ACTION MODAL ───
+        function openActionModal(rowIndex, fromAuditRowIndex) {
+            var action=dashboardData.actions.find(function(a){return a.rowIndex===rowIndex;});
+            if(!action)return;
+            currentActionRowIndex=rowIndex;
+            if(fromAuditRowIndex!==undefined)parentAuditRowIndex=fromAuditRowIndex;
+            
+            if(actionNavList.length===0||actionNavList.indexOf(rowIndex)===-1){
+                actionNavList=getFilteredActions().map(function(a){return a.rowIndex;});
+                if(actionNavList.indexOf(rowIndex)===-1)actionNavList=dashboardData.actions.map(function(a){return a.rowIndex;});
+            }
+            
+            var st=getActionStatus(action);
+            var days=getActionDaysOpen(action);
+            var linkedAudit=dashboardData.audits.find(function(au){return action.actionId&&au.auditId&&action.actionId.replace(/_A\d+$/,'')=== au.auditId;});
+            
+            var titleEl=document.getElementById('modal-action-title');
+            if(titleEl)titleEl.textContent=action.actionId||'Action';
+            
+            var returnEl=document.getElementById('modal-action-return');
+            if(returnEl){
+                if(parentAuditRowIndex!==null){
+                    var parentAudit=dashboardData.audits.find(function(a){return a.rowIndex===parentAuditRowIndex;});
+                    returnEl.innerHTML='<button style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:var(--teal);cursor:pointer;border:none;background:none;font-family:inherit;padding:4px 0" onclick="closeActionModal()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour audit '+(parentAudit?parentAudit.auditId:'')+'</button>';
+                } else { returnEl.innerHTML=''; }
+            }
+            
+            var idx=actionNavList.indexOf(rowIndex);
+            var prevBtn=document.getElementById('action-nav-prev');
+            var nextBtn=document.getElementById('action-nav-next');
+            if(prevBtn)prevBtn.disabled=idx<=0;
+            if(nextBtn)nextBtn.disabled=idx>=actionNavList.length-1;
+            
+            var isClosed=st==='closed'||st==='cancelled';
+            var bodyEl=document.getElementById('modal-action-body');
+            if(!bodyEl)return;
+            
+            var h='<div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Statut</div><span class="db2-badge db2-badge-'+(st==='overdue'?'red':st==='inprogress'?'teal':st==='closed'?'green':st==='cancelled'?'gray':'orange')+'">'+getStatusLabel(st)+'</span>'+(st==='overdue'?'<span style="font-size:12px;color:var(--traffic-red);margin-left:8px">'+days+' jours</span>':'')+'</div>';
+            h+='<div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Description</div><div style="font-size:14px">'+(action.action||'-')+'</div></div>';
+            h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)"><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Type</div><span class="db2-badge '+(action.type==='Écart'?'db2-badge-red':'db2-badge-green')+'">'+(action.type||'-')+'</span></div><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Zone</div><div style="font-size:14px">'+(action.zone||'-')+'</div></div><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Responsable</div><div style="font-size:14px">'+(action.responsable||'—')+'</div></div><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Date ouverture</div><div style="font-size:14px">'+formatExcelDate(action.dateOuverture)+'</div></div></div>';
+            if(action.dateCloture&&action.dateCloture!=='')h+='<div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Date clôture</div><div style="font-size:14px">'+formatExcelDate(action.dateCloture)+'</div></div>';
+            if(linkedAudit){var lPct=getAuditPerformance(linkedAudit);h+='<div style="margin-top:var(--space-sm);padding-top:var(--space-md);border-top:1px solid var(--gray-10)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Audit source</div><div style="display:flex;align-items:center;gap:var(--space-sm);flex-wrap:wrap;font-size:14px"><span>'+linkedAudit.auditId+'</span><span class="db2-badge db2-badge-gray">'+linkedAudit.niveau+'</span><span style="color:var(--gray-50)">'+formatExcelDate(linkedAudit.date)+'</span><span style="font-weight:600;color:'+(lPct>=70?'var(--traffic-green)':'var(--traffic-orange)')+'">'+lPct+'%</span></div></div>';}
+            
+            if(!isClosed){
+                h+='<div class="dashboard-action-modal-comment" style="margin-top:var(--space-md)"><label class="dashboard-action-modal-label" for="modal-comment">Commentaire <span id="modal-comment-required" style="color:var(--traffic-red);display:none">*</span></label><textarea id="modal-comment" class="dashboard-action-comment-input" rows="2" placeholder="Ajouter un commentaire..."></textarea></div>';
+                h+='<div class="dashboard-action-modal-actions"><button class="dashboard-action-btn close-action" id="modal-btn-close" onclick="handleAction(\'close\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Clôturer</button>';
+                if(st!=='inprogress')h+='<button class="dashboard-action-btn inprogress-action" id="modal-btn-inprogress" onclick="handleAction(\'inprogress\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>En cours</button>';
+                h+='<button class="dashboard-action-btn cancel-action" id="modal-btn-cancel" onclick="handleAction(\'cancel\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Annuler</button></div>';
+            }
+            
+            bodyEl.innerHTML=h;
+            document.getElementById('dashboard-action-modal').classList.add('visible');
+        }
+        
+        function navAction(dir) {
+            var idx=actionNavList.indexOf(currentActionRowIndex);
+            var newIdx=idx+dir;
+            if(newIdx>=0&&newIdx<actionNavList.length){parentAuditRowIndex=null;openActionModal(actionNavList[newIdx]);}
+        }
+        
+        function closeActionModal() {
+            document.getElementById('dashboard-action-modal').classList.remove('visible');
+            if(parentAuditRowIndex!==null){var returnTo=parentAuditRowIndex;parentAuditRowIndex=null;currentActionRowIndex=null;setTimeout(function(){openAuditDetailModal(returnTo);},150);return;}
+            currentActionRowIndex=null;
+        }
+        
+        // ─── AUDIT DETAIL MODAL ───
         
         // Labels des critères
         const AUDIT_CRITERIA_LABELS = {
@@ -13538,12 +13310,11 @@ Cordialement`);
             seiketsu_1: 'Standards et consignes affichés',
             seiketsu_2: 'Management visuel efficace',
             seiketsu_3: 'Respect des règles 5S',
-            shitsuke_1: 'Implication de l\'équipe',
+            shitsuke_1: "Implication de l'équipe",
             shitsuke_2: 'Audits réguliers et suivi',
-            shitsuke_3: 'Actions d\'amélioration réalisées'
+            shitsuke_3: "Actions d'amélioration réalisées"
         };
         
-        // Configuration des S
         const S_CONFIG = [
             { key: 'S1', name: 'Trier', prefix: 'seiri', criteria: ['seiri_1', 'seiri_2', 'seiri_3'] },
             { key: 'S2', name: 'Ranger', prefix: 'seiton', criteria: ['seiton_1', 'seiton_2', 'seiton_3'] },
@@ -13552,230 +13323,110 @@ Cordialement`);
             { key: 'S5', name: 'Respecter', prefix: 'shitsuke', criteria: ['shitsuke_1', 'shitsuke_2', 'shitsuke_3'] }
         ];
         
-        let currentAuditDetail = null;
+        var currentAuditDetail = null;
         
         function openAuditDetailModal(rowIndex) {
-            const audit = dashboardData.audits.find(a => a.rowIndex === rowIndex);
+            var audit = dashboardData.audits.find(function(a) { return a.rowIndex === rowIndex; });
             if (!audit) return;
-            
             currentAuditDetail = audit;
+            currentAuditRowIndex = rowIndex;
             
-            // Remplir les infos de base
-            document.getElementById('audit-detail-id').textContent = audit.auditId || '-';
-            document.getElementById('audit-detail-zone').textContent = audit.zone || '-';
-            document.getElementById('audit-detail-meta').textContent = `${formatExcelDate(audit.date)} • ${audit.auditeur || '-'}`;
+            if(auditNavList.length===0||auditNavList.indexOf(rowIndex)===-1){
+                auditNavList=dashboardData.audits.slice().sort(function(a,b){return(b.date||'').toString().localeCompare((a.date||'').toString());}).map(function(a){return a.rowIndex;});
+            }
             
-            const niveauEl = document.getElementById('audit-detail-niveau');
-            niveauEl.textContent = audit.niveau || '-';
-            niveauEl.className = 'audit-detail-niveau' + (audit.niveau === 'N1' ? ' n1' : '');
+            var pct=getAuditPerformance(audit);
+            var sScores=getAuditSScores(audit);
+            var auditActions=getAuditActions(audit);
             
-            // Score global
-            const score = Math.round(parseScorePercent(audit.performance));
-            const scoreClass = getScoreClass(score);
-            const scoreEl = document.getElementById('audit-detail-score');
-            scoreEl.textContent = score + '%';
-            scoreEl.className = 'audit-detail-score-value ' + scoreClass;
+            document.getElementById('audit-detail-id').textContent=audit.auditId||'-';
             
-            // Mini barres S
-            renderAuditDetailSBars(audit);
+            var idx=auditNavList.indexOf(rowIndex);
+            var prevBtn=document.getElementById('audit-nav-prev');
+            var nextBtn=document.getElementById('audit-nav-next');
+            if(prevBtn)prevBtn.disabled=idx<=0;
+            if(nextBtn)nextBtn.disabled=idx>=auditNavList.length-1;
             
-            // Scores détaillés
-            renderAuditDetailScores(audit);
+            var scoreColor=pct>=85?'var(--traffic-green)':pct>=70?'var(--gray-80)':pct>=50?'var(--traffic-orange)':'var(--traffic-red)';
+            var sNames=['Trier','Ranger','Nettoyer','Standardiser','Respecter'];
+            var sKeys=['S1','S2','S3','S4','S5'];
             
-            // Actions liées
-            renderAuditDetailActions(audit);
+            var catBars=sKeys.map(function(k,i){
+                var v=sScores[k];
+                var bPct=Math.round(v/4*100);
+                var color=v>=3.4?'var(--traffic-green)':v>=2.8?'var(--sartorius-yellow)':v>=2?'var(--traffic-orange)':'var(--traffic-red)';
+                var criteria=S_CONFIG[i].criteria.map(function(c){return AUDIT_CRITERIA_LABELS[c]+': '+(audit.scores[c]||0)+'/4';}).join(' · ');
+                return '<div style="position:relative;display:flex;align-items:center;gap:12px" title="'+criteria+'"><div style="width:100px;font-size:13px;font-weight:500;color:var(--gray-70);flex-shrink:0">'+sNames[i]+'</div><div style="flex:1;height:8px;background:var(--gray-10);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+bPct+'%;background:'+color+';border-radius:4px;transition:width 0.6s"></div></div><div style="width:44px;font-size:13px;font-weight:600;text-align:right;flex-shrink:0;color:'+color+'">'+v.toFixed(1)+'</div></div>';
+            }).join('');
             
-            // Photos - on essaie de les charger
-            loadAuditDetailPhotos(audit);
+            var linkedHtml='';
+            if(auditActions.length>0){
+                linkedHtml=auditActions.map(function(ac){var st=getActionStatus(ac);var dotColor={open:'var(--traffic-orange)',overdue:'var(--traffic-red)',inprogress:'var(--teal)',closed:'var(--traffic-green)',cancelled:'var(--gray-40)'}[st];return '<div style="display:flex;align-items:flex-start;gap:var(--space-sm);padding:var(--space-sm) 0;border-top:1px solid var(--gray-10);cursor:pointer" onclick="closeAuditDetailModalSilent();setTimeout(function(){openActionModal('+ac.rowIndex+','+rowIndex+');},150)"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'+dotColor+';margin-top:5px;flex-shrink:0"></span><div><div style="font-size:13px;font-weight:500;line-height:1.3">'+(ac.action||'-')+'</div><div style="font-size:11px;color:var(--gray-50);margin-top:2px">'+(ac.responsable||'—')+' · '+(ac.type||'-')+' · <span class="db2-badge db2-badge-'+(st==='overdue'?'red':st==='inprogress'?'teal':st==='closed'?'green':'orange')+'" style="font-size:10px;padding:1px 6px">'+getStatusLabel(st)+'</span></div></div></div>';}).join('');
+            } else { linkedHtml='<div style="font-size:13px;color:var(--gray-50);padding:var(--space-sm) 0">Aucune action liée</div>'; }
             
-            // Ouvrir la modale
+            var bodyEl=document.getElementById('audit-detail-body');
+            if(!bodyEl)return;
+            
+            var scoreMoy=typeof audit.scoreMoyen==='number'?audit.scoreMoyen.toFixed(2):'-';
+            bodyEl.innerHTML='<div style="padding:var(--space-lg)"><div style="display:flex;gap:var(--space-lg);flex-wrap:wrap;margin-bottom:var(--space-lg)"><div style="min-width:100px"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Auditeur</div><div style="font-size:14px">'+(audit.auditeur||'-')+'</div></div><div style="min-width:100px"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Niveau</div><span class="db2-badge db2-badge-gray">'+(audit.niveau||'-')+'</span></div><div style="min-width:100px"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Score global</div><div style="font-size:18px;font-weight:700;color:'+scoreColor+'">'+pct+'% <span style="font-size:13px;font-weight:400;color:var(--gray-50)">('+scoreMoy+'/4)</span></div></div><div style="min-width:100px"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Zone</div><span class="db2-badge db2-badge-gray">'+(audit.zone||'-')+'</span></div></div><div style="margin-bottom:var(--space-lg)"><div style="font-size:12px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:var(--space-sm)">Scores par catégorie</div><div style="display:flex;flex-direction:column;gap:8px">'+catBars+'</div></div><div style="margin-bottom:var(--space-lg)"><div style="font-size:12px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:var(--space-sm)">Actions liées ('+auditActions.length+')</div>'+linkedHtml+'</div><div style="margin-bottom:var(--space-lg)"><div style="font-size:12px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:var(--space-sm)">Photos</div><div id="audit-detail-photos-content"><div style="font-size:12px;color:var(--gray-40);display:flex;align-items:center;gap:var(--space-sm)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gray-40)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Chargement...</div></div></div></div>';
+            
             document.getElementById('audit-detail-modal').classList.add('visible');
-            document.body.style.overflow = 'hidden';
+            
+            // Load photos async
+            loadAuditDetailPhotos(audit);
+        }
+        
+        function navAudit(dir) {
+            var idx=auditNavList.indexOf(currentAuditRowIndex);
+            var newIdx=idx+dir;
+            if(newIdx>=0&&newIdx<auditNavList.length)openAuditDetailModal(auditNavList[newIdx]);
         }
         
         function closeAuditDetailModal() {
             document.getElementById('audit-detail-modal').classList.remove('visible');
-            document.body.style.overflow = 'hidden'; // Dashboard toujours ouvert
-            currentAuditDetail = null;
-            
-            // Fermer toutes les sections
-            document.querySelectorAll('.audit-detail-section').forEach(s => s.classList.remove('open'));
-            document.querySelectorAll('.audit-detail-s-group').forEach(g => g.classList.remove('open'));
+            currentAuditRowIndex=null;
         }
         
-        function toggleAuditDetailSection(sectionId) {
-            const section = document.getElementById('audit-detail-' + sectionId + '-section');
-            if (section) {
-                section.classList.toggle('open');
-            }
+        function closeAuditDetailModalSilent() {
+            document.getElementById('audit-detail-modal').classList.remove('visible');
         }
         
-        function toggleAuditDetailSGroup(sKey) {
-            const group = document.getElementById('audit-detail-s-' + sKey.toLowerCase());
-            if (group) {
-                group.classList.toggle('open');
-            }
+        // Keep old function names as aliases for compatibility
+        function toggleAuditDetailSection() {}
+        function toggleAuditDetailSGroup() {}
+        function getScoreColor(s){return s>=3.4?'var(--traffic-green)':s>=2.8?'var(--sartorius-yellow)':s>=2?'var(--traffic-orange)':'var(--traffic-red)';}
+        function getCriteriaScoreClass(s){return s>=3?'good':s>=2?'warning':'critical';}
+        function renderAuditDetailSBars() {}
+        function renderAuditDetailScores() {}
+        function renderAuditDetailActions() {}
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            var auditOpen=document.getElementById('audit-detail-modal').classList.contains('visible');
+            var actionOpen=document.getElementById('dashboard-action-modal').classList.contains('visible');
+            if(!auditOpen&&!actionOpen)return;
+            var tag=(e.target.tagName||'').toLowerCase();
+            if(tag==='textarea'||tag==='input')return;
+            if(e.key==='Escape'){e.preventDefault();if(actionOpen)closeActionModal();else if(auditOpen)closeAuditDetailModal();}
+            else if(e.key==='ArrowLeft'){e.preventDefault();if(actionOpen)navAction(-1);else if(auditOpen)navAudit(-1);}
+            else if(e.key==='ArrowRight'){e.preventDefault();if(actionOpen)navAction(1);else if(auditOpen)navAudit(1);}
+        });
+        
+        // Switch dashboard tab programmatically
+        function switchDashboardTab(tabId) {
+            document.querySelectorAll('.dashboard-nav-tab').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelectorAll('.dashboard-tab').forEach(function(t) { t.classList.remove('active'); });
+            var navTab = document.querySelector('.dashboard-nav-tab[data-tab="' + tabId + '"]');
+            if (navTab) navTab.classList.add('active');
+            var panel = document.getElementById('tab-' + tabId);
+            if (panel) panel.classList.add('active');
+            var content = document.querySelector('.dashboard-content');
+            if (content) content.scrollTop = 0;
         }
         
-        // Obtenir la couleur pour un score
-        function getScoreColor(score) {
-            const s = parseFloat(score) || 0;
-            if (s >= 4) return 'var(--traffic-green)';
-            if (s >= 3) return 'var(--sartorius-yellow)';
-            if (s >= 2) return 'var(--traffic-orange)';
-            return 'var(--traffic-red)';
-        }
-        
-        // Obtenir la classe pour un score critère (0-4)
-        function getCriteriaScoreClass(score) {
-            const s = parseInt(score) || 0;
-            return 'score-' + Math.min(4, Math.max(0, s));
-        }
-        
-        // Rendre les mini barres S
-        function renderAuditDetailSBars(audit) {
-            const container = document.getElementById('audit-detail-s-bars');
-            
-            const bars = S_CONFIG.map((s, idx) => {
-                const scoreKey = 'scoreS' + (idx + 1);
-                const score = parseFloat(audit[scoreKey]) || 0;
-                const color = getScoreColor(score);
-                
-                return `
-                    <div class="audit-detail-s-bar">
-                        <div class="audit-detail-s-bar-fill" style="background: ${color};"></div>
-                        <span class="audit-detail-s-bar-label">${s.key}</span>
-                    </div>
-                `;
-            }).join('');
-            
-            container.innerHTML = bars;
-        }
-        
-        // Rendre les scores détaillés (accordéon)
-        function renderAuditDetailScores(audit) {
-            const container = document.getElementById('audit-detail-scores-content');
-            
-            if (!audit.scores) {
-                container.innerHTML = '<div class="audit-detail-empty">Scores détaillés non disponibles</div>';
-                return;
-            }
-            
-            let html = '';
-            
-            S_CONFIG.forEach((s, idx) => {
-                const scoreKey = 'scoreS' + (idx + 1);
-                const sScore = parseFloat(audit[scoreKey]) || 0;
-                const scoreColor = getScoreColor(sScore);
-                
-                html += `
-                    <div class="audit-detail-s-group" id="audit-detail-s-${s.key.toLowerCase()}">
-                        <div class="audit-detail-s-header" onclick="toggleAuditDetailSGroup('${s.key}')">
-                            <span class="audit-detail-s-name">${s.key} — ${s.name}</span>
-                            <span class="audit-detail-s-score" style="color: ${scoreColor};">${sScore.toFixed(1)}/4</span>
-                        </div>
-                        <div class="audit-detail-criteria-list">
-                `;
-                
-                s.criteria.forEach((criteriaKey, cIdx) => {
-                    const criteriaScore = parseInt(audit.scores[criteriaKey]) || 0;
-                    const criteriaLabel = AUDIT_CRITERIA_LABELS[criteriaKey] || criteriaKey;
-                    const scoreClass = getCriteriaScoreClass(criteriaScore);
-                    
-                    html += `
-                        <div class="audit-detail-criteria-item">
-                            <span class="audit-detail-criteria-label">${criteriaLabel}</span>
-                            <span class="audit-detail-criteria-score ${scoreClass}">${criteriaScore}</span>
-                        </div>
-                    `;
-                });
-                
-                html += `
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-        
-        // Rendre les actions liées à l'audit
-        function renderAuditDetailActions(audit) {
-            const container = document.getElementById('audit-detail-actions-content');
-            
-            // Trouver les actions liées via auditId (préfixe de actionId)
-            const relatedActions = dashboardData.actions.filter(a => {
-                if (!a.actionId || !audit.auditId) return false;
-                // actionId format: A5S_2026-1_A1 → auditId: A5S_2026-1
-                const auditIdFromAction = a.actionId.replace(/_A\d+$/, '');
-                return auditIdFromAction === audit.auditId;
-            });
-            
-            if (relatedActions.length === 0) {
-                container.innerHTML = '<div class="audit-detail-empty">Aucune action liée à cet audit</div>';
-                // Masquer le badge count si présent
-                const section = document.getElementById('audit-detail-actions-section');
-                const header = section.querySelector('.audit-detail-section-header');
-                header.innerHTML = `
-                    <span class="audit-detail-section-title">Actions</span>
-                    <span class="audit-detail-section-toggle">▼</span>
-                `;
-                return;
-            }
-            
-            // Mettre à jour le header avec le count
-            const section = document.getElementById('audit-detail-actions-section');
-            const header = section.querySelector('.audit-detail-section-header');
-            const openCount = relatedActions.filter(a => {
-                const status = getActionStatus(a);
-                return status === 'open' || status === 'overdue' || status === 'inprogress';
-            }).length;
-            
-            header.innerHTML = `
-                <div class="audit-detail-actions-header" style="display: flex; align-items: center; gap: 8px; flex: 1;">
-                    <span class="audit-detail-section-title">Actions</span>
-                    ${openCount > 0 ? `<span class="audit-detail-actions-count">${openCount}</span>` : ''}
-                </div>
-                <span class="audit-detail-section-toggle">▼</span>
-            `;
-            
-            // Rendre les actions
-            let html = '';
-            
-            relatedActions.forEach(action => {
-                const status = getActionStatus(action);
-                const statusColor = {
-                    'open': 'var(--traffic-orange)',
-                    'overdue': 'var(--traffic-red)',
-                    'inprogress': 'var(--teal)',
-                    'closed': 'var(--traffic-green)',
-                    'cancelled': 'var(--gray-40)'
-                }[status] || 'var(--gray-40)';
-                
-                const statusLabel = {
-                    'open': 'Ouverte',
-                    'overdue': 'En retard',
-                    'inprogress': 'En cours',
-                    'closed': 'Clôturée',
-                    'cancelled': 'Annulée'
-                }[status] || status;
-                
-                html += `
-                    <div class="audit-detail-action-card ${status}">
-                        <div class="audit-detail-action-row">
-                            <span class="audit-detail-action-status" style="background: ${statusColor};"></span>
-                            <div class="audit-detail-action-content">
-                                <div class="audit-detail-action-text">${action.action || '-'}</div>
-                                <div class="audit-detail-action-meta">${action.responsable || '-'} • ${statusLabel}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-        
+        // ═══════════════════════════════════════════════════════════════
+        // PHOTO LOADING (preserved from existing code)
+        // ═══════════════════════════════════════════════════════════════
         // Charger les photos depuis le JSON SharePoint
         async function loadAuditDetailPhotos(audit) {
             const container = document.getElementById('audit-detail-photos-content');
