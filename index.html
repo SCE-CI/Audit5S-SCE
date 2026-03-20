@@ -6221,7 +6221,14 @@
             border-radius: var(--radius-lg);
             padding: var(--space-lg);
             margin-bottom: var(--space-lg);
+            overflow: visible;
         }
+
+        .db2-kpi-grid { position: relative; z-index: 10; overflow: visible; }
+        .db2-kpi-card { overflow: visible; }
+        .db2-zones-grid { overflow: visible; }
+        .db2-zone-card { overflow: visible; }
+        .db2-zone-badges { overflow: visible; }
 
         .db2-section-header {
             display: flex;
@@ -6456,7 +6463,6 @@
 
         /* Zone card tooltips - pointer-events none to prevent flicker */
         .db2-zone-card > .db2-tooltip { pointer-events: none; }
-        .db2-zone-card { overflow: visible; }
         
         /* Badge tooltips below the badge */
         .db2-zone-badge.has-tooltip { position: relative; }
@@ -6469,6 +6475,12 @@
         .db2-urgent-item > .db2-tooltip { pointer-events: none; left: 0; transform: translateX(0) translateY(4px); }
         .db2-urgent-item > .db2-tooltip.tooltip-visible { transform: translateX(0) translateY(0); }
         .db2-urgent-item > .db2-tooltip::after { left: 20px; transform: none; }
+
+        /* Zone stat card tooltips (below) */
+        #db2-zone-stats .has-tooltip { position: relative; overflow: visible; }
+        #db2-zone-stats .has-tooltip > .db2-tooltip { bottom: auto; top: calc(100% + 8px); transform: translateX(-50%) translateY(-4px); }
+        #db2-zone-stats .has-tooltip > .db2-tooltip.tooltip-visible { transform: translateX(-50%) translateY(0); }
+        #db2-zone-stats .has-tooltip > .db2-tooltip::after { top: auto; bottom: 100%; border: 5px solid transparent; border-bottom-color: var(--gray-90); border-top-color: transparent; }
 
         .db2-tooltip-row { display: flex; justify-content: space-between; gap: var(--space-md); }
         .db2-tooltip-row + .db2-tooltip-row { margin-top: 4px; }
@@ -6648,10 +6660,10 @@
             .db2-zone-filters, #db2-zone-filters { gap: var(--space-sm) !important; }
             .db2-filter-chip { padding: 5px 10px; font-size: 12px; }
             .db2-zone-selector, #db2-zone-selector { gap: var(--space-xs) !important; }
-            #tab-zones { overflow-x: hidden; }
-            #tab-zones .dashboard-chart-container { overflow: hidden; max-width: 100%; }
-            #tab-zones .dashboard-chart { overflow: hidden; }
-            #tab-zones .dashboard-radar-container { overflow: hidden; }
+            #tab-zones { max-width: 100vw; box-sizing: border-box; }
+            #tab-zones .dashboard-chart-container { max-width: 100%; }
+            #tab-zones .dashboard-chart { max-width: 100%; }
+            #tab-zones .dashboard-radar-container { max-width: 100%; }
             #tab-zones .dashboard-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
             #db2-actions-summary { gap: var(--space-sm) !important; padding: var(--space-sm) !important; }
             #db2-actions-summary > div > div:first-child { font-size: 16px; }
@@ -13338,8 +13350,13 @@ Cordialement`);
             
             container.innerHTML='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%">'+gridLines+'<line x1="'+pad.l+'" y1="'+threshY+'" x2="'+(w-pad.r)+'" y2="'+threshY+'" stroke="var(--gray-30)" stroke-width="1" stroke-dasharray="4 4"/><text x="'+(w-pad.r+4)+'" y="'+(threshY+3)+'" style="font-size:9px;fill:var(--gray-50);font-family:inherit">85%</text><path d="'+areaD+'" fill="var(--sartorius-yellow)" opacity="0.08"/><path d="'+lineD+'" fill="none" stroke="var(--sartorius-yellow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dots+xLabels+'</svg>';
             
+            // Re-create chart tooltip element (innerHTML destroyed the original)
+            var tipEl = document.createElement('div');
+            tipEl.id='chart-tooltip';
+            tipEl.style.cssText='position:absolute;background:var(--gray-90);color:#fff;padding:5px 10px;border-radius:4px;font-size:11px;pointer-events:none;opacity:0;z-index:9999;white-space:nowrap;transition:opacity 0.1s';
+            container.appendChild(tipEl);
+            
             // Chart dot tooltips + click to open audit
-            var tipEl = document.getElementById('chart-tooltip');
             var svgEl = container.querySelector('svg');
             container.style.overflow = 'visible';
             if (svgEl && tipEl) {
@@ -13383,7 +13400,7 @@ Cordialement`);
             if (allAudits.length === 0) { container.innerHTML = '<div class="dashboard-empty" style="padding:var(--space-lg)"><p>Aucun audit</p></div>'; return; }
             
             var sNames=['Trier','Ranger','Nettoyer','Standard.','Suivre'], sKeys=['S1','S2','S3','S4','S5'];
-            var cx=140,cy=130,maxR=105,n=5,angleStart=-Math.PI/2;
+            var cx=140,cy=145,maxR=105,n=5,angleStart=-Math.PI/2;
             function polar(angle,r){return{x:Math.round(cx+r*Math.cos(angle)),y:Math.round(cy+r*Math.sin(angle))};}
             
             var gridSvg='',axisSvg='',labelPositions=[];
@@ -13413,9 +13430,9 @@ Cordialement`);
             var globalPct=Math.round(globalScore/4*100);
             var labelsSvg=sNames.map(function(name,i){var p=labelPositions[i];return '<text x="'+p.x+'" y="'+(p.y-4)+'" text-anchor="middle" style="font-size:11px;font-weight:600;fill:var(--gray-70);font-family:inherit">'+name+'</text>';}).join('');
             
-            var catBars=sKeys.map(function(k,i){var v=primaryScores[i];var bPct=Math.round(v/4*100);var color=v>=3.4?'var(--traffic-green)':v>=2.8?'var(--sartorius-yellow)':v>=2?'var(--traffic-orange)':'var(--traffic-red)';return '<div style="display:flex;align-items:center;gap:12px"><div style="width:90px;font-size:13px;font-weight:500;color:var(--gray-70);flex-shrink:0">'+sNames[i]+'</div><div style="flex:1;height:8px;background:var(--gray-10);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+bPct+'%;background:'+color+';border-radius:4px;transition:width 0.6s"></div></div><div style="width:44px;font-size:13px;font-weight:600;text-align:right;flex-shrink:0;color:'+color+'">'+v.toFixed(1)+'</div></div>';}).join('');
+            var catBars=sKeys.map(function(k,i){var v=primaryScores[i];var bPct=Math.round(v/4*100);var color=v>=3.4?'var(--traffic-green)':v>=2.8?'var(--sartorius-yellow)':v>=2?'var(--traffic-orange)':'var(--traffic-red)';var criteriaNames=S_CONFIG[i].criteria.map(function(c){return AUDIT_CRITERIA_LABELS[c];}).join(' · ');return '<div style="display:flex;align-items:center;gap:12px;cursor:help" title="'+criteriaNames+'"><div style="width:90px;font-size:13px;font-weight:500;color:var(--gray-70);flex-shrink:0">'+sNames[i]+'</div><div style="flex:1;height:8px;background:var(--gray-10);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+bPct+'%;background:'+color+';border-radius:4px;transition:width 0.6s"></div></div><div style="width:44px;font-size:13px;font-weight:600;text-align:right;flex-shrink:0;color:'+color+'">'+v.toFixed(1)+'</div></div>';}).join('');
             
-            container.innerHTML='<div style="width:290px;height:280px;margin:0 auto"><svg viewBox="0 0 280 270" width="100%" height="100%">'+gridSvg+axisSvg+shapesSvg+labelsSvg+'</svg></div><div style="display:flex;justify-content:center;gap:var(--space-lg);margin-top:var(--space-sm)">'+legendItems.join('')+'</div><div style="text-align:center;margin-top:var(--space-md)"><div style="font-size:28px;font-weight:700" class="'+getScoreClass(globalPct)+'">'+globalPct+'<span style="font-size:16px;color:var(--gray-40);font-weight:400">%</span></div><div style="font-size:12px;color:var(--gray-50);margin-top:2px">'+primarySubtitle+'</div></div><div style="margin-top:var(--space-lg);display:flex;flex-direction:column;gap:8px">'+catBars+'</div>';
+            container.innerHTML='<div style="width:290px;height:300px;margin:0 auto"><svg viewBox="0 0 280 290" width="100%" height="100%">'+gridSvg+axisSvg+shapesSvg+labelsSvg+'</svg></div><div style="display:flex;justify-content:center;gap:var(--space-lg);margin-top:var(--space-sm)">'+legendItems.join('')+'</div><div style="text-align:center;margin-top:var(--space-md)"><div style="font-size:28px;font-weight:700" class="'+getScoreClass(globalPct)+'">'+globalPct+'<span style="font-size:16px;color:var(--gray-40);font-weight:400">%</span></div><div style="font-size:12px;color:var(--gray-50);margin-top:2px">'+primarySubtitle+'</div></div><div style="margin-top:var(--space-lg);display:flex;flex-direction:column;gap:8px">'+catBars+'</div>';
         }
         
         function renderZoneHistory(zoneName) {
@@ -13716,7 +13733,7 @@ Cordialement`);
                 var bPct=Math.round(v/4*100);
                 var color=v>=3.4?'var(--traffic-green)':v>=2.8?'var(--sartorius-yellow)':v>=2?'var(--traffic-orange)':'var(--traffic-red)';
                 var criteria=S_CONFIG[i].criteria.map(function(c){return AUDIT_CRITERIA_LABELS[c]+': '+(audit.scores[c]||0)+'/4';}).join(' · ');
-                return '<div style="position:relative;display:flex;align-items:center;gap:12px" title="'+criteria+'"><div style="width:100px;font-size:13px;font-weight:500;color:var(--gray-70);flex-shrink:0">'+sNames[i]+'</div><div style="flex:1;height:8px;background:var(--gray-10);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+bPct+'%;background:'+color+';border-radius:4px;transition:width 0.6s"></div></div><div style="width:44px;font-size:13px;font-weight:600;text-align:right;flex-shrink:0;color:'+color+'">'+v.toFixed(1)+'</div></div>';
+                return '<div style="position:relative;display:flex;align-items:center;gap:12px;cursor:help" title="'+criteria+'"><div style="width:100px;font-size:13px;font-weight:500;color:var(--gray-70);flex-shrink:0">'+sNames[i]+'</div><div style="flex:1;height:8px;background:var(--gray-10);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+bPct+'%;background:'+color+';border-radius:4px;transition:width 0.6s"></div></div><div style="width:44px;font-size:13px;font-weight:600;text-align:right;flex-shrink:0;color:'+color+'">'+v.toFixed(1)+'</div></div>';
             }).join('');
             
             var linkedHtml='';
