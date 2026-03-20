@@ -3192,7 +3192,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 250;
+            z-index: 9999;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -5890,7 +5890,7 @@
         }
         
         .dashboard-table tbody tr.clickable-row:hover td {
-            background: rgba(255, 237, 0, 0.15);
+            background: rgba(255, 237, 0, 0.08);
         }
         
         /* Bouton clôturer dans le tableau */
@@ -6089,7 +6089,7 @@
         }
         
         .dashboard-table tr:hover td {
-            background: var(--gray-5);
+            background: rgba(255, 237, 0, 0.06);
         }
         
         .dashboard-table .score-excellent { color: var(--traffic-green); font-weight: 600; }
@@ -6432,7 +6432,7 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.15s, transform 0.15s;
-            z-index: 200;
+            z-index: 9999;
             box-shadow: 0 4px 16px rgba(0,0,0,0.15);
         }
 
@@ -6449,7 +6449,7 @@
         .db2-tooltip.tooltip-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         /* Tooltip below variant (for KPI cards) - HIGH z-index to not be masked */
-        .db2-kpi-card > .db2-tooltip { bottom: auto; top: calc(100% + 8px); transform: translateX(-50%) translateY(-4px); z-index: 250; }
+        .db2-kpi-card > .db2-tooltip { bottom: auto; top: calc(100% + 8px); transform: translateX(-50%) translateY(-4px); z-index: 9999; }
         .db2-kpi-card > .db2-tooltip.tooltip-visible { transform: translateX(-50%) translateY(0); }
         .db2-kpi-card > .db2-tooltip::after { top: auto; bottom: 100%; border: 5px solid transparent; border-bottom-color: var(--gray-90); border-top-color: transparent; }
         .db2-kpi-grid { position: relative; z-index: 10; }
@@ -12127,7 +12127,7 @@ Cordialement`);
                         <div class="dashboard-chart-title">Évolution de la performance</div>
                         <div class="dashboard-chart" id="dashboard-zone-chart" style="position:relative;height:260px;overflow:visible">
                             <!-- SVG généré dynamiquement -->
-                            <div class="chart-tooltip" id="chart-tooltip" style="position:absolute;background:var(--gray-90);color:#fff;padding:5px 10px;border-radius:4px;font-size:11px;pointer-events:none;opacity:0;z-index:200;white-space:nowrap;transition:opacity 0.1s"></div>
+                            <div class="chart-tooltip" id="chart-tooltip" style="position:absolute;background:var(--gray-90);color:#fff;padding:5px 10px;border-radius:4px;font-size:11px;pointer-events:none;opacity:0;z-index:9999;white-space:nowrap;transition:opacity 0.1s"></div>
                         </div>
                         <div class="dashboard-chart-legend">
                             <div class="dashboard-chart-legend-item">
@@ -13015,7 +13015,7 @@ Cordialement`);
         function typeIconHtml(val) {
             var t = normalizeType(val);
             if (t === 'Écart') return '<span title="Écart aux standards" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--t-red-subtle);color:var(--traffic-red);cursor:help"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v8m0 4h.01"/></svg></span>';
-            if (t === 'Élévation') return '<span title="Élévation des standards" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--t-green-subtle);color:var(--traffic-green);cursor:help"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M14 20V14M10 20V18"/><path d="M6 20h16"/></svg></span>';
+            if (t === 'Élévation') return '<span title="Élévation des standards" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--t-green-subtle);color:var(--traffic-green);cursor:help"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l5-5 4 4 4-8"/><path d="M16 8h4v4"/></svg></span>';
             return '<span>' + val + '</span>';
         }
         
@@ -13621,7 +13621,7 @@ Cordialement`);
             if(linkedAudit){var lPct=getAuditPerformance(linkedAudit);h+='<div style="margin-top:var(--space-sm);padding-top:var(--space-md);border-top:1px solid var(--gray-10)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Audit source</div><div style="display:flex;align-items:center;gap:var(--space-sm);flex-wrap:wrap;font-size:14px;cursor:pointer;padding:6px;border-radius:var(--radius-md);transition:background 0.15s" onclick="var ri=currentActionRowIndex;closeActionModal();parentAuditRowIndex=null;setTimeout(function(){parentActionRowIndex=ri;openAuditDetailModal('+linkedAudit.rowIndex+');},150)" onmouseover="this.style.background=\'var(--gray-5)\'" onmouseout="this.style.background=\'\'"><span style="color:var(--teal);font-weight:600">'+linkedAudit.auditId+'</span><span class="db2-badge db2-badge-gray">'+normalizeNiveau(linkedAudit.niveau)+'</span><span style="color:var(--gray-50)">'+formatExcelDate(linkedAudit.date)+'</span><span style="font-weight:600;color:'+(lPct>=70?'var(--traffic-green)':'var(--traffic-orange)')+'">'+lPct+'%</span></div></div>';}
             
             // Photo section
-            h+='<div style="margin-top:var(--space-md);padding-top:var(--space-md);border-top:1px solid var(--gray-10)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Photo</div><div id="action-modal-photo"><div style="font-size:12px;color:var(--gray-40);display:flex;align-items:center;gap:var(--space-sm)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gray-40)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Chargement...</div></div></div>';
+            h+='<div id="action-modal-photo-section" style="margin-top:var(--space-md);padding-top:var(--space-md);border-top:1px solid var(--gray-10)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Photo</div><div id="action-modal-photo"><div style="font-size:12px;color:var(--gray-40);display:flex;align-items:center;gap:var(--space-sm)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gray-40)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Chargement...</div></div></div>';
             
             if(!isClosed){
                 h+='<div class="dashboard-action-modal-comment" style="margin-top:var(--space-md)"><label class="dashboard-action-modal-label" for="modal-comment">Commentaire <span id="modal-comment-required" style="color:var(--traffic-red);display:none">*</span></label><textarea id="modal-comment" class="dashboard-action-comment-input" rows="2" placeholder="Ajouter un commentaire..."></textarea></div>';
@@ -13637,8 +13637,8 @@ Cordialement`);
             if (linkedAudit) {
                 loadActionModalPhotos(linkedAudit);
             } else {
-                var photoEl = document.getElementById('action-modal-photo');
-                if (photoEl) photoEl.innerHTML = '<div style="font-size:12px;color:var(--gray-40)">Pas d\'audit source lié</div>';
+                var photoEl = document.getElementById('action-modal-photo-section');
+                if (photoEl) photoEl.style.display = 'none';
             }
         }
         
@@ -13865,43 +13865,39 @@ Cordialement`);
                 var elapsed=Date.now()-startTime;
                 var vx=Math.abs(dx)/elapsed, vy=Math.abs(dy)/elapsed;
                 
-                // Quick horizontal flick
+                // Quick horizontal flick - slide out, navigate, slide in
                 if (Math.abs(dx) > threshold && Math.abs(dx) > Math.abs(dy) * 1.5 && (vx > velocityThreshold || Math.abs(dx) > 100)) {
-                    if (dx < 0) {
-                        // Swipe left → next
-                        modalEl.style.transition='transform 0.2s ease-out, opacity 0.2s';
-                        modalEl.style.transform='translateX(-40px)';
-                        modalEl.style.opacity='0.5';
-                        setTimeout(function(){
-                            modalEl.style.transition='none';
+                    var direction = dx < 0 ? -1 : 1;
+                    modalEl.style.transition='transform 0.15s ease-in, opacity 0.15s';
+                    modalEl.style.transform='translateX('+(direction * -60)+'px)';
+                    modalEl.style.opacity='0.3';
+                    setTimeout(function(){
+                        // Reset position instantly (off-screen opposite side)
+                        modalEl.style.transition='none';
+                        modalEl.style.transform='translateX('+(direction * 60)+'px)';
+                        modalEl.style.opacity='0.3';
+                        // Navigate
+                        if (direction < 0) onRight(); else onLeft();
+                        // Slide in from opposite side
+                        requestAnimationFrame(function(){
+                            modalEl.style.transition='transform 0.2s ease-out, opacity 0.2s';
                             modalEl.style.transform='';
                             modalEl.style.opacity='';
-                            onRight();
-                        }, 180);
-                    } else {
-                        // Swipe right → prev
-                        modalEl.style.transition='transform 0.2s ease-out, opacity 0.2s';
-                        modalEl.style.transform='translateX(40px)';
-                        modalEl.style.opacity='0.5';
-                        setTimeout(function(){
-                            modalEl.style.transition='none';
-                            modalEl.style.transform='';
-                            modalEl.style.opacity='';
-                            onLeft();
-                        }, 180);
-                    }
+                            setTimeout(function(){ modalEl.style.transition=''; }, 250);
+                        });
+                    }, 150);
                 }
-                // Quick downward flick
+                // Quick downward flick - slide down to close
                 else if (dy > threshold && Math.abs(dy) > Math.abs(dx) * 1.5 && (vy > velocityThreshold || dy > 120)) {
-                    modalEl.style.transition='transform 0.2s ease-out, opacity 0.2s';
-                    modalEl.style.transform='translateY(60px)';
+                    modalEl.style.transition='transform 0.25s ease-in, opacity 0.25s';
+                    modalEl.style.transform='translateY(80px)';
                     modalEl.style.opacity='0';
                     setTimeout(function(){
                         modalEl.style.transition='none';
                         modalEl.style.transform='';
                         modalEl.style.opacity='';
                         onDown();
-                    }, 180);
+                    }, 250);
                 }
             }, {passive:true});
         }
@@ -13945,18 +13941,21 @@ Cordialement`);
         // Load photos for action modal from linked audit's JSON
         async function loadActionModalPhotos(audit) {
             var container = document.getElementById('action-modal-photo');
+            var section = document.getElementById('action-modal-photo-section');
             if (!container) return;
+            
+            function hidePhotoSection() {
+                if (section) section.style.display = 'none';
+            }
+            
             try {
                 if (!audit.date || !audit.zone || !msalConnected) {
-                    container.innerHTML = '<div style="font-size:12px;color:var(--gray-40)">Photos non disponibles</div>';
+                    hidePhotoSection();
                     return;
                 }
-                // Reuse the same logic as loadAuditDetailPhotos but target action modal container
-                // Store current audit detail temporarily
                 var prevAuditDetail = currentAuditDetail;
                 currentAuditDetail = audit;
                 
-                // Create a temporary container, load photos into it, then copy
                 var tempContainer = document.createElement('div');
                 tempContainer.id = 'audit-detail-photos-content';
                 tempContainer.style.display = 'none';
@@ -13964,18 +13963,23 @@ Cordialement`);
                 
                 await loadAuditDetailPhotos(audit);
                 
-                // Copy the result
                 var realPhotosEl = document.getElementById('audit-detail-photos-content');
                 if (realPhotosEl && realPhotosEl !== tempContainer) {
-                    container.innerHTML = realPhotosEl.innerHTML || '<div style="font-size:12px;color:var(--gray-40)">Aucune photo</div>';
+                    var html = realPhotosEl.innerHTML || '';
+                    if (html && !html.includes('Aucun') && !html.includes('non disponible') && !html.includes('Erreur')) {
+                        container.innerHTML = html;
+                    } else {
+                        hidePhotoSection();
+                    }
+                } else {
+                    hidePhotoSection();
                 }
                 
-                // Cleanup
                 if (tempContainer.parentNode) tempContainer.parentNode.removeChild(tempContainer);
                 currentAuditDetail = prevAuditDetail;
             } catch(e) {
                 console.error('Action modal photos error:', e);
-                container.innerHTML = '<div style="font-size:12px;color:var(--gray-40)">Erreur chargement photos</div>';
+                hidePhotoSection();
             }
         }
         
