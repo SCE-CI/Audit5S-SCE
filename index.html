@@ -6506,7 +6506,8 @@
             #db2-actions-summary > div > div:first-child { font-size: 16px; }
             #db2-actions-table-wrap { display: none; }
             #db2-actions-mobile { display: block !important; }
-            #db2-history-table-wrap { overflow-x: auto; }
+            #db2-history-table-wrap { display: none; }
+            #db2-history-mobile { display: block !important; }
             .modal-nav { display: none !important; }
         }
     </style>
@@ -11949,7 +11950,7 @@ Cordialement`);
                     <div class="db2-zone-stats" id="db2-zone-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-md);margin-bottom:var(--space-lg)"></div>
                     <div class="dashboard-chart-container">
                         <div class="dashboard-chart-title">Évolution de la performance</div>
-                        <div class="dashboard-chart" id="dashboard-zone-chart" style="position:relative;height:200px">
+                        <div class="dashboard-chart" id="dashboard-zone-chart" style="position:relative;height:260px">
                             <!-- SVG généré dynamiquement -->
                         </div>
                         <div class="chart-tooltip" id="chart-tooltip" style="position:absolute;background:var(--gray-90);color:#fff;padding:5px 10px;border-radius:4px;font-size:11px;pointer-events:none;opacity:0;z-index:50;white-space:nowrap;transition:opacity 0.1s"></div>
@@ -12856,7 +12857,7 @@ Cordialement`);
             }
             
             // Mes actions
-            var userName = getCurrentUserName().toLowerCase();
+            var userName = getCurrentUserName().toLowerCase().replace(/,/g, '');
             var userWords = userName ? userName.split(/\s+/).filter(function(w) { return w.length > 2; }) : [];
             var myActions = userWords.length > 0 ? actions.filter(function(a) {
                 var resp = (a.responsable || '').toLowerCase();
@@ -13036,7 +13037,7 @@ Cordialement`);
             if (audits.length < 2) { container.innerHTML = '<div class="dashboard-empty" style="padding:var(--space-xl)"><p>Pas assez de données</p></div>'; return; }
             
             var recent = audits.slice(-10);
-            var w = container.offsetWidth || 600, h = 200;
+            var w = container.offsetWidth || 600, h = 260;
             var pad = {t:24,r:30,b:30,l:40}, cw = w-pad.l-pad.r, ch = h-pad.t-pad.b;
             var xStep = cw / (recent.length-1);
             var pts = recent.map(function(a,i) {
@@ -13236,9 +13237,19 @@ Cordialement`);
         function renderAuditsTable(searchQuery) {
             var filtered=getFilteredHistoryAudits(searchQuery);
             var tbody=document.getElementById('dashboard-audits-tbody');
+            var mobileEl=document.getElementById('db2-history-mobile');
             if(!tbody)return;
-            if(filtered.length===0){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--gray-50);padding:var(--space-xl)">Aucun audit trouvé</td></tr>';return;}
+            if(filtered.length===0){
+                tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--gray-50);padding:var(--space-xl)">Aucun audit trouvé</td></tr>';
+                if(mobileEl)mobileEl.innerHTML='<div style="text-align:center;padding:var(--space-xl);color:var(--gray-50)">Aucun audit trouvé</div>';
+                return;
+            }
+            // Desktop table
             tbody.innerHTML=filtered.map(function(a){var pct=getAuditPerformance(a);var color=pct>=85?'var(--traffic-green)':pct>=70?'var(--gray-80)':pct>=50?'var(--traffic-orange)':'var(--traffic-red)';var auditActions=getAuditActions(a);var ecarts=auditActions.filter(function(ac){return ac.type==='Écart';}).length;var elevations=auditActions.filter(function(ac){return ac.type==='Élévation';}).length;var actStr='';if(ecarts)actStr+=ecarts+' écart'+(ecarts>1?'s':'');if(elevations)actStr+=(actStr?', ':'')+elevations+' élév.';if(!actStr)actStr='—';return '<tr style="cursor:pointer" onclick="openAuditFromHistory('+a.rowIndex+')"><td style="font-weight:500">'+formatExcelDate(a.date)+'</td><td><span class="db2-badge db2-badge-gray">'+(a.zone||'-').replace('Process / Entrée','Process')+'</span></td><td><span class="db2-badge db2-badge-gray">'+(a.niveau||'-')+'</span></td><td style="font-weight:600;color:'+color+'">'+pct+'%</td><td style="color:var(--gray-60)">'+(a.auditeur||'-')+'</td><td style="font-size:12px;color:var(--gray-50)">'+actStr+'</td></tr>';}).join('');
+            // Mobile cards
+            if(mobileEl){
+                mobileEl.innerHTML=filtered.map(function(a){var pct=getAuditPerformance(a);var color=pct>=85?'var(--traffic-green)':pct>=70?'var(--gray-80)':pct>=50?'var(--traffic-orange)':'var(--traffic-red)';var ecarts=getAuditActions(a).filter(function(ac){return ac.type==='Écart';}).length;return '<div style="background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg);padding:var(--space-md);margin-bottom:var(--space-sm);cursor:pointer" onclick="openAuditFromHistory('+a.rowIndex+')"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div><div style="font-size:14px;font-weight:600">'+formatExcelDate(a.date)+'</div><div style="font-size:11px;color:var(--gray-50)">'+(a.zone||'-')+' · '+(a.niveau||'-')+'</div></div><div style="font-size:20px;font-weight:700;color:'+color+'">'+pct+'%</div></div><div style="display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11px;color:var(--gray-50)"><span>'+(a.auditeur||'-')+'</span>'+(ecarts?'<span>'+ecarts+' écart'+(ecarts>1?'s':'')+'</span>':'')+'</div></div>';}).join('');
+            }
         }
         
         // ─── MODAL NAVIGATION STATE ───
@@ -13256,7 +13267,7 @@ Cordialement`);
         }
         
         function openActionFromMyActions(rowIndex) {
-            var userName=getCurrentUserName().toLowerCase();
+            var userName=getCurrentUserName().toLowerCase().replace(/,/g,'');
             var words=userName?userName.split(/\s+/).filter(function(w){return w.length>2;}):[];
             actionNavList=dashboardData.actions.filter(function(a){var resp=(a.responsable||'').toLowerCase();return words.some(function(w){return resp.includes(w);})&&!['closed','cancelled'].includes(getActionStatus(a));}).map(function(a){return a.rowIndex;});
             parentAuditRowIndex=null;
