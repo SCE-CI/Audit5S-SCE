@@ -4508,35 +4508,17 @@
                 font-size: 10px;
             }
             
+            /* Hide old ::before icons - we use inline SVGs now */
             .dashboard-nav-tab::before {
-                content: '';
+                display: none !important;
+            }
+            
+            /* Make inline SVGs bigger on mobile */
+            .dashboard-nav-tab svg {
+                width: 22px !important;
+                height: 22px !important;
                 display: block;
-                width: 24px;
-                height: 24px;
-                background-size: 24px 24px;
-                background-repeat: no-repeat;
-                background-position: center;
-                opacity: 0.5;
-            }
-            
-            .dashboard-nav-tab.active::before {
-                opacity: 1;
-            }
-            
-            .dashboard-nav-tab[data-tab="overview"]::before {
-                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7'/%3E%3Crect x='14' y='3' width='7' height='7'/%3E%3Crect x='14' y='14' width='7' height='7'/%3E%3Crect x='3' y='14' width='7' height='7'/%3E%3C/svg%3E");
-            }
-            
-            .dashboard-nav-tab[data-tab="zones"]::before {
-                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E");
-            }
-            
-            .dashboard-nav-tab[data-tab="actions"]::before {
-                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 11.08V12a10 10 0 1 1-5.93-9.14'/%3E%3Cpolyline points='22 4 12 14.01 9 11.01'/%3E%3C/svg%3E");
-            }
-            
-            .dashboard-nav-tab[data-tab="history"]::before {
-                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E");
+                margin: 0 auto 2px;
             }
             
             .dashboard-nav-tab.active {
@@ -6450,7 +6432,7 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.15s, transform 0.15s;
-            z-index: 50;
+            z-index: 200;
             box-shadow: 0 4px 16px rgba(0,0,0,0.15);
         }
 
@@ -6467,7 +6449,7 @@
         .db2-tooltip.tooltip-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         /* Tooltip below variant (for KPI cards) - HIGH z-index to not be masked */
-        .db2-kpi-card > .db2-tooltip { bottom: auto; top: calc(100% + 8px); transform: translateX(-50%) translateY(-4px); z-index: 100; }
+        .db2-kpi-card > .db2-tooltip { bottom: auto; top: calc(100% + 8px); transform: translateX(-50%) translateY(-4px); z-index: 250; }
         .db2-kpi-card > .db2-tooltip.tooltip-visible { transform: translateX(-50%) translateY(0); }
         .db2-kpi-card > .db2-tooltip::after { top: auto; bottom: 100%; border: 5px solid transparent; border-bottom-color: var(--gray-90); border-top-color: transparent; }
         .db2-kpi-grid { position: relative; z-index: 10; }
@@ -6666,6 +6648,11 @@
             .db2-zone-filters, #db2-zone-filters { gap: var(--space-sm) !important; }
             .db2-filter-chip { padding: 5px 10px; font-size: 12px; }
             .db2-zone-selector, #db2-zone-selector { gap: var(--space-xs) !important; }
+            #tab-zones { overflow-x: hidden; }
+            #tab-zones .dashboard-chart-container { overflow: hidden; max-width: 100%; }
+            #tab-zones .dashboard-chart { overflow: hidden; }
+            #tab-zones .dashboard-radar-container { overflow: hidden; }
+            #tab-zones .dashboard-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
             #db2-actions-summary { gap: var(--space-sm) !important; padding: var(--space-sm) !important; }
             #db2-actions-summary > div > div:first-child { font-size: 16px; }
             #db2-actions-table-wrap { display: none; }
@@ -12138,10 +12125,10 @@ Cordialement`);
                     <div class="db2-zone-stats" id="db2-zone-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-md);margin-bottom:var(--space-lg)"></div>
                     <div class="dashboard-chart-container">
                         <div class="dashboard-chart-title">Évolution de la performance</div>
-                        <div class="dashboard-chart" id="dashboard-zone-chart" style="position:relative;height:260px">
+                        <div class="dashboard-chart" id="dashboard-zone-chart" style="position:relative;height:260px;overflow:visible">
                             <!-- SVG généré dynamiquement -->
+                            <div class="chart-tooltip" id="chart-tooltip" style="position:absolute;background:var(--gray-90);color:#fff;padding:5px 10px;border-radius:4px;font-size:11px;pointer-events:none;opacity:0;z-index:200;white-space:nowrap;transition:opacity 0.1s"></div>
                         </div>
-                        <div class="chart-tooltip" id="chart-tooltip" style="position:absolute;background:var(--gray-90);color:#fff;padding:5px 10px;border-radius:4px;font-size:11px;pointer-events:none;opacity:0;z-index:50;white-space:nowrap;transition:opacity 0.1s"></div>
                         <div class="dashboard-chart-legend">
                             <div class="dashboard-chart-legend-item">
                                 <div class="dashboard-chart-legend-color" style="background: var(--sartorius-yellow);"></div>
@@ -12491,7 +12478,7 @@ Cordialement`);
             }
             
             // Afficher le loading
-            loadingEl.style.display = 'flex';
+            loadingEl.style.display = 'block';
             
             try {
                 // S'assurer qu'on a un token
@@ -13028,7 +13015,7 @@ Cordialement`);
         function typeIconHtml(val) {
             var t = normalizeType(val);
             if (t === 'Écart') return '<span title="Écart aux standards" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--t-red-subtle);color:var(--traffic-red);cursor:help"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v8m0 4h.01"/></svg></span>';
-            if (t === 'Élévation') return '<span title="Élévation des standards" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--t-green-subtle);color:var(--traffic-green);cursor:help"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 19V5m-5 5l5-5 5 5"/></svg></span>';
+            if (t === 'Élévation') return '<span title="Élévation des standards" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--t-green-subtle);color:var(--traffic-green);cursor:help"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M14 20V14M10 20V18"/><path d="M6 20h16"/></svg></span>';
             return '<span>' + val + '</span>';
         }
         
@@ -13290,11 +13277,36 @@ Cordialement`);
             var avg = total > 0 ? Math.round(audits.reduce(function(s,a) { return s + getAuditPerformance(a); }, 0) / total) : 0;
             var last = audits.length > 0 ? audits[audits.length - 1] : null;
             var lastPct = last ? getAuditPerformance(last) : 0;
-            var openAct = actions.filter(function(a) { return ['open','overdue','inprogress'].includes(getActionStatus(a)); }).length;
+            var openActions = actions.filter(function(a) { return ['open','overdue','inprogress'].includes(getActionStatus(a)); });
+            var openAct = openActions.length;
+            
+            // Tooltips
+            var n1 = audits.filter(function(a){var n=normalizeNiveau(a.niveau);return n==='N1';}).length;
+            var n2 = audits.filter(function(a){var n=normalizeNiveau(a.niveau);return n==='N2';}).length;
+            var totalTip = '<div class="db2-tooltip" style="bottom:auto;top:calc(100% + 8px)"><div class="db2-tooltip-row"><span class="db2-tooltip-label">N1</span><span>'+n1+' audits</span></div><div class="db2-tooltip-row"><span class="db2-tooltip-label">N2</span><span>'+n2+' audits</span></div></div>';
+            
+            var avgTip = '';
+            if (audits.length > 0) {
+                var sorted = audits.slice().sort(function(a,b){return getAuditPerformance(a)-getAuditPerformance(b);});
+                var worst=sorted[0];var best=sorted[sorted.length-1];
+                avgTip = '<div class="db2-tooltip" style="bottom:auto;top:calc(100% + 8px)"><div class="db2-tooltip-title">Étendue</div><div class="db2-tooltip-row"><span class="db2-tooltip-label">Min</span><span>'+getAuditPerformance(worst)+'% · '+formatDateShort(worst.date)+'</span></div><div class="db2-tooltip-row"><span class="db2-tooltip-label">Max</span><span>'+getAuditPerformance(best)+'% · '+formatDateShort(best.date)+'</span></div></div>';
+            }
+            
+            var lastTip = '';
+            if (last) {
+                lastTip = '<div class="db2-tooltip" style="bottom:auto;top:calc(100% + 8px)"><div class="db2-tooltip-title">'+(last.auditId||'-')+'</div><div class="db2-tooltip-row"><span class="db2-tooltip-label">Date</span><span>'+formatExcelDate(last.date)+'</span></div><div class="db2-tooltip-row"><span class="db2-tooltip-label">Auditeur</span><span>'+(last.auditeur||'-')+'</span></div><div class="db2-tooltip-row"><span class="db2-tooltip-label">Niveau</span><span>'+normalizeNiveau(last.niveau)+'</span></div></div>';
+            }
+            
+            var actionsTip = '';
+            if (openActions.length > 0) {
+                var actRows = openActions.slice(0,4).map(function(a){var d=getActionDaysOpen(a);return '<div class="db2-tooltip-row"><span>'+(a.action||'-')+'</span></div><div class="db2-tooltip-row"><span class="db2-tooltip-label">'+(a.responsable||'—')+' · '+d+'j</span></div>';}).join('<div class="db2-tooltip-divider"></div>');
+                actionsTip = '<div class="db2-tooltip" style="bottom:auto;top:calc(100% + 8px);min-width:220px"><div class="db2-tooltip-title">Actions ouvertes</div>'+actRows+'</div>';
+            }
             
             var el = document.getElementById('db2-zone-stats');
             if (!el) return;
-            el.innerHTML = '<div style="background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg);padding:var(--space-md);text-align:center"><div style="font-size:22px;font-weight:700">' + total + '</div><div style="font-size:11px;color:var(--gray-60);margin-top:2px">Audits total</div></div><div style="background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg);padding:var(--space-md);text-align:center"><div style="font-size:22px;font-weight:700" class="' + getScoreClass(avg) + '">' + avg + '%</div><div style="font-size:11px;color:var(--gray-60);margin-top:2px">Moyenne</div></div><div style="background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg);padding:var(--space-md);text-align:center"><div style="font-size:22px;font-weight:700" class="' + getScoreClass(lastPct) + '">' + lastPct + '%</div><div style="font-size:11px;color:var(--gray-60);margin-top:2px">Dernier audit</div></div><div style="background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg);padding:var(--space-md);text-align:center"><div style="font-size:22px;font-weight:700' + (openAct > 0 ? ';color:var(--traffic-orange)' : '') + '">' + openAct + '</div><div style="font-size:11px;color:var(--gray-60);margin-top:2px">Actions ouvertes</div></div>';
+            var cardStyle = 'background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg);padding:var(--space-md);text-align:center;position:relative';
+            el.innerHTML = '<div class="has-tooltip" style="'+cardStyle+'">'+totalTip+'<div style="font-size:22px;font-weight:700">' + total + '</div><div style="font-size:11px;color:var(--gray-60);margin-top:2px">Audits total</div></div><div class="has-tooltip" style="'+cardStyle+'">'+avgTip+'<div style="font-size:22px;font-weight:700" class="' + getScoreClass(avg) + '">' + avg + '%</div><div style="font-size:11px;color:var(--gray-60);margin-top:2px">Moyenne</div></div><div class="has-tooltip" style="'+cardStyle+'">'+lastTip+'<div style="font-size:22px;font-weight:700" class="' + getScoreClass(lastPct) + '">' + lastPct + '%</div><div style="font-size:11px;color:var(--gray-60);margin-top:2px">Dernier audit</div></div><div class="has-tooltip" style="'+cardStyle+'">'+actionsTip+'<div style="font-size:22px;font-weight:700' + (openAct > 0 ? ';color:var(--traffic-orange)' : '') + '">' + openAct + '</div><div style="font-size:11px;color:var(--gray-60);margin-top:2px">Actions ouvertes</div></div>';
         }
         
         function renderZoneChart(zoneName) {
@@ -13320,28 +13332,36 @@ Cordialement`);
             var threshY=Math.round(pad.t+(1-85/100)*ch);
             var lineD=pts.map(function(p,i){return(i===0?'M':'L')+p.x+' '+p.y;}).join(' ');
             var areaD=lineD+' L'+pts[pts.length-1].x+' '+(pad.t+ch)+' L'+pts[0].x+' '+(pad.t+ch)+' Z';
-            // Only show value labels for min and max points
-            var dots=pts.map(function(p,i){ var c=p.pct>=85?'var(--traffic-green)':p.pct>=70?'var(--sartorius-yellow)':p.pct>=50?'var(--traffic-orange)':'var(--traffic-red)'; var label=(i===minIdx||i===maxIdx)?'<text x="'+p.x+'" y="'+(p.y-10)+'" text-anchor="middle" style="font-size:10px;font-weight:600;fill:'+c+';font-family:inherit">'+p.pct+'%</text>':''; return '<circle cx="'+p.x+'" cy="'+p.y+'" r="5" fill="var(--white)"/><circle cx="'+p.x+'" cy="'+p.y+'" r="4" fill="'+c+'" stroke="var(--white)" stroke-width="2.5" style="cursor:pointer;transition:r 0.15s" data-idx="'+i+'"/>'+label;}).join('');
+            // Only show value labels for min and max points - in BLACK
+            var dots=pts.map(function(p,i){ var c=p.pct>=85?'var(--traffic-green)':p.pct>=70?'var(--sartorius-yellow)':p.pct>=50?'var(--traffic-orange)':'var(--traffic-red)'; var label=(i===minIdx||i===maxIdx)?'<text x="'+p.x+'" y="'+(p.y-10)+'" text-anchor="middle" style="font-size:10px;font-weight:600;fill:var(--black);font-family:inherit">'+p.pct+'%</text>':''; return '<circle cx="'+p.x+'" cy="'+p.y+'" r="5" fill="var(--white)"/><circle cx="'+p.x+'" cy="'+p.y+'" r="4" fill="'+c+'" stroke="var(--white)" stroke-width="2.5" style="cursor:pointer;transition:r 0.15s" data-idx="'+i+'"/>'+label;}).join('');
             var xLabels=pts.map(function(p){return '<text x="'+p.x+'" y="'+(h-6)+'" text-anchor="middle" style="font-size:10px;fill:var(--gray-50);font-family:inherit">'+p.date+'</text>';}).join('');
             
             container.innerHTML='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%">'+gridLines+'<line x1="'+pad.l+'" y1="'+threshY+'" x2="'+(w-pad.r)+'" y2="'+threshY+'" stroke="var(--gray-30)" stroke-width="1" stroke-dasharray="4 4"/><text x="'+(w-pad.r+4)+'" y="'+(threshY+3)+'" style="font-size:9px;fill:var(--gray-50);font-family:inherit">85%</text><path d="'+areaD+'" fill="var(--sartorius-yellow)" opacity="0.08"/><path d="'+lineD+'" fill="none" stroke="var(--sartorius-yellow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dots+xLabels+'</svg>';
             
-            // Chart dot tooltips
+            // Chart dot tooltips + click to open audit
             var tipEl = document.getElementById('chart-tooltip');
             var svgEl = container.querySelector('svg');
+            container.style.overflow = 'visible';
             if (svgEl && tipEl) {
                 container.querySelectorAll('circle[data-idx]').forEach(function(dot) {
                     dot.addEventListener('mouseenter', function() {
                         var idx=parseInt(this.dataset.idx); var p=pts[idx];
                         var rect=svgEl.getBoundingClientRect(); var scaleX=rect.width/w; var scaleY=rect.height/h;
-                        var dotX=rect.left+p.x*scaleX-container.getBoundingClientRect().left;
-                        var dotY=rect.top+p.y*scaleY-container.getBoundingClientRect().top;
+                        var cRect=container.getBoundingClientRect();
+                        var dotX=rect.left+p.x*scaleX-cRect.left;
+                        var dotY=rect.top+p.y*scaleY-cRect.top;
                         tipEl.textContent=p.niveau+' · '+p.dateFull+' · '+p.auditeur;
-                        tipEl.style.left=(dotX-tipEl.offsetWidth/2)+'px';
-                        tipEl.style.top=(dotY-32)+'px';
+                        var tipW=tipEl.offsetWidth||120;
+                        tipEl.style.left=Math.max(0, Math.min(dotX-tipW/2, cRect.width-tipW))+'px';
+                        tipEl.style.top=Math.max(0, dotY-32)+'px';
                         tipEl.style.opacity='1';
                     });
                     dot.addEventListener('mouseleave', function() { tipEl.style.opacity='0'; });
+                    dot.addEventListener('click', function() {
+                        var idx=parseInt(this.dataset.idx);
+                        var audit=recent[idx];
+                        if(audit) openAuditFromZone(audit.rowIndex, zoneName);
+                    });
                 });
             }
         }
@@ -13527,6 +13547,7 @@ Cordialement`);
         var currentActionRowIndex = null;
         var currentAuditRowIndex = null;
         var parentAuditRowIndex = null;
+        var parentActionRowIndex = null;
         var actionNavList = [];
         var auditNavList = [];
         
@@ -13597,7 +13618,10 @@ Cordialement`);
             h+='<div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Description</div><div style="font-size:14px">'+(action.action||'-')+'</div></div>';
             h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)"><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Type</div>'+typeIconHtml(action.type)+' <span style="font-size:13px;margin-left:4px">'+normalizeType(action.type)+'</span></div><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Zone</div><div style="font-size:14px">'+(action.zone||'-')+'</div></div><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Responsable</div><div style="font-size:14px">'+(action.responsable||'—')+'</div></div><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Date ouverture</div><div style="font-size:14px">'+formatExcelDate(action.dateOuverture)+'</div></div></div>';
             if(action.dateCloture&&action.dateCloture!=='')h+='<div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Date clôture</div><div style="font-size:14px">'+formatExcelDate(action.dateCloture)+'</div></div>';
-            if(linkedAudit){var lPct=getAuditPerformance(linkedAudit);h+='<div style="margin-top:var(--space-sm);padding-top:var(--space-md);border-top:1px solid var(--gray-10)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Audit source</div><div style="display:flex;align-items:center;gap:var(--space-sm);flex-wrap:wrap;font-size:14px;cursor:pointer;padding:6px;border-radius:var(--radius-md);transition:background 0.15s" onclick="closeActionModal();parentAuditRowIndex=null;setTimeout(function(){openAuditDetailModal('+linkedAudit.rowIndex+');},150)" onmouseover="this.style.background=\'var(--gray-5)\'" onmouseout="this.style.background=\'\'"><span style="color:var(--teal);font-weight:600">'+linkedAudit.auditId+'</span><span class="db2-badge db2-badge-gray">'+normalizeNiveau(linkedAudit.niveau)+'</span><span style="color:var(--gray-50)">'+formatExcelDate(linkedAudit.date)+'</span><span style="font-weight:600;color:'+(lPct>=70?'var(--traffic-green)':'var(--traffic-orange)')+'">'+lPct+'%</span></div></div>';}
+            if(linkedAudit){var lPct=getAuditPerformance(linkedAudit);h+='<div style="margin-top:var(--space-sm);padding-top:var(--space-md);border-top:1px solid var(--gray-10)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Audit source</div><div style="display:flex;align-items:center;gap:var(--space-sm);flex-wrap:wrap;font-size:14px;cursor:pointer;padding:6px;border-radius:var(--radius-md);transition:background 0.15s" onclick="var ri=currentActionRowIndex;closeActionModal();parentAuditRowIndex=null;setTimeout(function(){parentActionRowIndex=ri;openAuditDetailModal('+linkedAudit.rowIndex+');},150)" onmouseover="this.style.background=\'var(--gray-5)\'" onmouseout="this.style.background=\'\'"><span style="color:var(--teal);font-weight:600">'+linkedAudit.auditId+'</span><span class="db2-badge db2-badge-gray">'+normalizeNiveau(linkedAudit.niveau)+'</span><span style="color:var(--gray-50)">'+formatExcelDate(linkedAudit.date)+'</span><span style="font-weight:600;color:'+(lPct>=70?'var(--traffic-green)':'var(--traffic-orange)')+'">'+lPct+'%</span></div></div>';}
+            
+            // Photo section
+            h+='<div style="margin-top:var(--space-md);padding-top:var(--space-md);border-top:1px solid var(--gray-10)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Photo</div><div id="action-modal-photo"><div style="font-size:12px;color:var(--gray-40);display:flex;align-items:center;gap:var(--space-sm)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gray-40)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Chargement...</div></div></div>';
             
             if(!isClosed){
                 h+='<div class="dashboard-action-modal-comment" style="margin-top:var(--space-md)"><label class="dashboard-action-modal-label" for="modal-comment">Commentaire <span id="modal-comment-required" style="color:var(--traffic-red);display:none">*</span></label><textarea id="modal-comment" class="dashboard-action-comment-input" rows="2" placeholder="Ajouter un commentaire..."></textarea></div>';
@@ -13608,6 +13632,14 @@ Cordialement`);
             
             bodyEl.innerHTML=h;
             document.getElementById('dashboard-action-modal').classList.add('visible');
+            
+            // Load photos from linked audit async
+            if (linkedAudit) {
+                loadActionModalPhotos(linkedAudit);
+            } else {
+                var photoEl = document.getElementById('action-modal-photo');
+                if (photoEl) photoEl.innerHTML = '<div style="font-size:12px;color:var(--gray-40)">Pas d\'audit source lié</div>';
+            }
         }
         
         function navAction(dir) {
@@ -13712,7 +13744,14 @@ Cordialement`);
         
         function closeAuditDetailModal() {
             document.getElementById('audit-detail-modal').classList.remove('visible');
-            currentAuditRowIndex=null;
+            if (parentActionRowIndex !== null) {
+                var returnTo = parentActionRowIndex;
+                parentActionRowIndex = null;
+                currentAuditRowIndex = null;
+                setTimeout(function() { openActionModal(returnTo); }, 150);
+                return;
+            }
+            currentAuditRowIndex = null;
         }
         
         function closeAuditDetailModalSilent() {
@@ -13751,6 +13790,7 @@ Cordialement`);
                 var card = e.target.closest('.db2-zone-card.has-tooltip');
                 var kpiCard = e.target.closest('.db2-kpi-card.has-tooltip');
                 var urgentItem = e.target.closest('.db2-urgent-item.has-tooltip');
+                var generic = !badge && !card && !kpiCard && !urgentItem ? e.target.closest('.has-tooltip') : null;
                 
                 if (badge) {
                     var badgeTip = badge.querySelector(':scope > .db2-tooltip');
@@ -13767,6 +13807,9 @@ Cordialement`);
                 } else if (urgentItem) {
                     var tip2 = urgentItem.querySelector(':scope > .db2-tooltip');
                     if (tip2) tip2.classList.add('tooltip-visible');
+                } else if (generic) {
+                    var tip3 = generic.querySelector(':scope > .db2-tooltip');
+                    if (tip3) tip3.classList.add('tooltip-visible');
                 }
             }, true);
             
@@ -13776,6 +13819,7 @@ Cordialement`);
                 var card = e.target.closest('.db2-zone-card.has-tooltip');
                 var kpiCard = e.target.closest('.db2-kpi-card.has-tooltip');
                 var urgentItem = e.target.closest('.db2-urgent-item.has-tooltip');
+                var generic = !badge && !card && !kpiCard && !urgentItem ? e.target.closest('.has-tooltip') : null;
                 
                 if (badge) {
                     var badgeTip = badge.querySelector(':scope > .db2-tooltip');
@@ -13792,6 +13836,9 @@ Cordialement`);
                 } else if (urgentItem) {
                     var tip2 = urgentItem.querySelector(':scope > .db2-tooltip');
                     if (tip2) tip2.classList.remove('tooltip-visible');
+                } else if (generic) {
+                    var tip3 = generic.querySelector(':scope > .db2-tooltip');
+                    if (tip3) tip3.classList.remove('tooltip-visible');
                 }
             }, true);
         }
@@ -13803,23 +13850,59 @@ Cordialement`);
         // ═══════════════════════════════════════════════════════════════
         
         function initSwipe(modalEl, onLeft, onRight, onDown) {
-            var startX=0, startY=0, dx=0, dy=0, swiping=false;
-            var threshold=60;
+            var startX=0, startY=0, startTime=0;
+            var threshold=40, velocityThreshold=0.3;
+            
             modalEl.addEventListener('touchstart', function(e) {
-                var t=e.touches[0]; startX=t.clientX; startY=t.clientY; dx=0; dy=0; swiping=true;
+                var t=e.touches[0];
+                startX=t.clientX; startY=t.clientY;
+                startTime=Date.now();
             }, {passive:true});
-            modalEl.addEventListener('touchmove', function(e) {
-                if(!swiping)return;
-                var t=e.touches[0]; dx=t.clientX-startX; dy=t.clientY-startY;
-                if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>10){modalEl.style.transform='translateX('+(dx*0.4)+'px)';}
-                else if(dy>10&&Math.abs(dy)>Math.abs(dx)){modalEl.style.transform='translateY('+Math.max(0,dy*0.5)+'px)';modalEl.style.opacity=Math.max(0.3,1-dy/400);}
-            }, {passive:true});
-            modalEl.addEventListener('touchend', function() {
-                if(!swiping)return; swiping=false;
-                if(dx<-threshold&&Math.abs(dx)>Math.abs(dy))onRight();
-                else if(dx>threshold&&Math.abs(dx)>Math.abs(dy))onLeft();
-                else if(dy>threshold&&Math.abs(dy)>Math.abs(dx))onDown();
-                modalEl.style.transform=''; modalEl.style.opacity='';
+            
+            modalEl.addEventListener('touchend', function(e) {
+                var t=e.changedTouches[0];
+                var dx=t.clientX-startX, dy=t.clientY-startY;
+                var elapsed=Date.now()-startTime;
+                var vx=Math.abs(dx)/elapsed, vy=Math.abs(dy)/elapsed;
+                
+                // Quick horizontal flick
+                if (Math.abs(dx) > threshold && Math.abs(dx) > Math.abs(dy) * 1.5 && (vx > velocityThreshold || Math.abs(dx) > 100)) {
+                    if (dx < 0) {
+                        // Swipe left → next
+                        modalEl.style.transition='transform 0.2s ease-out, opacity 0.2s';
+                        modalEl.style.transform='translateX(-40px)';
+                        modalEl.style.opacity='0.5';
+                        setTimeout(function(){
+                            modalEl.style.transition='none';
+                            modalEl.style.transform='';
+                            modalEl.style.opacity='';
+                            onRight();
+                        }, 180);
+                    } else {
+                        // Swipe right → prev
+                        modalEl.style.transition='transform 0.2s ease-out, opacity 0.2s';
+                        modalEl.style.transform='translateX(40px)';
+                        modalEl.style.opacity='0.5';
+                        setTimeout(function(){
+                            modalEl.style.transition='none';
+                            modalEl.style.transform='';
+                            modalEl.style.opacity='';
+                            onLeft();
+                        }, 180);
+                    }
+                }
+                // Quick downward flick
+                else if (dy > threshold && Math.abs(dy) > Math.abs(dx) * 1.5 && (vy > velocityThreshold || dy > 120)) {
+                    modalEl.style.transition='transform 0.2s ease-out, opacity 0.2s';
+                    modalEl.style.transform='translateY(60px)';
+                    modalEl.style.opacity='0';
+                    setTimeout(function(){
+                        modalEl.style.transition='none';
+                        modalEl.style.transform='';
+                        modalEl.style.opacity='';
+                        onDown();
+                    }, 180);
+                }
             }, {passive:true});
         }
         
@@ -13857,6 +13940,43 @@ Cordialement`);
             // Scroll to top
             var content = document.querySelector('.dashboard-content');
             if (content) content.scrollTop = 0;
+        }
+        
+        // Load photos for action modal from linked audit's JSON
+        async function loadActionModalPhotos(audit) {
+            var container = document.getElementById('action-modal-photo');
+            if (!container) return;
+            try {
+                if (!audit.date || !audit.zone || !msalConnected) {
+                    container.innerHTML = '<div style="font-size:12px;color:var(--gray-40)">Photos non disponibles</div>';
+                    return;
+                }
+                // Reuse the same logic as loadAuditDetailPhotos but target action modal container
+                // Store current audit detail temporarily
+                var prevAuditDetail = currentAuditDetail;
+                currentAuditDetail = audit;
+                
+                // Create a temporary container, load photos into it, then copy
+                var tempContainer = document.createElement('div');
+                tempContainer.id = 'audit-detail-photos-content';
+                tempContainer.style.display = 'none';
+                document.body.appendChild(tempContainer);
+                
+                await loadAuditDetailPhotos(audit);
+                
+                // Copy the result
+                var realPhotosEl = document.getElementById('audit-detail-photos-content');
+                if (realPhotosEl && realPhotosEl !== tempContainer) {
+                    container.innerHTML = realPhotosEl.innerHTML || '<div style="font-size:12px;color:var(--gray-40)">Aucune photo</div>';
+                }
+                
+                // Cleanup
+                if (tempContainer.parentNode) tempContainer.parentNode.removeChild(tempContainer);
+                currentAuditDetail = prevAuditDetail;
+            } catch(e) {
+                console.error('Action modal photos error:', e);
+                container.innerHTML = '<div style="font-size:12px;color:var(--gray-40)">Erreur chargement photos</div>';
+            }
         }
         
         // ═══════════════════════════════════════════════════════════════
