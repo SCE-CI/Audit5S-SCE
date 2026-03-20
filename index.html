@@ -4090,11 +4090,8 @@
         
         /* Loading state */
         .dashboard-loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: var(--space-xl);
+            display: block;
+            padding: 0;
             color: var(--gray-60);
             min-height: 300px;
         }
@@ -6469,6 +6466,11 @@
 
         .db2-tooltip.tooltip-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+        /* Tooltip below variant (for KPI cards) */
+        .db2-kpi-card > .db2-tooltip { bottom: auto; top: calc(100% + 8px); transform: translateX(-50%) translateY(-4px); }
+        .db2-kpi-card > .db2-tooltip.tooltip-visible { transform: translateX(-50%) translateY(0); }
+        .db2-kpi-card > .db2-tooltip::after { top: auto; bottom: 100%; border: 5px solid transparent; border-bottom-color: var(--gray-90); border-top-color: transparent; }
+
         .db2-tooltip-row { display: flex; justify-content: space-between; gap: var(--space-md); }
         .db2-tooltip-row + .db2-tooltip-row { margin-top: 4px; }
         .db2-tooltip-label { color: var(--gray-40); }
@@ -6485,6 +6487,147 @@
         .db2-c-green { color: var(--traffic-green); }
         .db2-c-orange { color: var(--traffic-orange); }
         .db2-c-red { color: var(--traffic-red); }
+
+        /* --- Fade-in staggered animations v2 --- */
+        @keyframes db2-fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes db2-shimmer {
+            0% { background-position: -400px 0; }
+            100% { background-position: 400px 0; }
+        }
+
+        .db2-animate-in {
+            opacity: 0;
+            animation: db2-fadeInUp 0.35s ease-out forwards;
+        }
+
+        .db2-animate-in:nth-child(1) { animation-delay: 0.03s; }
+        .db2-animate-in:nth-child(2) { animation-delay: 0.08s; }
+        .db2-animate-in:nth-child(3) { animation-delay: 0.13s; }
+        .db2-animate-in:nth-child(4) { animation-delay: 0.18s; }
+        .db2-animate-in:nth-child(5) { animation-delay: 0.23s; }
+        .db2-animate-in:nth-child(6) { animation-delay: 0.28s; }
+
+        .db2-section.db2-animate-in { animation-delay: 0.2s; }
+        .db2-section.db2-animate-in:nth-of-type(2) { animation-delay: 0.35s; }
+
+        /* Table rows fade in */
+        .dashboard-table tbody tr {
+            animation: db2-fadeInUp 0.25s ease-out both;
+        }
+        .dashboard-table tbody tr:nth-child(1) { animation-delay: 0.02s; }
+        .dashboard-table tbody tr:nth-child(2) { animation-delay: 0.05s; }
+        .dashboard-table tbody tr:nth-child(3) { animation-delay: 0.08s; }
+        .dashboard-table tbody tr:nth-child(4) { animation-delay: 0.11s; }
+        .dashboard-table tbody tr:nth-child(5) { animation-delay: 0.14s; }
+        .dashboard-table tbody tr:nth-child(n+6) { animation-delay: 0.17s; }
+
+        /* --- Skeleton loading v2 --- */
+        .db2-skeleton {
+            background: linear-gradient(90deg, var(--gray-10) 25%, var(--gray-5) 50%, var(--gray-10) 75%);
+            background-size: 800px 100%;
+            animation: db2-shimmer 1.5s ease-in-out infinite;
+            border-radius: var(--radius-md);
+        }
+
+        .db2-skeleton-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .db2-skeleton-card {
+            height: 90px;
+            border-radius: var(--radius-lg);
+        }
+
+        .db2-skeleton-zones {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .db2-skeleton-zone {
+            height: 110px;
+            border-radius: var(--radius-lg);
+        }
+
+        .db2-skeleton-section {
+            height: 200px;
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .db2-skeleton-line {
+            height: 14px;
+            margin-bottom: var(--space-sm);
+            width: 60%;
+        }
+
+        .db2-skeleton-line.short { width: 35%; }
+        .db2-skeleton-line.full { width: 100%; }
+
+        .db2-skeleton-table {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            padding: var(--space-lg);
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .db2-skeleton-row {
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+        }
+
+        .db2-skeleton-row > div {
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 600px) {
+            .db2-skeleton-grid { grid-template-columns: repeat(2, 1fr); }
+            .db2-skeleton-zones { grid-template-columns: 1fr; }
+        }
+
+        /* --- Keyboard focus a11y v2 --- */
+        .db2-filter-chip:focus-visible,
+        .db2-kpi-card:focus-visible,
+        .db2-zone-card:focus-visible,
+        .db2-urgent-item:focus-visible,
+        .dashboard-nav-tab:focus-visible,
+        .dashboard-action-btn:focus-visible,
+        .modal-nav:focus-visible {
+            outline: 2px solid var(--sartorius-yellow);
+            outline-offset: 2px;
+        }
+
+        /* Remove default focus ring for mouse users */
+        .db2-filter-chip:focus:not(:focus-visible),
+        .db2-zone-card:focus:not(:focus-visible),
+        .dashboard-nav-tab:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        /* --- iOS overscroll fix --- */
+        .dashboard-overlay::before {
+            content: '';
+            position: fixed;
+            top: -100px;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: var(--sartorius-yellow);
+            z-index: 301;
+        }
 
         /* --- Mobile responsive v2 --- */
         @media (max-width: 600px) {
@@ -11884,8 +12027,32 @@ Cordialement`);
             
             <!-- Loading state -->
             <div class="dashboard-loading" id="dashboard-loading">
-                <div class="dashboard-loading-spinner"></div>
-                <p>Chargement des données...</p>
+                <div style="padding: var(--space-lg);">
+                    <!-- Skeleton KPI cards -->
+                    <div class="db2-skeleton-grid">
+                        <div class="db2-skeleton db2-skeleton-card" style="animation-delay:0s"></div>
+                        <div class="db2-skeleton db2-skeleton-card" style="animation-delay:0.1s"></div>
+                        <div class="db2-skeleton db2-skeleton-card" style="animation-delay:0.2s"></div>
+                        <div class="db2-skeleton db2-skeleton-card" style="animation-delay:0.3s"></div>
+                    </div>
+                    <!-- Skeleton zones -->
+                    <div class="db2-skeleton-table" style="margin-bottom:var(--space-lg)">
+                        <div class="db2-skeleton db2-skeleton-line" style="width:120px;height:16px;margin-bottom:var(--space-md)"></div>
+                        <div class="db2-skeleton-zones" style="margin-bottom:0">
+                            <div class="db2-skeleton db2-skeleton-zone" style="animation-delay:0.15s"></div>
+                            <div class="db2-skeleton db2-skeleton-zone" style="animation-delay:0.25s"></div>
+                            <div class="db2-skeleton db2-skeleton-zone" style="animation-delay:0.35s"></div>
+                            <div class="db2-skeleton db2-skeleton-zone" style="animation-delay:0.45s"></div>
+                        </div>
+                    </div>
+                    <!-- Skeleton urgent actions -->
+                    <div class="db2-skeleton-table">
+                        <div class="db2-skeleton db2-skeleton-line" style="width:140px;height:16px;margin-bottom:var(--space-md)"></div>
+                        <div class="db2-skeleton-row"><div class="db2-skeleton" style="width:8px;height:8px;border-radius:50%;flex-shrink:0"></div><div class="db2-skeleton" style="flex:1;height:14px"></div><div class="db2-skeleton" style="width:60px;height:14px"></div></div>
+                        <div class="db2-skeleton-row"><div class="db2-skeleton" style="width:8px;height:8px;border-radius:50%;flex-shrink:0"></div><div class="db2-skeleton" style="flex:1;height:14px"></div><div class="db2-skeleton" style="width:60px;height:14px"></div></div>
+                        <div class="db2-skeleton-row"><div class="db2-skeleton" style="width:8px;height:8px;border-radius:50%;flex-shrink:0"></div><div class="db2-skeleton" style="flex:1;height:14px"></div><div class="db2-skeleton" style="width:60px;height:14px"></div></div>
+                    </div>
+                </div>
             </div>
             
             <!-- État non connecté -->
@@ -12151,12 +12318,7 @@ Cordialement`);
             // Event listeners pour les onglets
             document.querySelectorAll('.dashboard-nav-tab').forEach(tab => {
                 tab.addEventListener('click', function() {
-                    document.querySelectorAll('.dashboard-nav-tab').forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    const tabId = this.dataset.tab;
-                    document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
-                    document.getElementById('tab-' + tabId).classList.add('active');
+                    switchDashboardTab(this.dataset.tab);
                 });
             });
             
@@ -12876,11 +13038,27 @@ Cordialement`);
                 myActionsHtml += '</div>';
             }
             
-            // KPI grid
-            var html = myActionsHtml + '<div class="db2-kpi-grid"><div class="db2-kpi-card accent has-tooltip"><div class="db2-kpi-label">Score moyen</div><div class="db2-kpi-value ' + getScoreClass(avgScore) + '">' + avgScore + '<span class="unit">%</span></div>' + trendHtml + '</div><div class="db2-kpi-card has-tooltip"><div class="db2-kpi-label">Audits ce mois</div><div class="db2-kpi-value">' + auditsThisMonth.length + '</div><div class="db2-kpi-trend neutral">' + audits.length + ' au total</div></div><div class="db2-kpi-card' + ((openCount+overdueCount) > 0 ? ' teal' : '') + ' has-tooltip"><div class="db2-kpi-label">Actions ouvertes</div><div class="db2-kpi-value ' + ((openCount+overdueCount) > 0 ? 'db2-c-orange' : '') + '">' + (openCount+overdueCount) + '</div>' + (inprogressCount > 0 ? '<div class="db2-kpi-trend neutral">' + inprogressCount + ' en cours</div>' : '') + '</div>';
+            // Build KPI tooltips
+            var zoneScores = dashboardZones.map(function(z) { var za=audits.filter(function(a){return a.zone===z;}); var l=za.length>0?za[za.length-1]:null; return {zone:z, score:l?getAuditPerformance(l):null}; }).filter(function(x){return x.score!==null;}).sort(function(a,b){return b.score-a.score;});
+            var scoreTooltipRows = zoneScores.map(function(z){return '<div class="db2-tooltip-row"><span>'+z.zone+'</span><span>'+z.score+'%</span></div>';}).join('');
+            var scoreTooltip = '<div class="db2-tooltip" style="bottom:auto;top:calc(100% + 8px)"><div class="db2-tooltip-title">Dernier score par zone</div>'+scoreTooltipRows+'<div class="db2-tooltip-divider"></div><div class="db2-tooltip-row"><span class="db2-tooltip-label">Calculé sur</span><span>'+audits.length+' audits</span></div></div>';
+            
+            var auditsMonthRows = auditsThisMonth.map(function(a){return '<div class="db2-tooltip-row"><span>'+a.zone+'</span><span>'+getAuditPerformance(a)+'%</span></div>';}).join('<div class="db2-tooltip-divider"></div>');
+            var auditsMonthTooltip = auditsThisMonth.length>0 ? '<div class="db2-tooltip" style="bottom:auto;top:calc(100% + 8px)"><div class="db2-tooltip-title">Audits ce mois</div>'+auditsMonthRows+'</div>' : '';
+            
+            var openByZone={}; actions.forEach(function(a){var st=getActionStatus(a);if(['open','overdue','inprogress'].includes(st)){openByZone[a.zone]=(openByZone[a.zone]||0)+1;}});
+            var actionsTooltipRows=Object.keys(openByZone).sort(function(a,b){return openByZone[b]-openByZone[a];}).map(function(z){return '<div class="db2-tooltip-row"><span>'+z+'</span><span>'+openByZone[z]+'</span></div>';}).join('');
+            var actionsTooltip = '<div class="db2-tooltip" style="bottom:auto;top:calc(100% + 8px)"><div class="db2-tooltip-title">Répartition par zone</div>'+actionsTooltipRows+'</div>';
+            
+            var overdueActionsSorted = actions.filter(function(a){return getActionStatus(a)==='overdue';}).sort(function(a,b){var da=parseExcelDate(a.dateOuverture);var db=parseExcelDate(b.dateOuverture);return(da||0)-(db||0);});
+            var overdueTooltip='';
+            if(overdueActionsSorted.length>0){var odRows=overdueActionsSorted.slice(0,3).map(function(a){var d=getActionDaysOpen(a);return '<div class="db2-tooltip-row"><span>'+(a.action||'-')+'</span></div><div class="db2-tooltip-row"><span class="db2-tooltip-label">'+(a.zone||'-')+' · '+(a.responsable||'—')+' · '+d+'j</span></div>';}).join('<div class="db2-tooltip-divider"></div>');overdueTooltip='<div class="db2-tooltip" style="bottom:auto;top:calc(100% + 8px);min-width:240px"><div class="db2-tooltip-title">Plus ancienne : '+getActionDaysOpen(overdueActionsSorted[0])+'j</div>'+odRows+'</div>';}
+            
+            // KPI grid with tooltips
+            var html = myActionsHtml + '<div class="db2-kpi-grid"><div class="db2-kpi-card accent has-tooltip" style="position:relative">'+scoreTooltip+'<div class="db2-kpi-label">Score moyen</div><div class="db2-kpi-value ' + getScoreClass(avgScore) + '">' + avgScore + '<span class="unit">%</span></div>' + trendHtml + '</div><div class="db2-kpi-card has-tooltip" style="position:relative">'+auditsMonthTooltip+'<div class="db2-kpi-label">Audits ce mois</div><div class="db2-kpi-value">' + auditsThisMonth.length + '</div><div class="db2-kpi-trend neutral">' + audits.length + ' au total</div></div><div class="db2-kpi-card' + ((openCount+overdueCount) > 0 ? ' teal' : '') + ' has-tooltip" style="position:relative">'+actionsTooltip+'<div class="db2-kpi-label">Actions ouvertes</div><div class="db2-kpi-value ' + ((openCount+overdueCount) > 0 ? 'db2-c-orange' : '') + '">' + (openCount+overdueCount) + '</div>' + (inprogressCount > 0 ? '<div class="db2-kpi-trend neutral">' + inprogressCount + ' en cours</div>' : '') + '</div>';
             
             if (overdueCount > 0) {
-                html += '<div class="db2-kpi-card alert has-tooltip"><div class="db2-kpi-label">> 30 jours</div><div class="db2-kpi-value db2-c-red">' + overdueCount + '</div></div>';
+                html += '<div class="db2-kpi-card alert has-tooltip" style="position:relative">'+overdueTooltip+'<div class="db2-kpi-label">> 30 jours</div><div class="db2-kpi-value db2-c-red">' + overdueCount + '</div></div>';
             } else {
                 var closedCount = actions.filter(function(a) { return getActionStatus(a) === 'closed'; }).length;
                 var closureRate = actions.length > 0 ? Math.round(closedCount / actions.length * 100) : 0;
@@ -12888,7 +13066,7 @@ Cordialement`);
             }
             html += '</div>';
             
-            // Zones grid
+            // Zones grid with sparkline tooltips
             html += '<div class="db2-section"><div class="db2-section-header"><h3 class="db2-section-title">État des zones</h3><button class="db2-section-link" onclick="switchDashboardTab(\'zones\')">Voir détail →</button></div><div class="db2-zones-grid">';
             
             dashboardZones.forEach(function(zoneName) {
@@ -12903,6 +13081,25 @@ Cordialement`);
                 var op = zoneActions.filter(function(a) { return getActionStatus(a)==='open'; }).length;
                 var ip = zoneActions.filter(function(a) { return getActionStatus(a)==='inprogress'; }).length;
                 
+                // Sparkline tooltip for zone card
+                var sparkAudits = zoneAudits.slice(-5);
+                var cardTooltip = '';
+                if (sparkAudits.length >= 2) {
+                    var sparkW=180,sparkH=40,padX=4,padY=4;
+                    var vals=sparkAudits.map(function(a){return getAuditPerformance(a);});
+                    var minV=Math.min.apply(null,vals.concat([40]));var maxV=Math.max.apply(null,vals.concat([100]));var rangeV=maxV-minV||1;
+                    var step=(sparkW-padX*2)/(vals.length-1);
+                    var pts=vals.map(function(v,i){return{x:Math.round(padX+i*step),y:Math.round(padY+(1-(v-minV)/rangeV)*(sparkH-padY*2))};});
+                    var lineD=pts.map(function(p,i){return(i===0?'M':'L')+p.x+' '+p.y;}).join(' ');
+                    var areaD=lineD+' L'+pts[pts.length-1].x+' '+(sparkH-padY)+' L'+pts[0].x+' '+(sparkH-padY)+' Z';
+                    var dots=pts.map(function(p,i){return '<circle cx="'+p.x+'" cy="'+p.y+'" r="'+(i===pts.length-1?3:2)+'" class="db2-sparkline-dot"/>';}).join('');
+                    var firstPct=Math.round(sparkAudits[0].performance<=1?sparkAudits[0].performance*100:sparkAudits[0].performance);
+                    var lastPct=pct;var delta=lastPct-firstPct;var deltaStr=delta>=0?'+'+delta:''+delta;
+                    cardTooltip='<div class="db2-tooltip"><div class="db2-tooltip-title">Évolution · '+zoneAudits.length+' audits</div><div class="db2-sparkline" style="margin:6px 0"><svg viewBox="0 0 '+sparkW+' '+sparkH+'" preserveAspectRatio="none"><path d="'+areaD+'" class="db2-sparkline-area"/><path d="'+lineD+'" class="db2-sparkline-line"/>'+dots+'</svg></div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--gray-40);margin-top:2px"><span>'+formatDateShort(sparkAudits[0].date)+' · '+firstPct+'%</span><span>'+formatDateShort(sparkAudits[sparkAudits.length-1].date)+' · '+lastPct+'% ('+deltaStr+')</span></div></div>';
+                } else {
+                    cardTooltip='<div class="db2-tooltip"><div class="db2-tooltip-title">'+zoneAudits.length+' audit</div></div>';
+                }
+                
                 var badges = '';
                 if (ov||op||ip) {
                     badges = '<div class="db2-zone-badges">';
@@ -12912,7 +13109,7 @@ Cordialement`);
                     badges += '</div>';
                 }
                 
-                html += '<div class="db2-zone-card ' + cls + '" onclick="onZoneCardClick(\'' + zoneName + '\')" style="cursor:pointer"><div class="db2-zone-top"><div><div class="db2-zone-name">' + zoneName + '</div><div class="db2-zone-meta">' + (last.niveau||'-') + ' · ' + formatExcelDate(last.date) + ' · ' + (last.auditeur||'-') + '</div></div><div class="db2-zone-score ' + cls + '">' + pct + '%</div></div>' + badges + '<div class="db2-zone-bar"><div class="db2-zone-bar-fill ' + cls + '" style="width:' + pct + '%"></div></div></div>';
+                html += '<div class="db2-zone-card ' + cls + ' has-tooltip" onclick="onZoneCardClick(\'' + zoneName + '\')" style="cursor:pointer;position:relative">' + cardTooltip + '<div class="db2-zone-top"><div><div class="db2-zone-name">' + zoneName + '</div><div class="db2-zone-meta">' + (last.niveau||'-') + ' · ' + formatExcelDate(last.date) + ' · ' + (last.auditeur||'-') + '</div></div><div class="db2-zone-score ' + cls + '">' + pct + '%</div></div>' + badges + '<div class="db2-zone-bar"><div class="db2-zone-bar-fill ' + cls + '" style="width:' + pct + '%"></div></div></div>';
             });
             html += '</div></div>';
             
@@ -12932,6 +13129,13 @@ Cordialement`);
             html += '</div>';
             
             document.getElementById('overview-content').innerHTML = html;
+            
+            // Apply staggered fade-in animations
+            var animTargets = document.querySelectorAll('#overview-content .db2-kpi-card, #overview-content .db2-zone-card, #overview-content .db2-urgent-item, #overview-content .db2-section, #overview-content .db2-my-actions');
+            animTargets.forEach(function(el, i) {
+                el.classList.add('db2-animate-in');
+                el.style.animationDelay = (i * 0.04) + 's';
+            });
         }
         
         // ─── ZONE TAB ───
@@ -13469,14 +13673,121 @@ Cordialement`);
             else if(e.key==='ArrowRight'){e.preventDefault();if(actionOpen)navAction(1);else if(auditOpen)navAudit(1);}
         });
         
+        // ═══════════════════════════════════════════════════════════════
+        // TOOLTIP CONTROLLER — JS-managed tooltip visibility
+        // ═══════════════════════════════════════════════════════════════
+        
+        function initTooltips() {
+            document.addEventListener('mouseenter', function(e) {
+                if (!e.target || !e.target.closest) return;
+                var badge = e.target.closest('.db2-zone-badge.has-tooltip');
+                var card = e.target.closest('.db2-zone-card.has-tooltip');
+                var kpiCard = e.target.closest('.db2-kpi-card.has-tooltip');
+                var urgentItem = e.target.closest('.db2-urgent-item.has-tooltip');
+                
+                if (badge) {
+                    var badgeTip = badge.querySelector(':scope > .db2-tooltip');
+                    var parentCard = badge.closest('.db2-zone-card.has-tooltip');
+                    if (parentCard) { var cardTip = parentCard.querySelector(':scope > .db2-tooltip'); if (cardTip) cardTip.classList.remove('tooltip-visible'); }
+                    if (badgeTip) badgeTip.classList.add('tooltip-visible');
+                } else if (card) {
+                    var cardTip = card.querySelector(':scope > .db2-tooltip');
+                    card.querySelectorAll('.db2-zone-badge > .db2-tooltip').forEach(function(t) { t.classList.remove('tooltip-visible'); });
+                    if (cardTip) cardTip.classList.add('tooltip-visible');
+                } else if (kpiCard) {
+                    var tip = kpiCard.querySelector(':scope > .db2-tooltip');
+                    if (tip) tip.classList.add('tooltip-visible');
+                } else if (urgentItem) {
+                    var tip2 = urgentItem.querySelector(':scope > .db2-tooltip');
+                    if (tip2) tip2.classList.add('tooltip-visible');
+                }
+            }, true);
+            
+            document.addEventListener('mouseleave', function(e) {
+                if (!e.target || !e.target.closest) return;
+                var badge = e.target.closest('.db2-zone-badge.has-tooltip');
+                var card = e.target.closest('.db2-zone-card.has-tooltip');
+                var kpiCard = e.target.closest('.db2-kpi-card.has-tooltip');
+                var urgentItem = e.target.closest('.db2-urgent-item.has-tooltip');
+                
+                if (badge) {
+                    var badgeTip = badge.querySelector(':scope > .db2-tooltip');
+                    if (badgeTip) badgeTip.classList.remove('tooltip-visible');
+                    var parentCard = badge.closest('.db2-zone-card.has-tooltip');
+                    if (parentCard && parentCard.matches(':hover')) { var cardTip = parentCard.querySelector(':scope > .db2-tooltip'); if (cardTip) cardTip.classList.add('tooltip-visible'); }
+                } else if (card) {
+                    var cardTip = card.querySelector(':scope > .db2-tooltip');
+                    if (cardTip) cardTip.classList.remove('tooltip-visible');
+                    card.querySelectorAll('.db2-zone-badge > .db2-tooltip').forEach(function(t) { t.classList.remove('tooltip-visible'); });
+                } else if (kpiCard) {
+                    var tip = kpiCard.querySelector(':scope > .db2-tooltip');
+                    if (tip) tip.classList.remove('tooltip-visible');
+                } else if (urgentItem) {
+                    var tip2 = urgentItem.querySelector(':scope > .db2-tooltip');
+                    if (tip2) tip2.classList.remove('tooltip-visible');
+                }
+            }, true);
+        }
+        
+        initTooltips();
+        
+        // ═══════════════════════════════════════════════════════════════
+        // SWIPE GESTURES — Mobile modals
+        // ═══════════════════════════════════════════════════════════════
+        
+        function initSwipe(modalEl, onLeft, onRight, onDown) {
+            var startX=0, startY=0, dx=0, dy=0, swiping=false;
+            var threshold=60;
+            modalEl.addEventListener('touchstart', function(e) {
+                var t=e.touches[0]; startX=t.clientX; startY=t.clientY; dx=0; dy=0; swiping=true;
+            }, {passive:true});
+            modalEl.addEventListener('touchmove', function(e) {
+                if(!swiping)return;
+                var t=e.touches[0]; dx=t.clientX-startX; dy=t.clientY-startY;
+                if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>10){modalEl.style.transform='translateX('+(dx*0.4)+'px)';}
+                else if(dy>10&&Math.abs(dy)>Math.abs(dx)){modalEl.style.transform='translateY('+Math.max(0,dy*0.5)+'px)';modalEl.style.opacity=Math.max(0.3,1-dy/400);}
+            }, {passive:true});
+            modalEl.addEventListener('touchend', function() {
+                if(!swiping)return; swiping=false;
+                if(dx<-threshold&&Math.abs(dx)>Math.abs(dy))onRight();
+                else if(dx>threshold&&Math.abs(dx)>Math.abs(dy))onLeft();
+                else if(dy>threshold&&Math.abs(dy)>Math.abs(dx))onDown();
+                modalEl.style.transform=''; modalEl.style.opacity='';
+            }, {passive:true});
+        }
+        
+        var actionModalContent=document.querySelector('#dashboard-action-modal .dashboard-action-modal-content');
+        var auditModalContent=document.querySelector('#audit-detail-modal .audit-detail-container');
+        if(actionModalContent)initSwipe(actionModalContent, function(){navAction(-1);}, function(){navAction(1);}, function(){closeActionModal();});
+        if(auditModalContent)initSwipe(auditModalContent, function(){navAudit(-1);}, function(){navAudit(1);}, function(){closeAuditDetailModal();});
+        
         // Switch dashboard tab programmatically
         function switchDashboardTab(tabId) {
+            // Fade out current
+            var currentPanel = document.querySelector('.dashboard-tab.active');
+            var newPanel = document.getElementById('tab-' + tabId);
+            
+            if (currentPanel && newPanel && currentPanel !== newPanel) {
+                currentPanel.style.opacity = '0';
+                currentPanel.style.transition = 'opacity 0.12s ease-out';
+                setTimeout(function() {
+                    document.querySelectorAll('.dashboard-tab').forEach(function(t) { t.classList.remove('active'); t.style.opacity = ''; t.style.transition = ''; });
+                    newPanel.classList.add('active');
+                    newPanel.style.opacity = '0';
+                    newPanel.style.transition = 'opacity 0.2s ease-in';
+                    requestAnimationFrame(function() { newPanel.style.opacity = '1'; });
+                    setTimeout(function() { newPanel.style.transition = ''; }, 250);
+                }, 120);
+            } else {
+                document.querySelectorAll('.dashboard-tab').forEach(function(t) { t.classList.remove('active'); });
+                if (newPanel) newPanel.classList.add('active');
+            }
+            
             document.querySelectorAll('.dashboard-nav-tab').forEach(function(t) { t.classList.remove('active'); });
-            document.querySelectorAll('.dashboard-tab').forEach(function(t) { t.classList.remove('active'); });
             var navTab = document.querySelector('.dashboard-nav-tab[data-tab="' + tabId + '"]');
             if (navTab) navTab.classList.add('active');
-            var panel = document.getElementById('tab-' + tabId);
-            if (panel) panel.classList.add('active');
+            
+            // Scroll to top
             var content = document.querySelector('.dashboard-content');
             if (content) content.scrollTop = 0;
         }
