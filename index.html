@@ -6466,10 +6466,27 @@
 
         .db2-tooltip.tooltip-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* Tooltip below variant (for KPI cards) */
-        .db2-kpi-card > .db2-tooltip { bottom: auto; top: calc(100% + 8px); transform: translateX(-50%) translateY(-4px); }
+        /* Tooltip below variant (for KPI cards) - HIGH z-index to not be masked */
+        .db2-kpi-card > .db2-tooltip { bottom: auto; top: calc(100% + 8px); transform: translateX(-50%) translateY(-4px); z-index: 100; }
         .db2-kpi-card > .db2-tooltip.tooltip-visible { transform: translateX(-50%) translateY(0); }
         .db2-kpi-card > .db2-tooltip::after { top: auto; bottom: 100%; border: 5px solid transparent; border-bottom-color: var(--gray-90); border-top-color: transparent; }
+        .db2-kpi-grid { position: relative; z-index: 10; }
+
+        /* Zone card tooltips - pointer-events none to prevent flicker */
+        .db2-zone-card > .db2-tooltip { pointer-events: none; }
+        .db2-zone-card { overflow: visible; }
+        
+        /* Badge tooltips below the badge */
+        .db2-zone-badge.has-tooltip { position: relative; }
+        .db2-zone-badge.has-tooltip > .db2-tooltip { top: calc(100% + 8px); bottom: auto; left: 0; transform: translateX(0) translateY(-4px); min-width: 220px; }
+        .db2-zone-badge.has-tooltip > .db2-tooltip.tooltip-visible { transform: translateX(0) translateY(0); }
+        .db2-zone-badge.has-tooltip > .db2-tooltip::after { top: auto; bottom: 100%; left: 16px; transform: none; border: 5px solid transparent; border-bottom-color: var(--gray-90); border-top-color: transparent; }
+
+        /* Urgent item tooltips above */
+        .db2-urgent-item.has-tooltip { position: relative; overflow: visible; }
+        .db2-urgent-item > .db2-tooltip { pointer-events: none; left: 0; transform: translateX(0) translateY(4px); }
+        .db2-urgent-item > .db2-tooltip.tooltip-visible { transform: translateX(0) translateY(0); }
+        .db2-urgent-item > .db2-tooltip::after { left: 20px; transform: none; }
 
         .db2-tooltip-row { display: flex; justify-content: space-between; gap: var(--space-md); }
         .db2-tooltip-row + .db2-tooltip-row { margin-top: 4px; }
@@ -6597,6 +6614,10 @@
             .db2-skeleton-grid { grid-template-columns: repeat(2, 1fr); }
             .db2-skeleton-zones { grid-template-columns: 1fr; }
         }
+
+        .dashboard-nav-tab svg { transition: opacity 0.2s; }
+        .dashboard-nav-tab.active svg { opacity: 1 !important; }
+        .dashboard-nav-tab:hover svg { opacity: 0.8 !important; }
 
         /* --- Keyboard focus a11y v2 --- */
         .db2-filter-chip:focus-visible,
@@ -12001,10 +12022,10 @@ Cordialement`);
             <nav class="dashboard-nav">
                 <div class="dashboard-nav-content">
                     <div class="dashboard-nav-inner">
-                        <button class="dashboard-nav-tab active" data-tab="overview">Vue d'ensemble</button>
-                        <button class="dashboard-nav-tab" data-tab="zones">Zones</button>
-                        <button class="dashboard-nav-tab" data-tab="actions">Actions</button>
-                        <button class="dashboard-nav-tab" data-tab="history">Historique</button>
+                        <button class="dashboard-nav-tab active" data-tab="overview"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;opacity:0.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Vue d'ensemble</button>
+                        <button class="dashboard-nav-tab" data-tab="zones"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;opacity:0.5"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/></svg>Zones</button>
+                        <button class="dashboard-nav-tab" data-tab="actions"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;opacity:0.5"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Actions</button>
+                        <button class="dashboard-nav-tab" data-tab="history"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;opacity:0.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Historique</button>
                     </div>
                     <div class="dashboard-nav-right" id="dashboard-nav-right" style="display: none;">
                         <div class="dashboard-last-modified" id="dashboard-last-modified">
@@ -12985,6 +13006,32 @@ Cordialement`);
             return { open:'Ouverte', overdue:'En retard', inprogress:'En cours', closed:'Clôturée', cancelled:'Annulée' }[st] || st;
         }
         
+        // Normalize "Niveau 1" → "N1", "Niveau 2" → "N2", etc.
+        function normalizeNiveau(val) {
+            if (!val) return '-';
+            var s = val.toString().trim();
+            if (/^N\d$/.test(s)) return s;
+            var m = s.match(/(\d)/);
+            return m ? 'N' + m[1] : s;
+        }
+        
+        // Normalize type: "Écart aux standards" → "Écart", "Élévation des standards" → "Élévation"
+        function normalizeType(val) {
+            if (!val) return '-';
+            var s = val.toString().trim().toLowerCase();
+            if (s.includes('cart')) return 'Écart';
+            if (s.includes('vation') || s.includes('lév')) return 'Élévation';
+            return val;
+        }
+        
+        // Type icon SVG
+        function typeIconHtml(val) {
+            var t = normalizeType(val);
+            if (t === 'Écart') return '<span title="Écart aux standards" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--t-red-subtle);color:var(--traffic-red);cursor:help"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v8m0 4h.01"/></svg></span>';
+            if (t === 'Élévation') return '<span title="Élévation des standards" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--t-green-subtle);color:var(--traffic-green);cursor:help"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 19V5m-5 5l5-5 5 5"/></svg></span>';
+            return '<span>' + val + '</span>';
+        }
+        
         // Helper: get user display name
         function getCurrentUserName() {
             return msalAccount ? msalAccount.name : '';
@@ -13103,13 +13150,25 @@ Cordialement`);
                 var badges = '';
                 if (ov||op||ip) {
                     badges = '<div class="db2-zone-badges">';
-                    if (ov) badges += '<span class="db2-zone-badge overdue">' + ov + ' en retard</span>';
-                    if (ip) badges += '<span class="db2-zone-badge inprogress">' + ip + ' en cours</span>';
-                    if (op) badges += '<span class="db2-zone-badge open">' + op + ' ouverte' + (op>1?'s':'') + '</span>';
+                    if (ov) {
+                        var ovActs=zoneActions.filter(function(a){return getActionStatus(a)==='overdue';});
+                        var ovRows=ovActs.map(function(a){var d=getActionDaysOpen(a);return '<div class="db2-tooltip-row"><span>'+(a.action||'-')+'</span></div><div class="db2-tooltip-row"><span class="db2-tooltip-label">'+(a.responsable||'—')+' · '+d+'j</span></div>';}).join('<div class="db2-tooltip-divider"></div>');
+                        badges += '<span class="db2-zone-badge overdue has-tooltip">' + ov + ' en retard<div class="db2-tooltip"><div class="db2-tooltip-title">Actions en retard</div>'+ovRows+'</div></span>';
+                    }
+                    if (ip) {
+                        var ipActs=zoneActions.filter(function(a){return getActionStatus(a)==='inprogress';});
+                        var ipRows=ipActs.map(function(a){var d=getActionDaysOpen(a);return '<div class="db2-tooltip-row"><span>'+(a.action||'-')+'</span></div><div class="db2-tooltip-row"><span class="db2-tooltip-label">'+(a.responsable||'—')+' · '+d+'j</span></div>';}).join('<div class="db2-tooltip-divider"></div>');
+                        badges += '<span class="db2-zone-badge inprogress has-tooltip">' + ip + ' en cours<div class="db2-tooltip"><div class="db2-tooltip-title">Actions en cours</div>'+ipRows+'</div></span>';
+                    }
+                    if (op) {
+                        var opActs=zoneActions.filter(function(a){return getActionStatus(a)==='open';});
+                        var opRows=opActs.map(function(a){var d=getActionDaysOpen(a);return '<div class="db2-tooltip-row"><span>'+(a.action||'-')+'</span></div><div class="db2-tooltip-row"><span class="db2-tooltip-label">'+(a.responsable||'—')+' · '+d+'j</span></div>';}).join('<div class="db2-tooltip-divider"></div>');
+                        badges += '<span class="db2-zone-badge open has-tooltip">' + op + ' ouverte' + (op>1?'s':'') + '<div class="db2-tooltip"><div class="db2-tooltip-title">Actions ouvertes</div>'+opRows+'</div></span>';
+                    }
                     badges += '</div>';
                 }
                 
-                html += '<div class="db2-zone-card ' + cls + ' has-tooltip" onclick="onZoneCardClick(\'' + zoneName + '\')" style="cursor:pointer;position:relative">' + cardTooltip + '<div class="db2-zone-top"><div><div class="db2-zone-name">' + zoneName + '</div><div class="db2-zone-meta">' + (last.niveau||'-') + ' · ' + formatExcelDate(last.date) + ' · ' + (last.auditeur||'-') + '</div></div><div class="db2-zone-score ' + cls + '">' + pct + '%</div></div>' + badges + '<div class="db2-zone-bar"><div class="db2-zone-bar-fill ' + cls + '" style="width:' + pct + '%"></div></div></div>';
+                html += '<div class="db2-zone-card ' + cls + ' has-tooltip" onclick="onZoneCardClick(\'' + zoneName + '\')" style="cursor:pointer;position:relative">' + cardTooltip + '<div class="db2-zone-top"><div><div class="db2-zone-name">' + zoneName + '</div><div class="db2-zone-meta">' + normalizeNiveau(last.niveau) + ' · ' + formatExcelDate(last.date) + ' · ' + (last.auditeur||'-') + '</div></div><div class="db2-zone-score ' + cls + '">' + pct + '%</div></div>' + badges + '<div class="db2-zone-bar"><div class="db2-zone-bar-fill ' + cls + '" style="width:' + pct + '%"></div></div></div>';
             });
             html += '</div></div>';
             
@@ -13123,7 +13182,10 @@ Cordialement`);
             } else {
                 urgentActions.forEach(function(a) {
                     var st = getActionStatus(a);
-                    html += '<div class="db2-urgent-item ' + (st==='overdue'?'is-overdue':'') + '" onclick="openActionFromOverview(' + a.rowIndex + ')" style="cursor:pointer"><div class="db2-urgent-dot ' + st + '"></div><div class="db2-urgent-body"><div class="db2-urgent-text">' + (a.action||'-') + '</div><div class="db2-urgent-meta"><span>' + (a.zone||'-') + '</span><span>' + (a.responsable||'—') + '</span><span>' + formatExcelDate(a.dateOuverture) + '</span></div></div><span class="db2-urgent-badge ' + st + '">' + (st==='overdue'?'> 30j':'Ouverte') + '</span></div>';
+                    var days = getActionDaysOpen(a);
+                    var linkedAudit = dashboardData.audits.find(function(au){return a.actionId&&au.auditId&&a.actionId.replace(/_A\d+$/,'')=== au.auditId;});
+                    var urgentTip = '<div class="db2-tooltip"><div class="db2-tooltip-row"><span class="db2-tooltip-label">Type</span><span>'+normalizeType(a.type)+'</span></div>'+(linkedAudit?'<div class="db2-tooltip-row"><span class="db2-tooltip-label">Audit</span><span>'+linkedAudit.auditId+' · '+getAuditPerformance(linkedAudit)+'%</span></div>':'')+'<div class="db2-tooltip-row"><span class="db2-tooltip-label">Ancienneté</span><span>'+days+' jours</span></div></div>';
+                    html += '<div class="db2-urgent-item ' + (st==='overdue'?'is-overdue':'') + ' has-tooltip" onclick="openActionFromOverview(' + a.rowIndex + ')" style="cursor:pointer;position:relative">'+urgentTip+'<div class="db2-urgent-dot ' + st + '"></div><div class="db2-urgent-body"><div class="db2-urgent-text">' + (a.action||'-') + '</div><div class="db2-urgent-meta"><span>' + (a.zone||'-') + '</span><span>' + (a.responsable||'—') + '</span><span>' + formatExcelDate(a.dateOuverture) + '</span></div></div><span class="db2-urgent-badge ' + st + '">' + (st==='overdue'?'> 30j':'Ouverte') + '</span></div>';
                 });
             }
             html += '</div>';
@@ -13241,23 +13303,28 @@ Cordialement`);
             if (audits.length < 2) { container.innerHTML = '<div class="dashboard-empty" style="padding:var(--space-xl)"><p>Pas assez de données</p></div>'; return; }
             
             var recent = audits.slice(-10);
-            var w = container.offsetWidth || 600, h = 260;
-            var pad = {t:24,r:30,b:30,l:40}, cw = w-pad.l-pad.r, ch = h-pad.t-pad.b;
+            var w = container.offsetWidth || 700, h = 260;
+            var pad = {t:20,r:30,b:30,l:40}, cw = w-pad.l-pad.r, ch = h-pad.t-pad.b;
             var xStep = cw / (recent.length-1);
             var pts = recent.map(function(a,i) {
                 var pct = getAuditPerformance(a);
-                return {x:Math.round(pad.l+i*xStep), y:Math.round(pad.t+(1-pct/100)*ch), pct:pct, date:formatDateShort(a.date), dateFull:formatExcelDate(a.date), niveau:a.niveau||'-', auditeur:a.auditeur||'-', id:a.auditId||'-'};
+                return {x:Math.round(pad.l+i*xStep), y:Math.round(pad.t+(1-pct/100)*ch), pct:pct, date:formatDateShort(a.date), dateFull:formatExcelDate(a.date), niveau:normalizeNiveau(a.niveau), auditeur:a.auditeur||'-', id:a.auditId||'-'};
             });
+            
+            // Find min/max indices
+            var minIdx=0, maxIdx=0;
+            pts.forEach(function(p,i){ if(p.pct<pts[minIdx].pct)minIdx=i; if(p.pct>pts[maxIdx].pct)maxIdx=i; });
             
             var gridLines='';
             for (var v=0;v<=100;v+=25) { var y=Math.round(pad.t+(1-v/100)*ch); gridLines+='<line x1="'+pad.l+'" y1="'+y+'" x2="'+(w-pad.r)+'" y2="'+y+'" stroke="var(--gray-10)" stroke-width="1"/><text x="'+(pad.l-6)+'" y="'+(y+3)+'" text-anchor="end" style="font-size:10px;fill:var(--gray-50);font-family:inherit">'+v+'%</text>'; }
             var threshY=Math.round(pad.t+(1-85/100)*ch);
             var lineD=pts.map(function(p,i){return(i===0?'M':'L')+p.x+' '+p.y;}).join(' ');
             var areaD=lineD+' L'+pts[pts.length-1].x+' '+(pad.t+ch)+' L'+pts[0].x+' '+(pad.t+ch)+' Z';
-            var dots=pts.map(function(p,i){ var c=p.pct>=85?'var(--traffic-green)':p.pct>=70?'var(--sartorius-yellow)':p.pct>=50?'var(--traffic-orange)':'var(--traffic-red)'; return '<circle cx="'+p.x+'" cy="'+p.y+'" r="5" fill="var(--white)"/><circle cx="'+p.x+'" cy="'+p.y+'" r="4" fill="'+c+'" stroke="var(--white)" stroke-width="2.5" style="cursor:pointer" data-idx="'+i+'"/><text x="'+p.x+'" y="'+(p.y-10)+'" text-anchor="middle" style="font-size:10px;font-weight:600;fill:var(--gray-70);font-family:inherit">'+p.pct+'</text>';}).join('');
+            // Only show value labels for min and max points
+            var dots=pts.map(function(p,i){ var c=p.pct>=85?'var(--traffic-green)':p.pct>=70?'var(--sartorius-yellow)':p.pct>=50?'var(--traffic-orange)':'var(--traffic-red)'; var label=(i===minIdx||i===maxIdx)?'<text x="'+p.x+'" y="'+(p.y-10)+'" text-anchor="middle" style="font-size:10px;font-weight:600;fill:'+c+';font-family:inherit">'+p.pct+'%</text>':''; return '<circle cx="'+p.x+'" cy="'+p.y+'" r="5" fill="var(--white)"/><circle cx="'+p.x+'" cy="'+p.y+'" r="4" fill="'+c+'" stroke="var(--white)" stroke-width="2.5" style="cursor:pointer;transition:r 0.15s" data-idx="'+i+'"/>'+label;}).join('');
             var xLabels=pts.map(function(p){return '<text x="'+p.x+'" y="'+(h-6)+'" text-anchor="middle" style="font-size:10px;fill:var(--gray-50);font-family:inherit">'+p.date+'</text>';}).join('');
             
-            container.innerHTML='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet">'+gridLines+'<line x1="'+pad.l+'" y1="'+threshY+'" x2="'+(w-pad.r)+'" y2="'+threshY+'" stroke="var(--gray-30)" stroke-width="1" stroke-dasharray="4 4"/><text x="'+(w-pad.r+4)+'" y="'+(threshY+3)+'" style="font-size:9px;fill:var(--gray-50);font-family:inherit">85%</text><path d="'+areaD+'" fill="var(--sartorius-yellow)" opacity="0.08"/><path d="'+lineD+'" fill="none" stroke="var(--sartorius-yellow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dots+xLabels+'</svg>';
+            container.innerHTML='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%">'+gridLines+'<line x1="'+pad.l+'" y1="'+threshY+'" x2="'+(w-pad.r)+'" y2="'+threshY+'" stroke="var(--gray-30)" stroke-width="1" stroke-dasharray="4 4"/><text x="'+(w-pad.r+4)+'" y="'+(threshY+3)+'" style="font-size:9px;fill:var(--gray-50);font-family:inherit">85%</text><path d="'+areaD+'" fill="var(--sartorius-yellow)" opacity="0.08"/><path d="'+lineD+'" fill="none" stroke="var(--sartorius-yellow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dots+xLabels+'</svg>';
             
             // Chart dot tooltips
             var tipEl = document.getElementById('chart-tooltip');
@@ -13296,11 +13363,11 @@ Cordialement`);
             if (allAudits.length === 0) { container.innerHTML = '<div class="dashboard-empty" style="padding:var(--space-lg)"><p>Aucun audit</p></div>'; return; }
             
             var sNames=['Trier','Ranger','Nettoyer','Standard.','Suivre'], sKeys=['S1','S2','S3','S4','S5'];
-            var cx=120,cy=110,maxR=85,n=5,angleStart=-Math.PI/2;
+            var cx=140,cy=130,maxR=105,n=5,angleStart=-Math.PI/2;
             function polar(angle,r){return{x:Math.round(cx+r*Math.cos(angle)),y:Math.round(cy+r*Math.sin(angle))};}
             
             var gridSvg='',axisSvg='',labelPositions=[];
-            for(var lv=1;lv<=4;lv++){var r=maxR*lv/4;var gp=[];for(var i=0;i<n;i++){gp.push(polar(angleStart+2*Math.PI*i/n,r));}gridSvg+='<polygon points="'+gp.map(function(p){return p.x+','+p.y;}).join(' ')+'" stroke="var(--gray-20)" stroke-width="0.5" fill="none"/>';}
+            for(var lv=1;lv<=4;lv++){var r=maxR*lv/4;var gp=[];for(var i=0;i<n;i++){gp.push(polar(angleStart+2*Math.PI*i/n,r));}gridSvg+='<polygon points="'+gp.map(function(p){return p.x+','+p.y;}).join(' ')+'" stroke="var(--gray-20)" stroke-width="0.5" fill="none"/>';gridSvg+='<text x="'+(cx+3)+'" y="'+(cy-r+10)+'" style="font-size:8px;fill:var(--gray-40);font-family:inherit">'+lv+'</text>';}
             for(var i=0;i<n;i++){var angle=angleStart+2*Math.PI*i/n;var end=polar(angle,maxR);axisSvg+='<line x1="'+cx+'" y1="'+cy+'" x2="'+end.x+'" y2="'+end.y+'" stroke="var(--gray-10)" stroke-width="0.5"/>';labelPositions.push(polar(angle,maxR+22));}
             
             var levelConfigs={N1:{color:'var(--teal)',hex:'#00B9BE'},N2:{color:'var(--traffic-orange)',hex:'#F59100'}};
@@ -13328,7 +13395,7 @@ Cordialement`);
             
             var catBars=sKeys.map(function(k,i){var v=primaryScores[i];var bPct=Math.round(v/4*100);var color=v>=3.4?'var(--traffic-green)':v>=2.8?'var(--sartorius-yellow)':v>=2?'var(--traffic-orange)':'var(--traffic-red)';return '<div style="display:flex;align-items:center;gap:12px"><div style="width:90px;font-size:13px;font-weight:500;color:var(--gray-70);flex-shrink:0">'+sNames[i]+'</div><div style="flex:1;height:8px;background:var(--gray-10);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+bPct+'%;background:'+color+';border-radius:4px;transition:width 0.6s"></div></div><div style="width:44px;font-size:13px;font-weight:600;text-align:right;flex-shrink:0;color:'+color+'">'+v.toFixed(1)+'</div></div>';}).join('');
             
-            container.innerHTML='<div style="width:240px;height:240px;margin:0 auto"><svg viewBox="0 0 240 220" width="100%" height="100%">'+gridSvg+axisSvg+shapesSvg+labelsSvg+'</svg></div><div style="display:flex;justify-content:center;gap:var(--space-lg);margin-top:var(--space-sm)">'+legendItems.join('')+'</div><div style="text-align:center;margin-top:var(--space-md)"><div style="font-size:28px;font-weight:700" class="'+getScoreClass(globalPct)+'">'+globalPct+'<span style="font-size:16px;color:var(--gray-40);font-weight:400">%</span></div><div style="font-size:12px;color:var(--gray-50);margin-top:2px">'+primarySubtitle+'</div></div><div style="margin-top:var(--space-lg);display:flex;flex-direction:column;gap:8px">'+catBars+'</div>';
+            container.innerHTML='<div style="width:290px;height:280px;margin:0 auto"><svg viewBox="0 0 280 270" width="100%" height="100%">'+gridSvg+axisSvg+shapesSvg+labelsSvg+'</svg></div><div style="display:flex;justify-content:center;gap:var(--space-lg);margin-top:var(--space-sm)">'+legendItems.join('')+'</div><div style="text-align:center;margin-top:var(--space-md)"><div style="font-size:28px;font-weight:700" class="'+getScoreClass(globalPct)+'">'+globalPct+'<span style="font-size:16px;color:var(--gray-40);font-weight:400">%</span></div><div style="font-size:12px;color:var(--gray-50);margin-top:2px">'+primarySubtitle+'</div></div><div style="margin-top:var(--space-lg);display:flex;flex-direction:column;gap:8px">'+catBars+'</div>';
         }
         
         function renderZoneHistory(zoneName) {
@@ -13339,7 +13406,7 @@ Cordialement`);
             tbody.innerHTML = audits.map(function(a) {
                 var pct = getAuditPerformance(a);
                 var color = pct>=85?'var(--traffic-green)':pct>=70?'var(--gray-80)':pct>=50?'var(--traffic-orange)':'var(--traffic-red)';
-                return '<tr style="cursor:pointer" onclick="openAuditFromZone('+a.rowIndex+',\''+zoneName+'\')"><td style="font-weight:500">'+formatExcelDate(a.date)+'</td><td><span class="db2-badge db2-badge-gray">'+(a.niveau||'-')+'</span></td><td style="font-weight:600;color:'+color+'">'+pct+'%</td><td style="color:var(--gray-60)">'+(a.auditeur||'-')+'</td></tr>';
+                return '<tr style="cursor:pointer" onclick="openAuditFromZone('+a.rowIndex+',\''+zoneName+'\')"><td style="font-weight:500">'+formatExcelDate(a.date)+'</td><td><span class="db2-badge db2-badge-gray">'+normalizeNiveau(a.niveau)+'</span></td><td style="font-weight:600;color:'+color+'">'+pct+'%</td><td style="color:var(--gray-60)">'+(a.auditeur||'-')+'</td></tr>';
             }).join('');
         }
         
@@ -13394,7 +13461,7 @@ Cordialement`);
                 return;
             }
             // Desktop table
-            tbody.innerHTML=filtered.map(function(a){var st=getActionStatus(a);var days=getActionDaysOpen(a);var dotColor={open:'var(--traffic-orange)',overdue:'var(--traffic-red)',inprogress:'var(--teal)',closed:'var(--traffic-green)',cancelled:'var(--gray-40)'}[st]||'var(--gray-40)';return '<tr style="cursor:pointer" onclick="openActionModal('+a.rowIndex+')"><td style="text-align:center;vertical-align:middle"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'+dotColor+'" title="'+getStatusLabel(st)+'"></span></td><td style="font-weight:500;max-width:280px">'+(a.action||'-')+'<div style="font-size:11px;color:var(--gray-50);margin-top:2px;font-weight:400">'+(a.actionId||'-')+'</div></td><td style="white-space:nowrap"><span class="db2-badge db2-badge-gray">'+(a.zone||'-').replace('Process / Entrée','Process')+'</span></td><td><span class="db2-badge '+(a.type==='Écart'?'db2-badge-red':'db2-badge-green')+'">'+(a.type||'-')+'</span></td><td style="white-space:nowrap;color:var(--gray-70)">'+(a.responsable||'—')+'</td><td style="white-space:nowrap;color:var(--gray-60)">'+formatDateShort(a.dateOuverture)+(st==='overdue'?' · '+days+'j':'')+'</td><td><button style="width:30px;height:30px;border:1px solid var(--gray-20);border-radius:var(--radius-sm);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-50)" onclick="event.stopPropagation();openActionModal('+a.rowIndex+')" title="Gérer"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button></td></tr>';}).join('');
+            tbody.innerHTML=filtered.map(function(a){var st=getActionStatus(a);var days=getActionDaysOpen(a);var dotColor={open:'var(--traffic-orange)',overdue:'var(--traffic-red)',inprogress:'var(--teal)',closed:'var(--traffic-green)',cancelled:'var(--gray-40)'}[st]||'var(--gray-40)';return '<tr style="cursor:pointer" onclick="openActionModal('+a.rowIndex+')"><td style="text-align:center;vertical-align:middle"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'+dotColor+'" title="'+getStatusLabel(st)+'"></span></td><td style="font-weight:500;max-width:280px">'+(a.action||'-')+'<div style="font-size:11px;color:var(--gray-50);margin-top:2px;font-weight:400">'+(a.actionId||'-')+'</div></td><td style="white-space:nowrap"><span class="db2-badge db2-badge-gray">'+(a.zone||'-').replace('Process / Entrée','Process')+'</span></td><td style="text-align:center">'+typeIconHtml(a.type)+'</td><td style="white-space:nowrap;color:var(--gray-70)">'+(a.responsable||'—')+'</td><td style="white-space:nowrap;color:var(--gray-60)">'+formatDateShort(a.dateOuverture)+(st==='overdue'?' · '+days+'j':'')+'</td><td><button style="width:30px;height:30px;border:1px solid var(--gray-20);border-radius:var(--radius-sm);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-50)" onclick="event.stopPropagation();openActionModal('+a.rowIndex+')" title="Gérer"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button></td></tr>';}).join('');
             // Mobile cards
             if(mobileEl){
                 mobileEl.innerHTML=filtered.map(function(a){var st=getActionStatus(a);var days=getActionDaysOpen(a);return '<div style="background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg);padding:var(--space-md);margin-bottom:var(--space-sm);cursor:pointer'+(st==='overdue'?';border-left:3px solid var(--traffic-red);border-radius:0 var(--radius-lg) var(--radius-lg) 0':'')+'" onclick="openActionModal('+a.rowIndex+')"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-sm);margin-bottom:var(--space-sm)"><div style="font-size:13px;font-weight:500;line-height:1.3;flex:1">'+(a.action||'-')+'</div><span class="db2-badge db2-badge-'+(st==='overdue'?'red':st==='inprogress'?'teal':st==='closed'?'green':'orange')+'">'+getStatusLabel(st)+'</span></div><div style="display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--gray-50)"><span>'+(a.zone||'-').replace('Process / Entrée','Process')+'</span><span>'+(a.responsable||'—')+'</span><span>'+formatDateShort(a.dateOuverture)+(st==='overdue'?' · '+days+'j':'')+'</span></div></div>';}).join('');
@@ -13449,10 +13516,10 @@ Cordialement`);
                 return;
             }
             // Desktop table
-            tbody.innerHTML=filtered.map(function(a){var pct=getAuditPerformance(a);var color=pct>=85?'var(--traffic-green)':pct>=70?'var(--gray-80)':pct>=50?'var(--traffic-orange)':'var(--traffic-red)';var auditActions=getAuditActions(a);var ecarts=auditActions.filter(function(ac){return ac.type==='Écart';}).length;var elevations=auditActions.filter(function(ac){return ac.type==='Élévation';}).length;var actStr='';if(ecarts)actStr+=ecarts+' écart'+(ecarts>1?'s':'');if(elevations)actStr+=(actStr?', ':'')+elevations+' élév.';if(!actStr)actStr='—';return '<tr style="cursor:pointer" onclick="openAuditFromHistory('+a.rowIndex+')"><td style="font-weight:500">'+formatExcelDate(a.date)+'</td><td><span class="db2-badge db2-badge-gray">'+(a.zone||'-').replace('Process / Entrée','Process')+'</span></td><td><span class="db2-badge db2-badge-gray">'+(a.niveau||'-')+'</span></td><td style="font-weight:600;color:'+color+'">'+pct+'%</td><td style="color:var(--gray-60)">'+(a.auditeur||'-')+'</td><td style="font-size:12px;color:var(--gray-50)">'+actStr+'</td></tr>';}).join('');
+            tbody.innerHTML=filtered.map(function(a){var pct=getAuditPerformance(a);var color=pct>=85?'var(--traffic-green)':pct>=70?'var(--gray-80)':pct>=50?'var(--traffic-orange)':'var(--traffic-red)';var auditActions=getAuditActions(a);var ecarts=auditActions.filter(function(ac){return normalizeType(ac.type)==='Écart';}).length;var elevations=auditActions.filter(function(ac){return normalizeType(ac.type)==='Élévation';}).length;var actStr='';if(ecarts)actStr+=ecarts+' écart'+(ecarts>1?'s':'');if(elevations)actStr+=(actStr?', ':'')+elevations+' élév.';if(!actStr)actStr='—';return '<tr style="cursor:pointer" onclick="openAuditFromHistory('+a.rowIndex+')"><td style="font-weight:500">'+formatExcelDate(a.date)+'</td><td><span class="db2-badge db2-badge-gray">'+(a.zone||'-').replace('Process / Entrée','Process')+'</span></td><td><span class="db2-badge db2-badge-gray">'+normalizeNiveau(a.niveau)+'</span></td><td style="font-weight:600;color:'+color+'">'+pct+'%</td><td style="color:var(--gray-60)">'+(a.auditeur||'-')+'</td><td style="font-size:12px;color:var(--gray-50)">'+actStr+'</td></tr>';}).join('');
             // Mobile cards
             if(mobileEl){
-                mobileEl.innerHTML=filtered.map(function(a){var pct=getAuditPerformance(a);var color=pct>=85?'var(--traffic-green)':pct>=70?'var(--gray-80)':pct>=50?'var(--traffic-orange)':'var(--traffic-red)';var ecarts=getAuditActions(a).filter(function(ac){return ac.type==='Écart';}).length;return '<div style="background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg);padding:var(--space-md);margin-bottom:var(--space-sm);cursor:pointer" onclick="openAuditFromHistory('+a.rowIndex+')"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div><div style="font-size:14px;font-weight:600">'+formatExcelDate(a.date)+'</div><div style="font-size:11px;color:var(--gray-50)">'+(a.zone||'-')+' · '+(a.niveau||'-')+'</div></div><div style="font-size:20px;font-weight:700;color:'+color+'">'+pct+'%</div></div><div style="display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11px;color:var(--gray-50)"><span>'+(a.auditeur||'-')+'</span>'+(ecarts?'<span>'+ecarts+' écart'+(ecarts>1?'s':'')+'</span>':'')+'</div></div>';}).join('');
+                mobileEl.innerHTML=filtered.map(function(a){var pct=getAuditPerformance(a);var color=pct>=85?'var(--traffic-green)':pct>=70?'var(--gray-80)':pct>=50?'var(--traffic-orange)':'var(--traffic-red)';var ecarts=getAuditActions(a).filter(function(ac){return normalizeType(ac.type)==='Écart';}).length;return '<div style="background:var(--white);border:1px solid var(--gray-20);border-radius:var(--radius-lg);padding:var(--space-md);margin-bottom:var(--space-sm);cursor:pointer" onclick="openAuditFromHistory('+a.rowIndex+')"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div><div style="font-size:14px;font-weight:600">'+formatExcelDate(a.date)+'</div><div style="font-size:11px;color:var(--gray-50)">'+(a.zone||'-')+' · '+normalizeNiveau(a.niveau)+'</div></div><div style="font-size:20px;font-weight:700;color:'+color+'">'+pct+'%</div></div><div style="display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11px;color:var(--gray-50)"><span>'+(a.auditeur||'-')+'</span>'+(ecarts?'<span>'+ecarts+' écart'+(ecarts>1?'s':'')+'</span>':'')+'</div></div>';}).join('');
             }
         }
         
@@ -13528,9 +13595,9 @@ Cordialement`);
             
             var h='<div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Statut</div><span class="db2-badge db2-badge-'+(st==='overdue'?'red':st==='inprogress'?'teal':st==='closed'?'green':st==='cancelled'?'gray':'orange')+'">'+getStatusLabel(st)+'</span>'+(st==='overdue'?'<span style="font-size:12px;color:var(--traffic-red);margin-left:8px">'+days+' jours</span>':'')+'</div>';
             h+='<div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Description</div><div style="font-size:14px">'+(action.action||'-')+'</div></div>';
-            h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)"><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Type</div><span class="db2-badge '+(action.type==='Écart'?'db2-badge-red':'db2-badge-green')+'">'+(action.type||'-')+'</span></div><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Zone</div><div style="font-size:14px">'+(action.zone||'-')+'</div></div><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Responsable</div><div style="font-size:14px">'+(action.responsable||'—')+'</div></div><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Date ouverture</div><div style="font-size:14px">'+formatExcelDate(action.dateOuverture)+'</div></div></div>';
+            h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)"><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Type</div>'+typeIconHtml(action.type)+' <span style="font-size:13px;margin-left:4px">'+normalizeType(action.type)+'</span></div><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Zone</div><div style="font-size:14px">'+(action.zone||'-')+'</div></div><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Responsable</div><div style="font-size:14px">'+(action.responsable||'—')+'</div></div><div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Date ouverture</div><div style="font-size:14px">'+formatExcelDate(action.dateOuverture)+'</div></div></div>';
             if(action.dateCloture&&action.dateCloture!=='')h+='<div style="margin-bottom:var(--space-md)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Date clôture</div><div style="font-size:14px">'+formatExcelDate(action.dateCloture)+'</div></div>';
-            if(linkedAudit){var lPct=getAuditPerformance(linkedAudit);h+='<div style="margin-top:var(--space-sm);padding-top:var(--space-md);border-top:1px solid var(--gray-10)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Audit source</div><div style="display:flex;align-items:center;gap:var(--space-sm);flex-wrap:wrap;font-size:14px"><span>'+linkedAudit.auditId+'</span><span class="db2-badge db2-badge-gray">'+linkedAudit.niveau+'</span><span style="color:var(--gray-50)">'+formatExcelDate(linkedAudit.date)+'</span><span style="font-weight:600;color:'+(lPct>=70?'var(--traffic-green)':'var(--traffic-orange)')+'">'+lPct+'%</span></div></div>';}
+            if(linkedAudit){var lPct=getAuditPerformance(linkedAudit);h+='<div style="margin-top:var(--space-sm);padding-top:var(--space-md);border-top:1px solid var(--gray-10)"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Audit source</div><div style="display:flex;align-items:center;gap:var(--space-sm);flex-wrap:wrap;font-size:14px;cursor:pointer;padding:6px;border-radius:var(--radius-md);transition:background 0.15s" onclick="closeActionModal();parentAuditRowIndex=null;setTimeout(function(){openAuditDetailModal('+linkedAudit.rowIndex+');},150)" onmouseover="this.style.background=\'var(--gray-5)\'" onmouseout="this.style.background=\'\'"><span style="color:var(--teal);font-weight:600">'+linkedAudit.auditId+'</span><span class="db2-badge db2-badge-gray">'+normalizeNiveau(linkedAudit.niveau)+'</span><span style="color:var(--gray-50)">'+formatExcelDate(linkedAudit.date)+'</span><span style="font-weight:600;color:'+(lPct>=70?'var(--traffic-green)':'var(--traffic-orange)')+'">'+lPct+'%</span></div></div>';}
             
             if(!isClosed){
                 h+='<div class="dashboard-action-modal-comment" style="margin-top:var(--space-md)"><label class="dashboard-action-modal-label" for="modal-comment">Commentaire <span id="modal-comment-required" style="color:var(--traffic-red);display:none">*</span></label><textarea id="modal-comment" class="dashboard-action-comment-input" rows="2" placeholder="Ajouter un commentaire..."></textarea></div>';
@@ -13629,7 +13696,7 @@ Cordialement`);
             if(!bodyEl)return;
             
             var scoreMoy=typeof audit.scoreMoyen==='number'?audit.scoreMoyen.toFixed(2):'-';
-            bodyEl.innerHTML='<div style="padding:var(--space-lg)"><div style="display:flex;gap:var(--space-lg);flex-wrap:wrap;margin-bottom:var(--space-lg)"><div style="min-width:100px"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Auditeur</div><div style="font-size:14px">'+(audit.auditeur||'-')+'</div></div><div style="min-width:100px"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Niveau</div><span class="db2-badge db2-badge-gray">'+(audit.niveau||'-')+'</span></div><div style="min-width:100px"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Score global</div><div style="font-size:18px;font-weight:700;color:'+scoreColor+'">'+pct+'% <span style="font-size:13px;font-weight:400;color:var(--gray-50)">('+scoreMoy+'/4)</span></div></div><div style="min-width:100px"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Zone</div><span class="db2-badge db2-badge-gray">'+(audit.zone||'-')+'</span></div></div><div style="margin-bottom:var(--space-lg)"><div style="font-size:12px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:var(--space-sm)">Scores par catégorie</div><div style="display:flex;flex-direction:column;gap:8px">'+catBars+'</div></div><div style="margin-bottom:var(--space-lg)"><div style="font-size:12px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:var(--space-sm)">Actions liées ('+auditActions.length+')</div>'+linkedHtml+'</div><div style="margin-bottom:var(--space-lg)"><div style="font-size:12px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:var(--space-sm)">Photos</div><div id="audit-detail-photos-content"><div style="font-size:12px;color:var(--gray-40);display:flex;align-items:center;gap:var(--space-sm)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gray-40)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Chargement...</div></div></div></div>';
+            bodyEl.innerHTML='<div style="padding:var(--space-lg)"><div style="display:flex;gap:var(--space-lg);flex-wrap:wrap;margin-bottom:var(--space-lg)"><div style="min-width:100px"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Auditeur</div><div style="font-size:14px">'+(audit.auditeur||'-')+'</div></div><div style="min-width:100px"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Niveau</div><span class="db2-badge db2-badge-gray">'+normalizeNiveau(audit.niveau)+'</span></div><div style="min-width:100px"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Score global</div><div style="font-size:18px;font-weight:700;color:'+scoreColor+'">'+pct+'% <span style="font-size:13px;font-weight:400;color:var(--gray-50)">('+scoreMoy+'/4)</span></div></div><div style="min-width:100px"><div style="font-size:11px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Zone</div><span class="db2-badge db2-badge-gray">'+(audit.zone||'-')+'</span></div></div><div style="margin-bottom:var(--space-lg)"><div style="font-size:12px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:var(--space-sm)">Scores par catégorie</div><div style="display:flex;flex-direction:column;gap:8px">'+catBars+'</div></div><div style="margin-bottom:var(--space-lg)"><div style="font-size:12px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:var(--space-sm)">Actions liées ('+auditActions.length+')</div>'+linkedHtml+'</div><div style="margin-bottom:var(--space-lg)"><div style="font-size:12px;font-weight:600;color:var(--gray-60);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:var(--space-sm)">Photos</div><div id="audit-detail-photos-content"><div style="font-size:12px;color:var(--gray-40);display:flex;align-items:center;gap:var(--space-sm)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gray-40)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Chargement...</div></div></div></div>';
             
             document.getElementById('audit-detail-modal').classList.add('visible');
             
