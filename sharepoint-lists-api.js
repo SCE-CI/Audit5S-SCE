@@ -96,7 +96,7 @@ const SharePointListsAPI = (() => {
         actions: {
             actionId:            'Title',
             auditRef:            'AuditRefLookupId',
-            dateCreation:        'DateCr_x00e9_ation',    // "DateCréation"
+            dateCreation:        'Date',                    // "DateCréation" — nom interne = Date
             zone:                'Zone',
             critere:             'Crit_x00e8_re',          // "Critère"
             type:                'TypeAction',              // "Type" était réservé
@@ -104,8 +104,8 @@ const SharePointListsAPI = (() => {
             responsable:         'Responsable',             // Person column (lecture)
             responsableLookupId: 'ResponsableLookupId',     // Person column (écriture)
             statut:              'Statut',
-            dateCloture:         'DateCl_x00f4_ture',      // "DateClôture"
-            commentaireCloture:  'CommentaireCl_x00f4_ture' // "CommentaireClôture"
+            dateCloture:         'DateCloture',              // "DateClôture" — recréée sans accent
+            commentaireCloture:  'CommentaireCloture'        // "CommentaireClôture" — recréée sans accent
         }
     };
 
