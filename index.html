@@ -13016,6 +13016,65 @@ Cordialement`);
                     throw new Error(error2.error ? error2.error.message : 'Erreur mise à jour commentaire');
                 }
             }
+            
+            // ── Sync vers SharePoint Lists (non bloquant) ──
+            // Cherche l'action dans Actions5S par son actionId, puis PATCH le statut
+            syncActionUpdateToLists(action, actionType, newComment).catch(function(e) {
+                console.warn('syncActionUpdateToLists: échoué (non bloquant) —', e.message);
+            });
+        }
+        
+        /**
+         * Sync la mise à jour d'une action vers la liste Actions5S.
+         * Cherche l'item par Title (= actionId), puis PATCH.
+         * Non bloquant — si ça échoue, l'Excel est déjà à jour.
+         */
+        async function syncActionUpdateToLists(action, actionType, comment) {
+            if (typeof SharePointListsAPI === 'undefined') return;
+            
+            try {
+                // Chercher l'item dans Actions5S par son actionId (= Title)
+                var actionId = action.actionId;
+                if (!actionId) {
+                    console.log('syncActionUpdateToLists: pas d\'actionId — skip');
+                    return;
+                }
+                
+                var C = SharePointListsAPI.COLUMN_MAP.actions;
+                var siteId = SharePointListsAPI.config.siteId;
+                var listId = SharePointListsAPI.config.lists.actions;
+                
+                // Rechercher par Title exact
+                var searchUrl = 'https://graph.microsoft.com/v1.0/sites/' + siteId + '/lists/' + listId + '/items?$filter=fields/Title eq \'' + encodeURIComponent(actionId).replace(/'/g, "''") + '\'&$select=id&$top=1';
+                var searchResult = await SharePointListsAPI.graphFetch(searchUrl);
+                
+                if (!searchResult.value || searchResult.value.length === 0) {
+                    console.log('syncActionUpdateToLists: Action "' + actionId + '" non trouvée dans Lists — skip');
+                    return;
+                }
+                
+                var itemId = searchResult.value[0].id;
+                
+                // Construire les updates selon le type d'action
+                var updates = {};
+                if (actionType === 'close') {
+                    updates.Statut = 'Clôturée';
+                    updates.DateCloture = new Date().toISOString().split('T')[0];
+                    updates.CommentaireCloture = comment || '';
+                } else if (actionType === 'cancel') {
+                    updates.Statut = 'Annulée';
+                    updates.CommentaireCloture = comment || '';
+                } else if (actionType === 'inprogress') {
+                    updates.Statut = 'En cours';
+                    updates.CommentaireCloture = comment || '';
+                }
+                
+                await SharePointListsAPI.updateAction(itemId, updates);
+                console.log('syncActionUpdateToLists: Action "' + actionId + '" (#' + itemId + ') → ' + (updates.Statut || 'mis à jour'));
+                
+            } catch (err) {
+                console.error('syncActionUpdateToLists:', err.message);
+            }
         }
         
         // ═══════════════════════════════════════════════════════════════

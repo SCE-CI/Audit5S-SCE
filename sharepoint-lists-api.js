@@ -440,12 +440,26 @@ const SharePointListsAPI = (() => {
         };
 
         // Colonne person "Auditeur" : résoudre le LookupId
-        if (audit.auditeur) {
-            const lookupId = await resolveEquipierLookupId(audit.auditeur);
+        // On cherche par email d'abord (plus fiable), puis par nom
+        if (audit.auditeurEmail || audit.auditeur) {
+            let lookupId = null;
+            // 1. Par email direct (le plus fiable)
+            if (audit.auditeurEmail && audit.auditeurEmail.includes('@')) {
+                lookupId = await resolvePersonLookupId(audit.auditeurEmail);
+            }
+            // 2. Par email depuis Equipe5S
+            if (!lookupId && audit.auditeur) {
+                const email = await getEmailByName(audit.auditeur);
+                if (email) lookupId = await resolvePersonLookupId(email);
+            }
+            // 3. Par nom dans siteUsers (dernier recours)
+            if (!lookupId && audit.auditeur) {
+                lookupId = await resolvePersonLookupId(audit.auditeur);
+            }
             if (lookupId) {
                 fields[C.auditeurLookupId] = lookupId;
             } else {
-                console.warn(`SharePointListsAPI: LookupId non trouvé pour "${audit.auditeur}" — colonne person laissée vide`);
+                console.warn(`SharePointListsAPI: LookupId non trouvé pour "${audit.auditeur}" (${audit.auditeurEmail}) — colonne person laissée vide`);
             }
         }
 
@@ -547,12 +561,25 @@ const SharePointListsAPI = (() => {
         }
 
         // Colonne person "Responsable" : résoudre le LookupId
-        if (action.responsable) {
-            const lookupId = await resolveEquipierLookupId(action.responsable);
+        if (action.responsable || action.responsableEmail) {
+            let lookupId = null;
+            // 1. Par email direct
+            if (action.responsableEmail && action.responsableEmail.includes('@')) {
+                lookupId = await resolvePersonLookupId(action.responsableEmail);
+            }
+            // 2. Par email depuis Equipe5S
+            if (!lookupId && action.responsable) {
+                const email = await getEmailByName(action.responsable);
+                if (email) lookupId = await resolvePersonLookupId(email);
+            }
+            // 3. Par nom
+            if (!lookupId && action.responsable) {
+                lookupId = await resolvePersonLookupId(action.responsable);
+            }
             if (lookupId) {
                 fields[C.responsableLookupId] = lookupId;
             } else {
-                console.warn(`SharePointListsAPI: LookupId non trouvé pour "${action.responsable}"`);
+                console.warn(`SharePointListsAPI: LookupId non trouvé pour responsable "${action.responsable}"`);
             }
         }
 
