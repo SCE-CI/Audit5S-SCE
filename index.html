@@ -9910,6 +9910,10 @@
                             responsableEmail: action.responsableMail || getEmailByName(action.responsable)
                         });
                         
+                        // Stocker le mapping critère → itemId Lists
+                        // pour que syncActionUpdateToLists puisse retrouver l'item
+                        storeListsActionId(json.auditId, action.critere, actionItem.id);
+                        
                         // 3. Photos en pièces jointes (si présentes)
                         if (action.photos && action.photos.length > 0) {
                             for (let i = 0; i < action.photos.length; i++) {
@@ -13025,47 +13029,105 @@ Cordialement`);
         }
         
         /**
+         * Mapping actionId (Excel) → itemId (SharePoint Lists)
+         * Stocké en sessionStorage pour survivre aux refreshes de page
+         * pendant une session de travail.
+         * Clé: "listsActionMap" → JSON { "A5S_2026-23_A1": 44, ... }
+         */
+        function getListsActionMap() {
+            try {
+                return JSON.parse(sessionStorage.getItem('listsActionMap') || '{}');
+            } catch(e) { return {}; }
+        }
+        
+        function storeListsActionId(auditId, critere, listsItemId) {
+            // On stocke par auditId + critère (clé composite)
+            // ET on stocke aussi l'itemId directement indexé par listsItemId
+            var map = getListsActionMap();
+            var key = auditId + '|' + critere;
+            map[key] = listsItemId;
+            // Aussi stocker par l'ID numérique pour lookup inverse
+            map['_itemId_' + listsItemId] = key;
+            try {
+                sessionStorage.setItem('listsActionMap', JSON.stringify(map));
+            } catch(e) {}
+            console.log('storeListsActionId:', key, '→ #' + listsItemId);
+        }
+        
+        /**
+         * Cherche l'itemId Lists pour une action du dashboard.
+         * Stratégie :
+         *   1. Mapping local (sessionStorage) — rapide, fiable pour les audits de cette session
+         *   2. Recherche par Title dans Lists avec Prefer header — pour les anciens audits migrés
+         *   3. Recherche par zone + date + description — dernier recours
+         */
+        async function findListsActionItemId(action) {
+            var map = getListsActionMap();
+            
+            // 1. Par auditId + critère (les audits créés dans cette session)
+            // L'actionId Excel est du type A5S_2026-23_A1, on ne peut pas
+            // reconstruire le critère depuis ça. Mais on peut essayer par
+            // correspondance zone+semaine+action text
+            
+            // 2. Recherche directe par actionId dans le mapping
+            //    Les clés sont "auditId|critere", on ne les a pas ici.
+            //    Essayons avec l'actionId Excel si il a été stocké
+            if (map[action.actionId]) {
+                return map[action.actionId];
+            }
+            
+            // 3. Recherche par Title dans Lists (pour les audits migrés via l'outil)
+            if (action.actionId) {
+                try {
+                    var siteId = SharePointListsAPI.config.siteId;
+                    var listId = SharePointListsAPI.config.lists.actions;
+                    var searchUrl = 'https://graph.microsoft.com/v1.0/sites/' + siteId + '/lists/' + listId + '/items?$filter=fields/Title eq \'' + action.actionId.replace(/'/g, "''") + '\'&$select=id&$top=1';
+                    var token = (await msalInstance.acquireTokenSilent({ scopes: loginRequest.scopes, account: msalAccount })).accessToken;
+                    var resp = await fetch(searchUrl, {
+                        headers: {
+                            'Authorization': 'Bearer ' + token,
+                            'Prefer': 'HonorNonIndexedQueriesWarningMayFailRandomly'
+                        }
+                    });
+                    if (resp.ok) {
+                        var data = await resp.json();
+                        if (data.value && data.value.length > 0) {
+                            return data.value[0].id;
+                        }
+                    }
+                } catch(e) {
+                    console.warn('findListsActionItemId: Recherche par Title échouée —', e.message);
+                }
+            }
+            
+            // 4. Recherche par zone + date + description (fuzzy, dernier recours)
+            try {
+                var C = SharePointListsAPI.COLUMN_MAP.actions;
+                var actions = await SharePointListsAPI.getActions({ zone: action.zone });
+                var actionText = (action.action || '').substring(0, 50).toLowerCase();
+                var found = actions.find(function(a) {
+                    return (a.description || '').toLowerCase().indexOf(actionText) !== -1;
+                });
+                if (found) return found.id;
+            } catch(e) {}
+            
+            return null;
+        }
+        
+        /**
          * Sync la mise à jour d'une action vers la liste Actions5S.
-         * Cherche l'item par Title (= actionId), puis PATCH.
          * Non bloquant — si ça échoue, l'Excel est déjà à jour.
          */
         async function syncActionUpdateToLists(action, actionType, comment) {
             if (typeof SharePointListsAPI === 'undefined') return;
             
             try {
-                // Chercher l'item dans Actions5S par son actionId (= Title)
-                var actionId = action.actionId;
-                if (!actionId) {
-                    console.log('syncActionUpdateToLists: pas d\'actionId — skip');
+                var itemId = await findListsActionItemId(action);
+                
+                if (!itemId) {
+                    console.log('syncActionUpdateToLists: Action "' + (action.actionId || '?') + '" non trouvée dans Lists — skip');
                     return;
                 }
-                
-                var C = SharePointListsAPI.COLUMN_MAP.actions;
-                var siteId = SharePointListsAPI.config.siteId;
-                var listId = SharePointListsAPI.config.lists.actions;
-                
-                // Rechercher par Title exact
-                // Header Prefer nécessaire car Title n'est pas indexé
-                var searchUrl = 'https://graph.microsoft.com/v1.0/sites/' + siteId + '/lists/' + listId + '/items?$filter=fields/Title eq \'' + actionId.replace(/'/g, "''") + '\'&$select=id&$top=1';
-                var searchToken = (await msalInstance.acquireTokenSilent({ scopes: loginRequest.scopes, account: msalAccount })).accessToken;
-                var searchResp = await fetch(searchUrl, {
-                    headers: {
-                        'Authorization': 'Bearer ' + searchToken,
-                        'Prefer': 'HonorNonIndexedQueriesWarningMayFailRandomly'
-                    }
-                });
-                if (!searchResp.ok) {
-                    console.warn('syncActionUpdateToLists: Recherche échouée HTTP ' + searchResp.status);
-                    return;
-                }
-                var searchResult = await searchResp.json();
-                
-                if (!searchResult.value || searchResult.value.length === 0) {
-                    console.log('syncActionUpdateToLists: Action "' + actionId + '" non trouvée dans Lists — skip');
-                    return;
-                }
-                
-                var itemId = searchResult.value[0].id;
                 
                 // Construire les updates selon le type d'action
                 var updates = {};
@@ -13082,7 +13144,7 @@ Cordialement`);
                 }
                 
                 await SharePointListsAPI.updateAction(itemId, updates);
-                console.log('syncActionUpdateToLists: Action "' + actionId + '" (#' + itemId + ') → ' + (updates.Statut || 'mis à jour'));
+                console.log('syncActionUpdateToLists: Action "' + (action.actionId || '?') + '" (#' + itemId + ') → ' + (updates.Statut || 'mis à jour'));
                 
             } catch (err) {
                 console.error('syncActionUpdateToLists:', err.message);
