@@ -13045,8 +13045,20 @@ Cordialement`);
                 var listId = SharePointListsAPI.config.lists.actions;
                 
                 // Rechercher par Title exact
-                var searchUrl = 'https://graph.microsoft.com/v1.0/sites/' + siteId + '/lists/' + listId + '/items?$filter=fields/Title eq \'' + encodeURIComponent(actionId).replace(/'/g, "''") + '\'&$select=id&$top=1';
-                var searchResult = await SharePointListsAPI.graphFetch(searchUrl);
+                // Header Prefer nécessaire car Title n'est pas indexé
+                var searchUrl = 'https://graph.microsoft.com/v1.0/sites/' + siteId + '/lists/' + listId + '/items?$filter=fields/Title eq \'' + actionId.replace(/'/g, "''") + '\'&$select=id&$top=1';
+                var searchToken = (await msalInstance.acquireTokenSilent({ scopes: loginRequest.scopes, account: msalAccount })).accessToken;
+                var searchResp = await fetch(searchUrl, {
+                    headers: {
+                        'Authorization': 'Bearer ' + searchToken,
+                        'Prefer': 'HonorNonIndexedQueriesWarningMayFailRandomly'
+                    }
+                });
+                if (!searchResp.ok) {
+                    console.warn('syncActionUpdateToLists: Recherche échouée HTTP ' + searchResp.status);
+                    return;
+                }
+                var searchResult = await searchResp.json();
                 
                 if (!searchResult.value || searchResult.value.length === 0) {
                     console.log('syncActionUpdateToLists: Action "' + actionId + '" non trouvée dans Lists — skip');
