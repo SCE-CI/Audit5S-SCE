@@ -9,6 +9,9 @@
     <!-- Microsoft Authentication Library (MSAL.js) -->
     <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
     
+    <!-- SharePoint Lists API — écriture parallèle vers Audits5S / Actions5S -->
+    <script src="./sharepoint-lists-api.js"></script>
+    
     <style>
         /* ═══════════════════════════════════════════════════════════════
            POLICE TT NORMS PRO - Sartorius Corporate Font
@@ -9837,6 +9840,105 @@
         // URL du dossier SharePoint
         const SHAREPOINT_URL = 'https://sartorius.sharepoint.com/:f:/r/sites/OP_SCEContImprovement/5S/Audits%205S?csf=1&web=1&e=hxVf7O';
         
+        // ═══════════════════════════════════════════════════════════════
+        // SYNC VERS SHAREPOINT LISTS (écriture parallèle, non bloquante)
+        // Envoie les données de l'audit vers Audits5S + Actions5S
+        // en complément du JSON uploadé sur SharePoint.
+        // Si ça échoue, on log l'erreur mais on ne bloque pas l'utilisateur.
+        // ═══════════════════════════════════════════════════════════════
+        
+        async function syncAuditToLists(exportData) {
+            // Vérifier que le module est chargé
+            if (typeof SharePointListsAPI === 'undefined') {
+                console.warn('syncAuditToLists: SharePointListsAPI non chargé — skip');
+                return;
+            }
+            
+            try {
+                console.log('syncAuditToLists: Début écriture vers Lists...');
+                
+                const json = exportData.jsonData;
+                const scores = json.scores; // Tableau ordonné [seiri_1, seiri_2, ..., shitsuke_3]
+                const niveauNum = parseInt(String(json.niveau).replace(/\D/g, '')) || 1;
+                const scoreTotal = scores.reduce((a, b) => a + b, 0);
+                
+                // 1. Créer l'audit dans Audits5S
+                const auditItem = await SharePointListsAPI.createAudit({
+                    auditId: json.auditId,
+                    date: json.date,
+                    auditeur: json.auditeur,
+                    auditeurEmail: getEmailByName(json.auditeur) || json.auditeur,
+                    zone: json.zone,
+                    niveau: niveauNum,
+                    scores: {
+                        seiri_1:    scores[0]  || 0,
+                        seiri_2:    scores[1]  || 0,
+                        seiri_3:    scores[2]  || 0,
+                        seiton_1:   scores[3]  || 0,
+                        seiton_2:   scores[4]  || 0,
+                        seiton_3:   scores[5]  || 0,
+                        seiso_1:    scores[6]  || 0,
+                        seiso_2:    scores[7]  || 0,
+                        seiso_3:    scores[8]  || 0,
+                        seiketsu_1: scores[9]  || 0,
+                        seiketsu_2: scores[10] || 0,
+                        seiketsu_3: scores[11] || 0,
+                        shitsuke_1: scores[12] || 0,
+                        shitsuke_2: scores[13] || 0,
+                        shitsuke_3: scores[14] || 0
+                    },
+                    scoreTotal: scoreTotal,
+                    scorePct: exportData.percent,
+                    commentaire: json.commentaire || ''
+                });
+                
+                console.log('syncAuditToLists: Audit créé dans Lists —', auditItem.id);
+                
+                // 2. Créer les actions dans Actions5S
+                let actionsOk = 0;
+                for (const action of (json.actions || [])) {
+                    try {
+                        const actionItem = await SharePointListsAPI.createAction({
+                            actionId: 'ACT-' + json.date + '-' + action.critere + '-' + json.zone.toLowerCase().replace(/[^a-z]/g, ''),
+                            auditItemId: auditItem.id,
+                            dateCreation: json.date,
+                            zone: json.zone,
+                            critere: action.critere,
+                            type: action.type,
+                            description: action.action,
+                            responsable: action.responsable,
+                            responsableEmail: action.responsableMail || getEmailByName(action.responsable)
+                        });
+                        
+                        // 3. Photos en pièces jointes (si présentes)
+                        if (action.photos && action.photos.length > 0) {
+                            for (let i = 0; i < action.photos.length; i++) {
+                                try {
+                                    await SharePointListsAPI.addAttachment(
+                                        'actions', actionItem.id,
+                                        action.photos[i],
+                                        'photo_' + action.critere + '_' + (i + 1) + '.jpg'
+                                    );
+                                } catch (photoErr) {
+                                    console.warn('syncAuditToLists: Photo échouée —', photoErr.message);
+                                }
+                            }
+                        }
+                        
+                        actionsOk++;
+                    } catch (actionErr) {
+                        console.error('syncAuditToLists: Action échouée —', action.critere, actionErr.message);
+                    }
+                }
+                
+                console.log('syncAuditToLists: Terminé — audit #' + auditItem.id + ', ' + actionsOk + '/' + json.actions.length + ' actions');
+                
+            } catch (err) {
+                // Non bloquant : on log l'erreur, l'utilisateur a déjà son JSON sauvegardé
+                console.error('syncAuditToLists: Erreur (non bloquante) —', err.message);
+            }
+        }
+        
         function initExportModal() {
             // Bouton SharePoint (upload automatique)
             document.getElementById('export-sharepoint').addEventListener('click', async function() {
@@ -9867,6 +9969,11 @@
                     
                     // Sauvegarder comme dernier export
                     saveLastExport(pendingExport.jsonData, pendingExport.filename);
+                    
+                    // Sync vers SharePoint Lists (non bloquant, en arrière-plan)
+                    syncAuditToLists(pendingExport).catch(e => 
+                        console.warn('Sync Lists en arrière-plan échouée:', e.message)
+                    );
                     
                     // Supprimer le brouillon
                     localStorage.removeItem('audit5s_draft');
