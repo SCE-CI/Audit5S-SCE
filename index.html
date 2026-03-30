@@ -3,48 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rapport PDF — Audit 5S</title>
+    <title>Rapport Audit 5S</title>
     <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
-    <!-- jsPDF : essayer plusieurs CDN, sinon utiliser la copie locale -->
-    <!-- Option 1 : jsdelivr -->
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-    <!-- Si aucun CDN ne marche, télécharger depuis https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js
-         et le mettre dans le repo sous ./jspdf.umd.min.js -->
-    <script>
-        if (typeof window.jspdf === 'undefined') {
-            // Fallback : copie locale
-            var s = document.createElement('script');
-            s.src = './jspdf.umd.min.js';
-            document.head.appendChild(s);
-        }
-    </script>
     <style>
+        /* ── Écran : UI de sélection ── */
         *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;padding:20px;color:#333;max-width:700px;margin:0 auto}
-        h1{font-size:1.3rem;margin-bottom:4px}
-        .sub{color:#777;font-size:.85rem;margin-bottom:16px}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#333}
+        
+        .ui-panel{max-width:650px;margin:0 auto;padding:20px}
+        .ui-panel h1{font-size:1.3rem;margin-bottom:4px}
+        .ui-sub{color:#777;font-size:.85rem;margin-bottom:16px}
         .card{background:#fff;border-radius:8px;padding:14px;margin-bottom:10px;border:1px solid #e0e0e0}
+        .flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
         button{background:#FFED00;border:none;padding:8px 18px;border-radius:6px;font-weight:600;cursor:pointer;font-size:.85rem}
         button:hover{background:#E6D600}
         button:disabled{opacity:.5;cursor:not-allowed}
         .s{padding:6px 10px;border-radius:5px;margin:3px 0;font-size:.82rem;font-family:Consolas,monospace}
-        .s.ok{background:#e6f9ed;color:#00754a}.s.err{background:#fde8ee;color:#c4002f}
-        .s.info{background:#e8f0fe;color:#1a5276}
-        .flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-        select{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:.85rem;min-width:300px}
-        .audit-card{padding:10px;border:1px solid #eee;border-radius:6px;margin:6px 0;cursor:pointer;transition:background .15s}
-        .audit-card:hover{background:#f9f9f0}
-        .audit-card.selected{background:#FFED00;border-color:#E6D600}
-        .preview{margin-top:12px;padding:12px;background:#fafafa;border-radius:6px;border:1px solid #eee;font-size:.82rem}
-        .preview h4{margin-bottom:6px}
-        .score-bar{height:8px;border-radius:4px;background:#eee;margin:4px 0}
-        .score-fill{height:100%;border-radius:4px;transition:width .3s}
-        #pdf-preview{margin-top:12px;width:100%;border:1px solid #ddd;border-radius:6px;min-height:200px;display:none}
+        .s.ok{background:#e6f9ed;color:#00754a}.s.err{background:#fde8ee;color:#c4002f}.s.info{background:#e8f0fe;color:#1a5276}
+        .audit-item{padding:10px;border:1px solid #eee;border-radius:6px;margin:4px 0;cursor:pointer;transition:all .15s}
+        .audit-item:hover{background:#fafaf0;border-color:#ddd}
+        .audit-item.selected{background:#FFED00;border-color:#E6D600}
+        .score-bar-ui{height:6px;border-radius:3px;background:#eee;flex:1}
+        .score-fill-ui{height:100%;border-radius:3px}
+
+        /* ── Impression : page A4 du rapport ── */
+        #report{display:none}
+
+        @media print {
+            body{background:#fff;margin:0;padding:0}
+            .ui-panel{display:none !important}
+            #report{display:block !important;width:210mm;margin:0 auto;padding:0;font-family:'Segoe UI',Arial,sans-serif;font-size:9pt;color:#333}
+        }
+
+        /* ── Report design (aussi visible en preview) ── */
+        #report.preview-mode{display:block;width:210mm;margin:20px auto;padding:0;font-family:'Segoe UI',Arial,sans-serif;font-size:9pt;color:#333;background:#fff;box-shadow:0 2px 20px rgba(0,0,0,.12);border-radius:4px;overflow:hidden}
+
+        .rpt-header{background:#FFED00;padding:10mm 12mm 7mm;display:flex;justify-content:space-between;align-items:flex-start}
+        .rpt-title{font-size:18pt;font-weight:700;color:#000}
+        .rpt-subtitle{font-size:9pt;color:#333;margin-top:1mm}
+        .rpt-header-right{text-align:right;font-size:8pt;color:#333}
+        
+        .rpt-body{padding:6mm 12mm 4mm}
+        
+        .rpt-info-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4mm}
+        .rpt-zone{font-size:15pt;font-weight:700}
+        .rpt-niveau{font-size:10pt;color:#575757;margin-left:3mm}
+        .rpt-auditeur{font-size:8.5pt;color:#575757}
+        
+        .rpt-score-circle{width:28mm;height:28mm;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2.5px solid}
+        .rpt-score-pct{font-size:16pt;font-weight:700}
+        .rpt-score-raw{font-size:7pt;color:#878787}
+
+        .rpt-sep{border:none;border-top:.5px solid #DADADA;margin:3mm 0}
+        
+        .rpt-section-title{font-size:10pt;font-weight:700;margin-bottom:3mm}
+
+        /* Score bars */
+        .rpt-scores{display:flex;gap:6mm}
+        .rpt-bars{flex:1}
+        .rpt-bar-row{display:flex;align-items:center;margin-bottom:2mm;gap:2mm}
+        .rpt-bar-label{width:38mm;font-size:7.5pt}
+        .rpt-bar-label b{font-weight:700}
+        .rpt-bar-track{flex:1;height:4mm;background:#EDEDED;border-radius:2mm}
+        .rpt-bar-fill{height:100%;border-radius:2mm}
+        .rpt-bar-val{width:12mm;text-align:right;font-size:7.5pt;font-weight:700}
+
+        /* Radar */
+        .rpt-radar{width:46mm;height:46mm;flex-shrink:0}
+        .rpt-radar svg{width:100%;height:100%}
+
+        /* Critères grid */
+        .rpt-criteria{display:flex;gap:3mm}
+        .rpt-criteria-col{flex:1}
+        .rpt-crit-row{display:flex;align-items:center;gap:1.5mm;margin-bottom:1.2mm}
+        .rpt-crit-name{width:9mm;font-size:6.5pt;color:#575757}
+        .rpt-crit-track{flex:1;height:2.5mm;background:#EDEDED;border-radius:1mm}
+        .rpt-crit-fill{height:100%;border-radius:1mm}
+        .rpt-crit-val{width:5mm;font-size:6.5pt;font-weight:700;text-align:right}
+
+        /* Actions table */
+        .rpt-actions-table{width:100%;border-collapse:collapse;font-size:7.5pt;margin-top:2mm}
+        .rpt-actions-table th{background:#F5F5F5;padding:1.5mm 2mm;text-align:left;font-weight:700;border-bottom:.5px solid #DADADA}
+        .rpt-actions-table td{padding:1.5mm 2mm;border-bottom:.3px solid #EDEDED;vertical-align:top}
+        .rpt-type-ecart{color:#E60046;font-weight:700}
+        .rpt-type-elev{color:#00AA46;font-weight:700}
+        .rpt-statut{font-weight:700;font-size:7pt}
+
+        /* Comment */
+        .rpt-comment{font-size:8pt;color:#575757;margin-top:2mm;font-style:italic}
+
+        /* Footer */
+        .rpt-footer{margin-top:4mm;padding:3mm 12mm;border-top:2px solid #FFED00;display:flex;justify-content:space-between;font-size:6.5pt;color:#9D9D9D}
+
+        @media print {
+            .rpt-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+            .rpt-score-circle,.rpt-bar-fill,.rpt-crit-fill,.rpt-bar-track,.rpt-crit-track,.rpt-actions-table th,.rpt-footer{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+            @page{size:A4 portrait;margin:0}
+        }
     </style>
 </head>
 <body>
+
+<!-- ═══════════════════════ UI PANEL (écran) ═══════════════════════ -->
+<div class="ui-panel">
     <h1>📄 Rapport PDF — Fiche synthèse Audit 5S</h1>
-    <p class="sub">Lit un audit depuis la liste Audits5S et génère une fiche synthèse 1 page en PDF.</p>
+    <p class="ui-sub">Sélectionnez un audit pour générer le rapport imprimable.</p>
 
     <div class="card">
         <div class="flex">
@@ -54,56 +117,41 @@
     </div>
 
     <div class="card">
-        <h3 style="font-size:.95rem;margin-bottom:8px">Sélectionner un audit</h3>
         <button id="btn-load" onclick="loadAudits()" disabled>Charger les audits récents</button>
-        <div id="audits-list" style="margin-top:10px"></div>
+        <div id="audits-list" style="margin-top:8px"></div>
     </div>
 
-    <div class="card" id="detail-card" style="display:none">
-        <h3 style="font-size:.95rem;margin-bottom:8px">Aperçu</h3>
-        <div id="audit-detail"></div>
-        <div style="margin-top:12px">
-            <button id="btn-pdf" onclick="generatePDF()" disabled>Générer le PDF</button>
+    <div class="card" id="action-card" style="display:none">
+        <div class="flex">
+            <button onclick="showPreview()">Prévisualiser le rapport</button>
+            <button onclick="printReport()" style="background:#000;color:#FFED00">Télécharger en PDF</button>
         </div>
+        <p style="font-size:.78rem;color:#999;margin-top:6px">Le bouton "Télécharger" ouvre la boîte d'impression → choisir "Enregistrer en PDF"</p>
     </div>
+</div>
 
-    <iframe id="pdf-preview"></iframe>
+<!-- ═══════════════════════ REPORT (impression) ═══════════════════════ -->
+<div id="report"></div>
 
 <script>
 // ── Config ──
-const SITE_ID = 'sartorius.sharepoint.com,ec2b83d2-7066-467c-83e6-fa97ca5db8e3,a833e672-c3d7-4db5-92c0-6169773c2516';
-const LIST_IDS = {
-    audits:  'fb669de2-4d64-49c7-a1cb-50a3b7ed79dc',
-    actions: 'aa10c625-373c-4d14-859a-3b468470cc3f'
-};
+const SITE_ID='sartorius.sharepoint.com,ec2b83d2-7066-467c-83e6-fa97ca5db8e3,a833e672-c3d7-4db5-92c0-6169773c2516';
+const LIST_IDS={audits:'fb669de2-4d64-49c7-a1cb-50a3b7ed79dc',actions:'aa10c625-373c-4d14-859a-3b468470cc3f'};
 
-const COL_AUDITS = {
-    auditId:'Title', date:'Date', auditeur:'Auditeur', auditeurLookupId:'AuditeurLookupId',
-    auditeurEmail:'AuditeurEmail', zone:'Zone', niveau:'Niveau',
+const CA={auditId:'Title',date:'Date',auditeurEmail:'AuditeurEmail',zone:'Zone',niveau:'Niveau',
     s1_1:'S1_1',s1_2:'S1_2',s1_3:'S1_3',s2_1:'S2_1',s2_2:'S2_2',s2_3:'S2_3',
     s3_1:'S3_1',s3_2:'S3_2',s3_3:'S3_3',s4_1:'S4_1',s4_2:'S4_2',s4_3:'S4_3',
-    s5_1:'S5_1',s5_2:'S5_2',s5_3:'S5_3',
-    scoreTotal:'ScoreTotal', scorePct:'ScorePct', commentaire:'Commentaire'
-};
-const COL_ACTIONS = {
-    actionId:'Title', dateCreation:'Date', zone:'Zone',
-    critere:'Crit_x00e8_re', type:'TypeAction', description:'Description',
-    responsable:'Responsable', responsableLookupId:'ResponsableLookupId',
-    statut:'Statut', dateCloture:'DateCloture', commentaireCloture:'CommentaireCloture'
-};
+    s5_1:'S5_1',s5_2:'S5_2',s5_3:'S5_3',scoreTotal:'ScoreTotal',scorePct:'ScorePct',commentaire:'Commentaire'};
+const CX={actionId:'Title',zone:'Zone',critere:'Crit_x00e8_re',type:'TypeAction',description:'Description',
+    statut:'Statut',dateCloture:'DateCloture',commentaireCloture:'CommentaireCloture'};
 
-const S_NAMES = ['Seiri — Trier','Seiton — Ranger','Seiso — Nettoyer','Seiketsu — Standardiser','Shitsuke — Respecter'];
-const S_SHORT = ['S1','S2','S3','S4','S5'];
+const S_LABELS=['Seiri — Trier','Seiton — Ranger','Seiso — Nettoyer','Seiketsu — Standardiser','Shitsuke — Respecter'];
+const S_SHORT=['S1','S2','S3','S4','S5'];
+const CRIT_NAMES=['S1.1','S1.2','S1.3','S2.1','S2.2','S2.3','S3.1','S3.2','S3.3','S4.1','S4.2','S4.3','S5.1','S5.2','S5.3'];
 
-const msalConfig = {
-    auth:{clientId:'d97a32d2-865c-480b-96c2-1cfdcea3636c',authority:'https://login.microsoftonline.com/sartorius.com',redirectUri:location.origin+location.pathname},
-    cache:{cacheLocation:'sessionStorage'}
-};
-const loginRequest = {scopes:['Sites.ReadWrite.All']};
-let msalInstance, msalAccount;
-let auditsData = [];
-let selectedAudit = null;
-let selectedActions = [];
+const msalConfig={auth:{clientId:'d97a32d2-865c-480b-96c2-1cfdcea3636c',authority:'https://login.microsoftonline.com/sartorius.com',redirectUri:location.origin+location.pathname},cache:{cacheLocation:'sessionStorage'}};
+const loginRequest={scopes:['Sites.ReadWrite.All']};
+let msalInstance,msalAccount,auditsData=[],selectedAudit=null,selectedActions=[];
 
 (async()=>{
     msalInstance=new msal.PublicClientApplication(msalConfig);
@@ -112,518 +160,208 @@ let selectedActions = [];
     if(a.length>0){msalAccount=a[0];onAuth();}
 })();
 
-async function connect(){
-    try{const r=await msalInstance.loginPopup(loginRequest);msalAccount=r.account;onAuth();}catch(e){alert(e.message);}
-}
-function onAuth(){
-    el('auth-status').textContent='✓ '+msalAccount.username;
-    el('auth-status').className='s ok';
-    el('btn-load').disabled=false;
-}
-async function getToken(){
-    return(await msalInstance.acquireTokenSilent({scopes:loginRequest.scopes,account:msalAccount})).accessToken;
-}
-async function graphGet(url,headers={}){
-    const t=await getToken();
-    const r=await fetch(url,{headers:{'Authorization':'Bearer '+t,...headers}});
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    return r.json();
-}
+async function connect(){try{const r=await msalInstance.loginPopup(loginRequest);msalAccount=r.account;onAuth();}catch(e){alert(e.message);}}
+function onAuth(){el('auth-status').textContent='✓ '+msalAccount.username;el('auth-status').className='s ok';el('btn-load').disabled=false;}
+async function getToken(){return(await msalInstance.acquireTokenSilent({scopes:loginRequest.scopes,account:msalAccount})).accessToken;}
+async function graphGet(url,hdrs={}){const t=await getToken();const r=await fetch(url,{headers:{'Authorization':'Bearer '+t,...hdrs}});if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+function el(id){return document.getElementById(id);}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function scoreColor(pct){return pct>=85?'#00AA46':pct>=70?'#F59100':pct>=50?'#FFED00':'#E60046';}
 
 // ── Charger audits ──
 async function loadAudits(){
     el('btn-load').disabled=true;
-    el('btn-load').textContent='Chargement...';
-    
-    const C = COL_AUDITS;
-    const select=[C.auditId,C.date,C.auditeurEmail,C.zone,C.niveau,
-        C.s1_1,C.s1_2,C.s1_3,C.s2_1,C.s2_2,C.s2_3,C.s3_1,C.s3_2,C.s3_3,
-        C.s4_1,C.s4_2,C.s4_3,C.s5_1,C.s5_2,C.s5_3,
-        C.scoreTotal,C.scorePct,C.commentaire].join(',');
-    
-    const url=`https://graph.microsoft.com/v1.0/sites/${SITE_ID}/lists/${LIST_IDS.audits}/items?$expand=fields($select=${select})&$top=20`;
+    const sel=Object.values(CA).join(',');
+    const url=`https://graph.microsoft.com/v1.0/sites/${SITE_ID}/lists/${LIST_IDS.audits}/items?$expand=fields($select=${sel})&$top=20`;
     const data=await graphGet(url);
+    auditsData=(data.value||[]).map(it=>{
+        const f=it.fields;
+        return{id:it.id,auditId:f[CA.auditId],date:f[CA.date],auditeur:f[CA.auditeurEmail]||'',zone:f[CA.zone],niveau:f[CA.niveau],
+            scores:[f[CA.s1_1]||0,f[CA.s1_2]||0,f[CA.s1_3]||0,f[CA.s2_1]||0,f[CA.s2_2]||0,f[CA.s2_3]||0,f[CA.s3_1]||0,f[CA.s3_2]||0,f[CA.s3_3]||0,f[CA.s4_1]||0,f[CA.s4_2]||0,f[CA.s4_3]||0,f[CA.s5_1]||0,f[CA.s5_2]||0,f[CA.s5_3]||0],
+            scoreTotal:f[CA.scoreTotal]||0,scorePct:f[CA.scorePct]||0,commentaire:f[CA.commentaire]||''};
+    }).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
     
-    auditsData=(data.value||[]).map(item=>{
-        const f=item.fields;
-        return {
-            id:item.id, auditId:f[C.auditId], date:f[C.date],
-            auditeur:f[C.auditeurEmail]||'',
-            zone:f[C.zone], niveau:f[C.niveau],
-            scores:[f[C.s1_1]||0,f[C.s1_2]||0,f[C.s1_3]||0,f[C.s2_1]||0,f[C.s2_2]||0,f[C.s2_3]||0,
-                    f[C.s3_1]||0,f[C.s3_2]||0,f[C.s3_3]||0,f[C.s4_1]||0,f[C.s4_2]||0,f[C.s4_3]||0,
-                    f[C.s5_1]||0,f[C.s5_2]||0,f[C.s5_3]||0],
-            scoreTotal:f[C.scoreTotal]||0, scorePct:f[C.scorePct]||0,
-            commentaire:f[C.commentaire]||''
-        };
-    });
-    
-    // Trier par date desc
-    auditsData.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-    
-    // Afficher la liste
-    let html='';
+    let h='';
     auditsData.forEach((a,i)=>{
-        const date=a.date?new Date(a.date).toLocaleDateString('fr-FR'):'?';
-        const pct=a.scorePct||0;
-        const color=pct>=85?'#00AA46':pct>=70?'#F59100':pct>=50?'#FFED00':'#E60046';
-        html+=`<div class="audit-card" onclick="selectAudit(${i})" id="ac-${i}">
-            <div class="flex" style="justify-content:space-between">
-                <div><strong>${esc(a.zone||'?')}</strong> — Niveau ${a.niveau||'?'}</div>
-                <div style="font-weight:700;color:${color}">${pct}%</div>
-            </div>
-            <div style="font-size:.78rem;color:#777;margin-top:2px">${date} • ${esc(a.auditeur)} • ${esc(a.auditId||'')}</div>
-            <div class="score-bar"><div class="score-fill" style="width:${pct}%;background:${color}"></div></div>
+        const d=a.date?new Date(a.date).toLocaleDateString('fr-FR'):'?';
+        const c=scoreColor(a.scorePct);
+        h+=`<div class="audit-item" onclick="selectAudit(${i})" id="ai${i}">
+            <div class="flex" style="justify-content:space-between"><div><b>${esc(a.zone)}</b> — N${a.niveau}</div><div style="font-weight:700;color:${c}">${a.scorePct}%</div></div>
+            <div style="font-size:.78rem;color:#999;margin-top:2px">${d} · ${esc(a.auditeur)} · ${esc(a.auditId||'')}</div>
+            <div class="flex" style="margin-top:4px"><div class="score-bar-ui"><div class="score-fill-ui" style="width:${a.scorePct}%;background:${c}"></div></div></div>
         </div>`;
     });
-    if(!auditsData.length) html='<div class="s err">Aucun audit trouvé dans la liste</div>';
-    el('audits-list').innerHTML=html;
-    el('btn-load').textContent='Charger les audits récents';
+    el('audits-list').innerHTML=h||'<div class="s err">Aucun audit</div>';
     el('btn-load').disabled=false;
 }
 
-async function selectAudit(index){
-    document.querySelectorAll('.audit-card').forEach(c=>c.classList.remove('selected'));
-    el('ac-'+index).classList.add('selected');
-    selectedAudit=auditsData[index];
+async function selectAudit(i){
+    document.querySelectorAll('.audit-item').forEach(c=>c.classList.remove('selected'));
+    el('ai'+i).classList.add('selected');
+    selectedAudit=auditsData[i];
     
-    // Charger les actions associées
-    const C=COL_ACTIONS;
-    const select=[C.actionId,C.dateCreation,C.zone,C.critere,C.type,C.description,C.statut,C.dateCloture,C.commentaireCloture].join(',');
+    // Charger actions de cette zone
     try{
-        const url=`https://graph.microsoft.com/v1.0/sites/${SITE_ID}/lists/${LIST_IDS.actions}/items?$expand=fields($select=${select})&$filter=fields/Zone eq '${selectedAudit.zone}'&$top=50`;
+        const sel=Object.values(CX).join(',');
+        const url=`https://graph.microsoft.com/v1.0/sites/${SITE_ID}/lists/${LIST_IDS.actions}/items?$expand=fields($select=${sel})&$filter=fields/Zone eq '${selectedAudit.zone}'&$top=50`;
         const data=await graphGet(url,{'Prefer':'HonorNonIndexedQueriesWarningMayFailRandomly'});
-        selectedActions=(data.value||[]).map(item=>{
-            const f=item.fields;
-            return {
-                actionId:f[C.actionId], zone:f[C.zone], critere:f[C.critere]||'',
-                type:f[C.type]||'', description:f[C.description]||'',
-                statut:f[C.statut]||'Ouverte', dateCloture:f[C.dateCloture]||''
-            };
-        });
-    }catch(e){
-        selectedActions=[];
-    }
+        selectedActions=(data.value||[]).map(it=>{const f=it.fields;return{actionId:f[CX.actionId],critere:f[CX.critere]||'',type:f[CX.type]||'',description:f[CX.description]||'',statut:f[CX.statut]||'Ouverte',dateCloture:f[CX.dateCloture]||''};});
+    }catch(e){selectedActions=[];}
     
-    // Aperçu
+    el('action-card').style.display='';
+}
+
+// ── Construire le HTML du rapport ──
+function buildReport(){
     const a=selectedAudit;
-    const sScores=[];
-    for(let i=0;i<5;i++){
-        sScores.push(((a.scores[i*3]||0)+(a.scores[i*3+1]||0)+(a.scores[i*3+2]||0))/3);
-    }
+    if(!a)return;
+    const pct=a.scorePct||0;
+    const color=scoreColor(pct);
+    const dateStr=a.date?new Date(a.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'}):'';
     
-    let html=`<div class="preview">
-        <h4>${esc(a.zone)} — Niveau ${a.niveau} — ${a.date?new Date(a.date).toLocaleDateString('fr-FR'):''}</h4>
-        <p>Auditeur : ${esc(a.auditeur)} | Score : <strong>${a.scorePct}%</strong> (${a.scoreTotal}/60)</p>
-        <div style="margin-top:8px">`;
+    // Scores par S
+    const sS=[];
+    for(let i=0;i<5;i++) sS.push(((a.scores[i*3]||0)+(a.scores[i*3+1]||0)+(a.scores[i*3+2]||0))/3);
     
-    S_NAMES.forEach((name,i)=>{
-        const val=sScores[i];
-        const pct=Math.round(val/4*100);
-        const color=pct>=85?'#00AA46':pct>=70?'#F59100':pct>=50?'#FFED00':'#E60046';
-        html+=`<div style="display:flex;align-items:center;gap:8px;margin:3px 0;font-size:.82rem">
-            <span style="width:180px">${S_SHORT[i]} — ${name.split(' — ')[1]}</span>
-            <div class="score-bar" style="flex:1"><div class="score-fill" style="width:${pct}%;background:${color}"></div></div>
-            <span style="width:40px;text-align:right;font-weight:600">${val.toFixed(1)}/4</span>
+    let h=`
+    <div class="rpt-header">
+        <div><div class="rpt-title">AUDIT 5S</div><div class="rpt-subtitle">Fiche synthèse</div></div>
+        <div class="rpt-header-right">${esc(dateStr)}<br>Sartorius SCE — Pompey</div>
+    </div>
+    <div class="rpt-body">
+        <div class="rpt-info-row">
+            <div><span class="rpt-zone">${esc(a.zone)}</span><span class="rpt-niveau">Niveau ${a.niveau}</span><br><span class="rpt-auditeur">Auditeur : ${esc(a.auditeur)}</span></div>
+            <div class="rpt-score-circle" style="border-color:${color}">
+                <div class="rpt-score-pct" style="color:${color}">${pct}%</div>
+                <div class="rpt-score-raw">${a.scoreTotal}/60</div>
+            </div>
+        </div>
+        <hr class="rpt-sep">
+        <div class="rpt-section-title">Scores par catégorie</div>
+        <div class="rpt-scores">
+            <div class="rpt-bars">`;
+    
+    // Barres S
+    S_LABELS.forEach((label,i)=>{
+        const v=sS[i];
+        const p=Math.round(v/4*100);
+        const c=scoreColor(p);
+        h+=`<div class="rpt-bar-row">
+            <div class="rpt-bar-label"><b>${S_SHORT[i]}</b> ${label.split(' — ')[1]}</div>
+            <div class="rpt-bar-track"><div class="rpt-bar-fill" style="width:${p}%;background:${c}"></div></div>
+            <div class="rpt-bar-val" style="color:${c}">${v.toFixed(1)}/4</div>
         </div>`;
     });
     
-    html+=`</div><p style="margin-top:8px;font-size:.82rem;color:#777">${selectedActions.length} action(s) associée(s)</p></div>`;
+    // Radar SVG
+    h+=`</div><div class="rpt-radar">${buildRadarSVG(sS)}</div></div>`;
     
-    el('audit-detail').innerHTML=html;
-    el('detail-card').style.display='';
-    el('btn-pdf').disabled=false;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// GÉNÉRATION PDF — jsPDF
-// ═══════════════════════════════════════════════════════════════
-
-function generatePDF(){
-    if(!selectedAudit)return;
-    const a=selectedAudit;
-    const {jsPDF}=window.jspdf;
-    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const W=210,H=297;
-    const margin=15;
-    
-    // Couleurs Sartorius
-    const YELLOW=[255,237,0];
-    const BLACK=[0,0,0];
-    const GRAY50=[157,157,157];
-    const GRAY80=[87,87,87];
-    const GRAY10=[237,237,237];
-    const WHITE=[255,255,255];
-    const GREEN=[0,170,70];
-    const ORANGE=[245,145,0];
-    const RED=[230,0,70];
-    
-    const scoreColor=(pct)=>pct>=85?GREEN:pct>=70?ORANGE:pct>=50?YELLOW:RED;
-    
-    // ── Header band ──
-    doc.setFillColor(...YELLOW);
-    doc.rect(0,0,W,28,'F');
-    
-    doc.setFontSize(18);
-    doc.setFont('helvetica','bold');
-    doc.setTextColor(...BLACK);
-    doc.text('AUDIT 5S',margin,12);
-    
-    doc.setFontSize(10);
-    doc.setFont('helvetica','normal');
-    doc.text('Fiche synthèse',margin,18);
-    
-    // Date en haut à droite
-    const dateStr=a.date?new Date(a.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'}):'';
-    doc.setFontSize(10);
-    doc.text(dateStr,W-margin,12,{align:'right'});
-    doc.text('Sartorius SCE — Pompey',W-margin,18,{align:'right'});
-    
-    // ── Info block ──
-    let y=36;
-    
-    // Zone + Niveau (gros)
-    doc.setFontSize(16);
-    doc.setFont('helvetica','bold');
-    doc.setTextColor(...BLACK);
-    doc.text(String(a.zone||''),margin,y);
-    
-    doc.setFontSize(11);
-    doc.setFont('helvetica','normal');
-    doc.setTextColor(...GRAY80);
-    const niveauX=margin+doc.getTextWidth(String(a.zone||'')+'  ');
-    doc.text('Niveau '+String(a.niveau||''),margin+doc.getTextWidth(String(a.zone||''))+4,y);
-    
-    // Score circulaire (droite)
-    const pct=a.scorePct||0;
-    const scoreX=W-margin-18;
-    const scoreY=y-4;
-    const sc=scoreColor(pct);
-    
-    // Cercle de fond
-    doc.setFillColor(...GRAY10);
-    doc.circle(scoreX,scoreY,14,'F');
-    // Arc coloré (simplifié : cercle plein coloré)
-    doc.setFillColor(...sc);
-    doc.circle(scoreX,scoreY,14,'F');
-    // Centre blanc
-    doc.setFillColor(...WHITE);
-    doc.circle(scoreX,scoreY,11,'F');
-    // Score text
-    doc.setFontSize(16);
-    doc.setFont('helvetica','bold');
-    doc.setTextColor(...sc);
-    doc.text(pct+'%',scoreX,scoreY+2,{align:'center'});
-    doc.setFontSize(7);
-    doc.setTextColor(...GRAY50);
-    doc.text(a.scoreTotal+'/60',scoreX,scoreY+7,{align:'center'});
-    
-    y+=8;
-    doc.setFontSize(9);
-    doc.setFont('helvetica','normal');
-    doc.setTextColor(...GRAY80);
-    doc.text('Auditeur : '+String(a.auditeur||''),margin,y);
-    
-    // ── Ligne de séparation ──
-    y+=6;
-    doc.setDrawColor(...GRAY10);
-    doc.setLineWidth(0.5);
-    doc.line(margin,y,W-margin,y);
-    
-    // ── Scores par S — barres horizontales ──
-    y+=8;
-    doc.setFontSize(11);
-    doc.setFont('helvetica','bold');
-    doc.setTextColor(...BLACK);
-    doc.text('Scores par catégorie',margin,y);
-    y+=6;
-    
-    const sScores=[];
-    for(let i=0;i<5;i++){
-        sScores.push(((a.scores[i*3]||0)+(a.scores[i*3+1]||0)+(a.scores[i*3+2]||0))/3);
-    }
-    
-    const barLeft=margin+52;
-    const barWidth=70;
-    const barH=5;
-    
-    S_NAMES.forEach((name,i)=>{
-        const val=sScores[i];
-        const p=Math.round(val/4*100);
-        const c=scoreColor(p);
-        
-        // Label
-        doc.setFontSize(8);
-        doc.setFont('helvetica','bold');
-        doc.setTextColor(...BLACK);
-        doc.text(S_SHORT[i],margin,y+3.5);
-        doc.setFont('helvetica','normal');
-        doc.setTextColor(...GRAY80);
-        doc.text(name.split(' — ')[1],margin+8,y+3.5);
-        
-        // Barre de fond
-        doc.setFillColor(...GRAY10);
-        doc.roundedRect(barLeft,y,barWidth,barH,1.5,1.5,'F');
-        
-        // Barre de score
-        const fillW=Math.max(barWidth*(val/4),2);
-        doc.setFillColor(...c);
-        doc.roundedRect(barLeft,y,fillW,barH,1.5,1.5,'F');
-        
-        // Valeur
-        doc.setFontSize(8);
-        doc.setFont('helvetica','bold');
-        doc.setTextColor(...c);
-        doc.text(val.toFixed(1)+'/4',barLeft+barWidth+3,y+3.5);
-        
-        y+=8;
-    });
-    
-    // ── Radar chart (canvas → image) ──
-    const radarX=W-margin-50;
-    const radarY=62;
-    const radarSize=42;
-    
-    drawRadarToPDF(doc, radarX, radarY, radarSize, sScores);
-    
-    // ── Détail des 15 critères ──
-    y+=4;
-    doc.setDrawColor(...GRAY10);
-    doc.line(margin,y,W-margin,y);
-    y+=6;
-    
-    doc.setFontSize(11);
-    doc.setFont('helvetica','bold');
-    doc.setTextColor(...BLACK);
-    doc.text('Détail des 15 critères',margin,y);
-    y+=5;
-    
-    const criteriaNames = [
-        'S1.1','S1.2','S1.3','S2.1','S2.2','S2.3',
-        'S3.1','S3.2','S3.3','S4.1','S4.2','S4.3',
-        'S5.1','S5.2','S5.3'
-    ];
-    
-    // 3 colonnes de 5
-    const colW=(W-2*margin)/3;
+    // Critères détail
+    h+=`<hr class="rpt-sep"><div class="rpt-section-title">Détail des 15 critères</div><div class="rpt-criteria">`;
     for(let col=0;col<3;col++){
-        const cx=margin+col*colW;
-        let cy=y;
+        h+=`<div class="rpt-criteria-col">`;
         for(let row=0;row<5;row++){
             const idx=col*5+row;
-            if(idx>=15)break;
-            const score=a.scores[idx]||0;
-            const p=Math.round(score/4*100);
+            const v=a.scores[idx]||0;
+            const p=Math.round(v/4*100);
             const c=scoreColor(p);
-            
-            // Mini barre
-            doc.setFontSize(7);
-            doc.setFont('helvetica','normal');
-            doc.setTextColor(...GRAY80);
-            doc.text(criteriaNames[idx],cx,cy+3);
-            
-            const miniBarX=cx+12;
-            const miniBarW=colW-22;
-            doc.setFillColor(...GRAY10);
-            doc.roundedRect(miniBarX,cy,miniBarW,3.5,1,1,'F');
-            doc.setFillColor(...c);
-            doc.roundedRect(miniBarX,cy,Math.max(miniBarW*(score/4),1),3.5,1,1,'F');
-            
-            doc.setFont('helvetica','bold');
-            doc.setTextColor(...c);
-            doc.text(String(score),cx+colW-6,cy+3);
-            
-            cy+=6;
+            h+=`<div class="rpt-crit-row">
+                <div class="rpt-crit-name">${CRIT_NAMES[idx]}</div>
+                <div class="rpt-crit-track"><div class="rpt-crit-fill" style="width:${p}%;background:${c}"></div></div>
+                <div class="rpt-crit-val" style="color:${c}">${v}</div>
+            </div>`;
         }
+        h+=`</div>`;
     }
+    h+=`</div>`;
     
-    y+=34;
-    
-    // ── Actions ──
-    doc.setDrawColor(...GRAY10);
-    doc.line(margin,y,W-margin,y);
-    y+=6;
-    
-    doc.setFontSize(11);
-    doc.setFont('helvetica','bold');
-    doc.setTextColor(...BLACK);
-    doc.text('Actions ('+selectedActions.length+')',margin,y);
-    y+=5;
-    
-    if(selectedActions.length===0){
-        doc.setFontSize(8);
-        doc.setFont('helvetica','normal');
-        doc.setTextColor(...GRAY50);
-        doc.text('Aucune action associée',margin,y);
+    // Actions
+    h+=`<hr class="rpt-sep"><div class="rpt-section-title">Actions (${selectedActions.length})</div>`;
+    if(selectedActions.length>0){
+        h+=`<table class="rpt-actions-table"><tr><th>Type</th><th>Description</th><th style="width:18mm">Statut</th></tr>`;
+        selectedActions.slice(0,10).forEach(act=>{
+            const isE=(act.type||'').includes('cart');
+            const stColor=act.statut==='Clôturée'?'#00AA46':act.statut==='Annulée'?'#9D9D9D':act.statut==='En cours'?'#F59100':'#E60046';
+            h+=`<tr>
+                <td class="${isE?'rpt-type-ecart':'rpt-type-elev'}">${isE?'Écart':'Élévation'}</td>
+                <td>${esc((act.description||'').substring(0,90))}${act.description?.length>90?'…':''}</td>
+                <td class="rpt-statut" style="color:${stColor}">${esc(act.statut)}</td>
+            </tr>`;
+        });
+        if(selectedActions.length>10) h+=`<tr><td colspan="3" style="color:#9D9D9D;font-style:italic">… et ${selectedActions.length-10} autre(s)</td></tr>`;
+        h+=`</table>`;
     } else {
-        // En-tête tableau
-        doc.setFillColor(...GRAY10);
-        doc.rect(margin,y-1,W-2*margin,5,'F');
-        doc.setFontSize(7);
-        doc.setFont('helvetica','bold');
-        doc.setTextColor(...GRAY80);
-        doc.text('Type',margin+1,y+2.5);
-        doc.text('Description',margin+28,y+2.5);
-        doc.text('Statut',W-margin-20,y+2.5);
-        y+=6;
-        
-        // Lignes
-        const maxActions=Math.min(selectedActions.length,8); // Max 8 pour tenir sur 1 page
-        for(let i=0;i<maxActions;i++){
-            const act=selectedActions[i];
-            doc.setFontSize(7);
-            
-            // Type (badge)
-            const isEcart=(act.type||'').includes('cart');
-            doc.setFont('helvetica','bold');
-            doc.setTextColor(...(isEcart?RED:GREEN));
-            doc.text(isEcart?'Écart':'Élévation',margin+1,y+2.5);
-            
-            // Description (tronquée)
-            doc.setFont('helvetica','normal');
-            doc.setTextColor(...BLACK);
-            const desc=String(act.description||'').substring(0,70)+(act.description?.length>70?'…':'');
-            doc.text(desc,margin+28,y+2.5);
-            
-            // Statut
-            const statut=act.statut||'Ouverte';
-            const stColor=statut==='Clôturée'?GREEN:statut==='Annulée'?GRAY50:statut==='En cours'?ORANGE:RED;
-            doc.setFont('helvetica','bold');
-            doc.setTextColor(...stColor);
-            doc.text(statut,W-margin-20,y+2.5);
-            
-            // Ligne séparation
-            y+=5;
-            doc.setDrawColor(...GRAY10);
-            doc.setLineWidth(0.2);
-            doc.line(margin,y,W-margin,y);
-            y+=1;
-        }
-        
-        if(selectedActions.length>maxActions){
-            doc.setFontSize(7);
-            doc.setFont('helvetica','normal');
-            doc.setTextColor(...GRAY50);
-            doc.text('... et '+(selectedActions.length-maxActions)+' autre(s)',margin+1,y+3);
-        }
+        h+=`<div style="color:#9D9D9D;font-size:8pt">Aucune action associée</div>`;
     }
     
-    // ── Commentaire ──
+    // Commentaire
     if(a.commentaire){
-        y+=8;
-        doc.setDrawColor(...GRAY10);
-        doc.line(margin,y,W-margin,y);
-        y+=5;
-        doc.setFontSize(8);
-        doc.setFont('helvetica','bold');
-        doc.setTextColor(...BLACK);
-        doc.text('Commentaire',margin,y);
-        y+=4;
-        doc.setFont('helvetica','normal');
-        doc.setTextColor(...GRAY80);
-        const lines=doc.splitTextToSize(a.commentaire,W-2*margin);
-        doc.text(lines,margin,y);
+        h+=`<hr class="rpt-sep"><div class="rpt-section-title">Commentaire</div><div class="rpt-comment">${esc(a.commentaire)}</div>`;
     }
     
-    // ── Footer ──
-    doc.setFontSize(7);
-    doc.setFont('helvetica','normal');
-    doc.setTextColor(...GRAY50);
-    doc.text('Sartorius SCE — Amélioration Continue — Généré le '+new Date().toLocaleDateString('fr-FR')+' '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),margin,H-8);
-    doc.text('Audit 5S — '+String(a.auditId||''),W-margin,H-8,{align:'right'});
+    h+=`</div>`; // fin rpt-body
     
-    // Ligne footer
-    doc.setDrawColor(...YELLOW);
-    doc.setLineWidth(1);
-    doc.line(0,H-4,W,H-4);
+    // Footer
+    const now=new Date();
+    h+=`<div class="rpt-footer">
+        <div>Sartorius SCE — Amélioration Continue — Généré le ${now.toLocaleDateString('fr-FR')} ${now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>
+        <div>${esc(a.auditId||'')}</div>
+    </div>`;
     
-    // ── Preview + Download ──
-    const pdfBlob=doc.output('blob');
-    const url=URL.createObjectURL(pdfBlob);
-    const preview=el('pdf-preview');
-    preview.src=url;
-    preview.style.display='block';
-    preview.style.height='500px';
-    
-    // Auto-download
-    const filename='Audit_5S_'+String(a.zone||'').replace(/[^a-zA-Z]/g,'')+'_'+String(a.date||'').substring(0,10)+'.pdf';
-    doc.save(filename);
+    el('report').innerHTML=h;
 }
 
-// ── Radar chart directement dans le PDF ──
-function drawRadarToPDF(doc, cx, cy, size, values){
-    const n=5;
-    const maxVal=4;
-    const angleOffset=-Math.PI/2; // Commencer en haut
+// ── Radar SVG ──
+function buildRadarSVG(values){
+    const n=5, max=4, cx=90, cy=90, size=70;
+    const angle=i=>-Math.PI/2+(2*Math.PI*i/n);
+    const pt=(i,r)=>[cx+r*Math.cos(angle(i)),cy+r*Math.sin(angle(i))];
     
-    // Grille de fond
-    [0.25,0.5,0.75,1].forEach(level=>{
-        const r=size*level;
-        doc.setDrawColor(230,230,230);
-        doc.setLineWidth(0.2);
-        const pts=[];
-        for(let i=0;i<n;i++){
-            const angle=angleOffset+(2*Math.PI*i/n);
-            pts.push([cx+r*Math.cos(angle), cy+r*Math.sin(angle)]);
-        }
-        for(let i=0;i<n;i++){
-            doc.line(pts[i][0],pts[i][1],pts[(i+1)%n][0],pts[(i+1)%n][1]);
-        }
+    let svg=`<svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">`;
+    
+    // Grille
+    [.25,.5,.75,1].forEach(lv=>{
+        const r=size*lv;
+        let pts='';for(let i=0;i<n;i++){const p=pt(i,r);pts+=`${p[0]},${p[1]} `;}
+        svg+=`<polygon points="${pts}" fill="none" stroke="#E0E0E0" stroke-width="0.5"/>`;
     });
     
     // Axes
-    doc.setDrawColor(200,200,200);
-    for(let i=0;i<n;i++){
-        const angle=angleOffset+(2*Math.PI*i/n);
-        doc.line(cx,cy,cx+size*Math.cos(angle),cy+size*Math.sin(angle));
-    }
+    for(let i=0;i<n;i++){const p=pt(i,size);svg+=`<line x1="${cx}" y1="${cy}" x2="${p[0]}" y2="${p[1]}" stroke="#D0D0D0" stroke-width="0.3"/>`;}
     
-    // Zone colorée (polygone des valeurs)
-    const pts=[];
-    for(let i=0;i<n;i++){
-        const angle=angleOffset+(2*Math.PI*i/n);
-        const r=size*(values[i]/maxVal);
-        pts.push([cx+r*Math.cos(angle), cy+r*Math.sin(angle)]);
-    }
-    
-    // Remplir le polygone (pas de méthode native polygon dans jsPDF, on trace manuellement)
-    doc.setFillColor(255,237,0,0.3);
-    doc.setDrawColor(255,237,0);
-    doc.setLineWidth(0.8);
-    
-    // Dessiner le polygone via triangle fan
-    for(let i=0;i<n;i++){
-        const j=(i+1)%n;
-        // Triangle: center → pt[i] → pt[j]
-        doc.triangle(cx,cy, pts[i][0],pts[i][1], pts[j][0],pts[j][1], 'F');
-    }
-    // Contour
-    for(let i=0;i<n;i++){
-        const j=(i+1)%n;
-        doc.line(pts[i][0],pts[i][1],pts[j][0],pts[j][1]);
-    }
+    // Zone de valeur
+    let pts='';
+    for(let i=0;i<n;i++){const p=pt(i,size*(values[i]/max));pts+=`${p[0]},${p[1]} `;}
+    svg+=`<polygon points="${pts}" fill="rgba(255,237,0,0.35)" stroke="#FFED00" stroke-width="1.5"/>`;
     
     // Points
-    doc.setFillColor(255,237,0);
-    pts.forEach(p=>{
-        doc.circle(p[0],p[1],1,'F');
-    });
+    for(let i=0;i<n;i++){const p=pt(i,size*(values[i]/max));svg+=`<circle cx="${p[0]}" cy="${p[1]}" r="2.5" fill="#FFED00" stroke="#000" stroke-width="0.5"/>`;}
     
     // Labels
-    doc.setFontSize(7);
-    doc.setFont('helvetica','bold');
-    doc.setTextColor(60,60,60);
     for(let i=0;i<n;i++){
-        const angle=angleOffset+(2*Math.PI*i/n);
-        const lx=cx+(size+6)*Math.cos(angle);
-        const ly=cy+(size+6)*Math.sin(angle);
-        const align=Math.abs(Math.cos(angle))<0.1?'center':Math.cos(angle)>0?'left':'right';
-        doc.text(S_SHORT[i],lx,ly+1,{align});
+        const p=pt(i,size+12);
+        const anchor=Math.abs(Math.cos(angle(i)))<0.15?'middle':Math.cos(angle(i))>0?'start':'end';
+        const dy=Math.sin(angle(i))<-0.3?-2:Math.sin(angle(i))>0.3?6:2;
+        svg+=`<text x="${p[0]}" y="${p[1]+dy}" text-anchor="${anchor}" font-size="8" font-weight="700" fill="#575757">${S_SHORT[i]}</text>`;
+        svg+=`<text x="${p[0]}" y="${p[1]+dy+9}" text-anchor="${anchor}" font-size="6" fill="#9D9D9D">${values[i].toFixed(1)}/4</text>`;
     }
+    
+    svg+=`</svg>`;
+    return svg;
 }
 
-function el(id){return document.getElementById(id);}
-function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+// ── Preview & Print ──
+function showPreview(){
+    buildReport();
+    el('report').classList.add('preview-mode');
+    el('report').scrollIntoView({behavior:'smooth'});
+}
+
+function printReport(){
+    buildReport();
+    el('report').classList.remove('preview-mode');
+    window.print();
+}
 </script>
 </body>
 </html>
