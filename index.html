@@ -9754,7 +9754,8 @@
             
             // Nom de fichier lisible
             const moisCourt = ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'août', 'sep', 'oct', 'nov', 'déc'][now.getMonth()];
-            const filename = `5S ${zone} - ${now.getDate()} ${moisCourt} ${now.getFullYear()} ${now.getHours()}h${String(now.getMinutes()).padStart(2,'0')}`;
+            const zoneSafe = zone.replace(/\//g, '-').replace(/\s+-\s+/g, ' - ').trim();
+            const filename = `5S ${zoneSafe} - ${now.getDate()} ${moisCourt} ${now.getFullYear()} ${now.getHours()}h${String(now.getMinutes()).padStart(2,'0')}`;
             
             // Scores en tableau ordonné (pour colonnes G à U)
             const scoresArray = CRITERIA_ORDER.map(criteria => auditData.scores[criteria] || 0);
