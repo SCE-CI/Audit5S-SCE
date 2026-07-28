@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  Page de redirection de l'ANCIENNE application (monolithe)
+
+  DESTINATION : dépôt `SCE-CI/Audit5S-SCE`, à la place de son `index.html`.
+  Elle n'est PAS servie par ce dépôt-ci — elle est versionnée ici pour qu'on
+  sache ce qui a été déposé là-bas, et pour pouvoir la corriger sans fouiller.
+
+  Deux choix à ne pas défaire :
+
+  1. **La query string est transmise.** Les mails de notification déjà envoyés
+     pointent sur `https://sce-ci.github.io/Audit5S-SCE/?action=close&id=A5S_…`
+     et la V2 sait traiter ce paramètre (`src/utils/lienActionMail.ts`). Sans
+     ce report, ces liens tomberaient sur l'accueil de la V2 sans rien ouvrir.
+     Le fragment est repris aussi, par principe.
+
+  2. **Pas de `<meta http-equiv="refresh">` en secours.** Il ne sait pas
+     recopier la query string : il enverrait sur l'accueil nu et écraserait
+     silencieusement le travail du script. Sans JavaScript, la page reste donc
+     affichée avec son lien manuel — c'est volontaire.
+
+  Ne PAS supprimer GitHub Pages du dépôt : l'URL doit continuer de répondre
+  tant que d'anciens mails circulent.
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Audit 5S — application déplacée</title>
+<style>
+  :root { --jaune: #FFED00; --noir: #20201E; --gris: #575757; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: #F5F5F5;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: var(--noir);
+  }
+  .carte {
+    width: 100%;
+    max-width: 520px;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .08);
+  }
+  .bandeau {
+    background: var(--jaune);
+    padding: 22px 28px;
+  }
+  .marque {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .corps { padding: 28px; }
+  h1 { margin: 0 0 14px; font-size: 21px; font-weight: 600; }
+  p { margin: 0 0 14px; font-size: 15px; line-height: 1.55; color: var(--gris); }
+  .bouton {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 14px 30px;
+    background: #00AA46;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 6px;
+  }
+  .compte { font-size: 13px; color: #878787; margin-top: 16px; }
+  .pied {
+    padding: 18px 28px;
+    border-top: 1px solid #f0f0f0;
+    font-size: 12px;
+    color: #878787;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+  <div class="carte">
+    <div class="bandeau"><div class="marque">Sartorius</div></div>
+    <div class="corps">
+      <h1>L'audit 5S a déménagé</h1>
+      <p>
+        Cette version de l'application n'est plus utilisée et ne reçoit plus de
+        données. Tous les audits et toutes les actions se font désormais sur la
+        nouvelle adresse.
+      </p>
+      <p>
+        Pense à mettre à jour ton favori : <strong>audit5s.sce-apps.sartorius.com</strong>
+      </p>
+      <a class="bouton" id="lien" href="https://audit5s.sce-apps.sartorius.com/">
+        Ouvrir la nouvelle application
+      </a>
+      <div class="compte" id="compte">Redirection automatique dans 5 secondes…</div>
+    </div>
+    <div class="pied">
+      Continuous Improvement • Audit 5S<br>
+      Sartorius Chromatography Equipment • Pompey
+    </div>
+  </div>
+
+<script>
+  (function () {
+    var CIBLE = 'https://audit5s.sce-apps.sartorius.com/';
+
+    // Report des paramètres : un mail de notification pointe sur
+    // ?action=close&id=A5S_2026-38_A1, que la V2 sait ouvrir directement.
+    var url = CIBLE + (window.location.search || '') + (window.location.hash || '');
+    document.getElementById('lien').href = url;
+
+    var restant = 5;
+    var compte = document.getElementById('compte');
+    var tic = setInterval(function () {
+      restant--;
+      if (restant <= 0) {
+        clearInterval(tic);
+        compte.textContent = 'Redirection…';
+        // `replace` et non `assign` : le bouton Précédent ne doit pas ramener
+        // sur cette page, sinon l'utilisateur boucle.
+        window.location.replace(url);
+        return;
+      }
+      compte.textContent = 'Redirection automatique dans ' + restant + ' seconde'
+        + (restant > 1 ? 's' : '') + '…';
+    }, 1000);
+  })();
+</script>
+</body>
+</html>
