@@ -1,27 +1,31 @@
 <!DOCTYPE html>
 <!--
   ═══════════════════════════════════════════════════════════════════════════
-  Page de redirection de l'ANCIENNE application (monolithe)
+  OUTIL DE MIGRATION DE L'HISTORIQUE 5S — page autonome, temporaire
 
-  DESTINATION : dépôt `SCE-CI/Audit5S-SCE`, à la place de son `index.html`.
-  Elle n'est PAS servie par ce dépôt-ci — elle est versionnée ici pour qu'on
-  sache ce qui a été déposé là-bas, et pour pouvoir la corriger sans fouiller.
+  DESTINATION : dépôt `SCE-CI/Audit5S-SCE`, à la place de son `index.html`,
+  LE TEMPS DE LA MIGRATION SEULEMENT. Une fois l'import terminé, remplacer par
+  `redirection-github-pages.html` et supprimer ce fichier du dépôt.
 
-  Deux choix à ne pas défaire :
+  ─── Pourquoi cette page vit ICI et pas dans la V2 ─────────────────────────
+  Azure AD compare l'URI de redirection EN ENTIER, pas seulement l'origine.
+  Les seules URI déclarées sur l'App Registration `d97a32d2…` sont la V2 et
+  `https://sce-ci.github.io/Audit5S-SCE/`. `http://localhost:5173/` ne l'est
+  pas (constaté le 28/07/2026), et un sous-chemin `/private/` ne le serait pas
+  davantage. Cette page doit donc être servie à la RACINE de `/Audit5S-SCE/`.
 
-  1. **La query string est transmise.** Les mails de notification déjà envoyés
-     pointent sur `https://sce-ci.github.io/Audit5S-SCE/?action=close&id=A5S_…`
-     et la V2 sait traiter ce paramètre (`src/utils/lienActionMail.ts`). Sans
-     ce report, ces liens tomberaient sur l'accueil de la V2 sans rien ouvrir.
-     Le fragment est repris aussi, par principe.
+  ─── Deux comportements, une seule page ────────────────────────────────────
+  · sans `?migration=1` → page de redirection vers la V2, pour les visiteurs
+  · avec `?migration=1` → l'outil d'import
 
-  2. **Pas de `<meta http-equiv="refresh">` en secours.** Il ne sait pas
-     recopier la query string : il enverrait sur l'accueil nu et écraserait
-     silencieusement le travail du script. Sans JavaScript, la page reste donc
-     affichée avec son lien manuel — c'est volontaire.
-
-  Ne PAS supprimer GitHub Pages du dépôt : l'URL doit continuer de répondre
-  tant que d'anciens mails circulent.
+  ⚠️ ORDRE CRITIQUE AU CHARGEMENT. Au retour d'authentification, Azure AD
+  renvoie sur la RACINE, donc SANS `?migration=1`, avec la réponse dans le
+  fragment. Si on décidait d'afficher la page de redirection avant d'avoir
+  regardé ce fragment, on quitterait la page en emportant le code
+  d'autorisation — c'est exactement le bug qui a rendu la connexion V2
+  impossible le 24/07/2026 (cf. `src/main.tsx`). Le fragment est donc examiné
+  EN PREMIER, et MSAL (`navigateToLoginRequestUrl: true`) nous ramène ensuite
+  de lui-même sur l'URL qui portait `?migration=1`.
   ═══════════════════════════════════════════════════════════════════════════
 -->
 <html lang="fr">
@@ -29,113 +33,600 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Audit 5S — application déplacée</title>
+<title>Audit 5S — migration</title>
+<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 <style>
-  :root { --jaune: #FFED00; --noir: #20201E; --gris: #575757; }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    background: #F5F5F5;
-    font-family: "Segoe UI", Arial, sans-serif;
-    color: var(--noir);
-  }
-  .carte {
-    width: 100%;
-    max-width: 520px;
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, .08);
-  }
-  .bandeau {
-    background: var(--jaune);
-    padding: 22px 28px;
-  }
-  .marque {
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-  .corps { padding: 28px; }
-  h1 { margin: 0 0 14px; font-size: 21px; font-weight: 600; }
-  p { margin: 0 0 14px; font-size: 15px; line-height: 1.55; color: var(--gris); }
-  .bouton {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 14px 30px;
-    background: #00AA46;
-    color: #fff;
-    font-size: 15px;
-    font-weight: 600;
-    text-decoration: none;
-    border-radius: 6px;
-  }
-  .compte { font-size: 13px; color: #878787; margin-top: 16px; }
-  .pied {
-    padding: 18px 28px;
-    border-top: 1px solid #f0f0f0;
-    font-size: 12px;
-    color: #878787;
-    line-height: 1.6;
-  }
+  :root { --jaune:#FFED00; --noir:#20201E; --gris:#575757; --vert:#00AA46; --rouge:#E60046; }
+  * { box-sizing:border-box; }
+  /* ⚠️ Indispensable : `#redirection { display:flex }` est un sélecteur d'ID, il
+     l'emporte sur la règle `[hidden] { display:none }` de la feuille du
+     navigateur. Sans ce `!important`, la section de redirection reste affichée
+     même avec `?migration=1`, et recouvre l'outil sur toute la hauteur. */
+  [hidden] { display:none !important; }
+  body { margin:0; background:#F5F5F5; font-family:"Segoe UI",Arial,sans-serif; color:var(--noir); }
+
+  /* — page de redirection — */
+  #redirection { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .carte { width:100%; max-width:520px; background:#fff; border:1px solid #e5e5e5; border-radius:10px;
+           overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,.08); }
+  .bandeau { background:var(--jaune); padding:22px 28px; }
+  .marque { font-size:15px; font-weight:700; letter-spacing:2px; text-transform:uppercase; }
+  .corps { padding:28px; }
+  .corps h1 { margin:0 0 14px; font-size:21px; font-weight:600; }
+  .corps p { margin:0 0 14px; font-size:15px; line-height:1.55; color:var(--gris); }
+  .bouton-vert { display:inline-block; margin-top:10px; padding:14px 30px; background:var(--vert);
+                 color:#fff; font-size:15px; font-weight:600; text-decoration:none; border-radius:6px; }
+  .compte { font-size:13px; color:#878787; margin-top:16px; }
+  .pied { padding:18px 28px; border-top:1px solid #f0f0f0; font-size:12px; color:#878787; line-height:1.6; }
+
+  /* — outil — */
+  #outil { max-width:1000px; margin:0 auto; padding:24px; }
+  header.tete { background:var(--jaune); padding:18px 24px; border-radius:8px; margin-bottom:20px;
+                display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
+  header.tete h1 { margin:0; font-size:19px; font-weight:600; }
+  .etape { background:#fff; border:1px solid #e5e5e5; border-radius:8px; padding:18px 20px; margin-bottom:14px; }
+  .etape h2 { margin:0 0 6px; font-size:15px; font-weight:600; display:flex; align-items:center; gap:10px; }
+  .num { display:inline-flex; width:24px; height:24px; border-radius:50%; background:var(--noir); color:#fff;
+         align-items:center; justify-content:center; font-size:12px; flex:none; }
+  .etape.faite .num { background:var(--vert); }
+  .etape p { margin:4px 0 12px 34px; font-size:13.5px; color:var(--gris); line-height:1.5; }
+  .etape .actions { margin-left:34px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  button { font:inherit; padding:9px 18px; border:1px solid var(--noir); background:#fff; color:var(--noir);
+           border-radius:6px; cursor:pointer; font-size:14px; }
+  button:hover:not(:disabled) { background:var(--noir); color:#fff; }
+  button:disabled { opacity:.4; cursor:not-allowed; }
+  button.danger { border-color:var(--rouge); color:var(--rouge); }
+  button.danger:hover:not(:disabled) { background:var(--rouge); color:#fff; }
+  button.principal { background:var(--noir); color:#fff; }
+  .etat { font-size:13px; color:var(--gris); }
+  .ok { color:var(--vert); font-weight:600; }
+  .ko { color:var(--rouge); font-weight:600; }
+  table { border-collapse:collapse; width:100%; font-size:13px; margin:10px 0 0 34px; width:calc(100% - 34px); }
+  th,td { text-align:left; padding:5px 8px; border-bottom:1px solid #f0f0f0; }
+  th { color:var(--gris); font-weight:600; }
+  #journal { background:#1e1e1e; color:#ddd; font-family:Consolas,monospace; font-size:12px; padding:14px;
+             border-radius:8px; height:320px; overflow:auto; white-space:pre-wrap; line-height:1.5; }
+  #journal .j-ok { color:#6bd97f; } #journal .j-ko { color:#ff6b81; } #journal .j-info { color:#7fc7ff; }
+  .barre { height:6px; background:#eee; border-radius:3px; overflow:hidden; margin:10px 0 0 34px; }
+  .barre > div { height:100%; background:var(--vert); width:0; transition:width .2s; }
 </style>
 </head>
 <body>
+
+<!-- ══ Page vue par un visiteur normal ══ -->
+<div id="redirection" hidden>
   <div class="carte">
     <div class="bandeau"><div class="marque">Sartorius</div></div>
     <div class="corps">
       <h1>L'audit 5S a déménagé</h1>
-      <p>
-        Cette version de l'application n'est plus utilisée et ne reçoit plus de
-        données. Tous les audits et toutes les actions se font désormais sur la
-        nouvelle adresse.
-      </p>
-      <p>
-        Pense à mettre à jour ton favori : <strong>audit5s.sce-apps.sartorius.com</strong>
-      </p>
-      <a class="bouton" id="lien" href="https://audit5s.sce-apps.sartorius.com/">
-        Ouvrir la nouvelle application
-      </a>
-      <div class="compte" id="compte">Redirection automatique dans 5 secondes…</div>
+      <p>Cette version de l'application n'est plus utilisée et ne reçoit plus de données.
+         Tous les audits et toutes les actions se font désormais sur la nouvelle adresse.</p>
+      <p>Pense à mettre à jour ton favori : <strong>audit5s.sce-apps.sartorius.com</strong></p>
+      <a class="bouton-vert" id="lien-v2" href="https://audit5s.sce-apps.sartorius.com/">Ouvrir la nouvelle application</a>
+      <div class="compte" id="compte-a-rebours">Redirection automatique dans 5 secondes…</div>
     </div>
-    <div class="pied">
-      Continuous Improvement • Audit 5S<br>
-      Sartorius Chromatography Equipment • Pompey
+    <div class="pied">Continuous Improvement • Audit 5S<br>Sartorius Chromatography Equipment • Pompey</div>
+  </div>
+</div>
+
+<!-- ══ Outil ══ -->
+<div id="outil" hidden>
+  <header class="tete">
+    <h1>Migration de l'historique 5S</h1>
+    <div><span class="etat" id="compte-connecte">non connecté</span>
+      <button id="btn-connexion">Se connecter</button></div>
+  </header>
+
+  <div class="etape" id="e1">
+    <h2><span class="num">1</span> Fichier d'import</h2>
+    <p>Le <code>import.json</code> produit par <code>scripts/migration/convertir-excel.mjs</code>.
+       Rien n'est lu ailleurs : ce fichier fait foi.</p>
+    <div class="actions">
+      <input type="file" id="fichier" accept="application/json">
+      <span class="etat" id="etat-fichier"></span>
     </div>
   </div>
 
+  <div class="etape" id="e2">
+    <h2><span class="num">2</span> Sauvegarde des listes</h2>
+    <p>Télécharge l'intégralité d'Audits5S et d'Actions5S dans un fichier local.
+       <strong>Obligatoire</strong> : la purge de l'étape 4 est irréversible.</p>
+    <div class="actions">
+      <button id="btn-sauvegarde" disabled>Sauvegarder</button>
+      <span class="etat" id="etat-sauvegarde"></span>
+    </div>
+  </div>
+
+  <div class="etape" id="e3">
+    <h2><span class="num">3</span> Simulation</h2>
+    <p>Résout les personnes, compte ce qui serait supprimé et créé. <strong>N'écrit rien.</strong>
+       À lancer avant tout le reste — c'est ici qu'on voit les noms qui ne se résolvent pas.</p>
+    <div class="actions">
+      <button id="btn-simulation" disabled>Simuler</button>
+      <span class="etat" id="etat-simulation"></span>
+    </div>
+    <div id="table-personnes"></div>
+  </div>
+
+  <div class="etape" id="e4">
+    <h2><span class="num">4</span> Purge</h2>
+    <p>Supprime <strong>tous</strong> les items d'Audits5S et d'Actions5S.
+       Exige la sauvegarde, la simulation, et de taper le mot de confirmation.</p>
+    <div class="actions">
+      <input type="text" id="confirmation" placeholder="taper PURGER" style="padding:8px;border:1px solid #ccc;border-radius:6px;">
+      <button id="btn-purge" class="danger" disabled>Purger les deux listes</button>
+      <span class="etat" id="etat-purge"></span>
+    </div>
+    <div class="barre"><div id="barre-purge"></div></div>
+  </div>
+
+  <div class="etape" id="e5">
+    <h2><span class="num">5</span> Import</h2>
+    <p>Les audits d'abord — les actions ont besoin de leur ID d'item pour la colonne de recherche —
+       puis les actions, puis les photos.</p>
+    <div class="actions">
+      <button id="btn-import" class="principal" disabled>Importer</button>
+      <span class="etat" id="etat-import"></span>
+    </div>
+    <div class="barre"><div id="barre-import"></div></div>
+  </div>
+
+  <div class="etape">
+    <h2><span class="num">6</span> Journal</h2>
+    <div class="actions" style="margin-bottom:10px;">
+      <button id="btn-copier">Copier le journal</button>
+    </div>
+    <div id="journal" style="margin-left:34px;width:calc(100% - 34px);"></div>
+  </div>
+</div>
+
 <script>
-  (function () {
-    var CIBLE = 'https://audit5s.sce-apps.sartorius.com/';
+(function () {
+  'use strict';
 
-    // Report des paramètres : un mail de notification pointe sur
-    // ?action=close&id=A5S_2026-38_A1, que la V2 sait ouvrir directement.
-    var url = CIBLE + (window.location.search || '') + (window.location.hash || '');
-    document.getElementById('lien').href = url;
+  // ══ Constantes — reprises de src/api/graphClient.ts et src/auth/msalConfig.ts ══
+  var CLIENT_ID = 'd97a32d2-865c-480b-96c2-1cfdcea3636c';
+  var AUTHORITY = 'https://login.microsoftonline.com/sartorius.com';
+  var REDIRECT  = 'https://sce-ci.github.io/Audit5S-SCE/';
+  var SCOPES    = ['Files.ReadWrite', 'Sites.ReadWrite.All'];
+  var SITE_ID   = 'sartorius.sharepoint.com,ec2b83d2-7066-467c-83e6-fa97ca5db8e3,a833e672-c3d7-4db5-92c0-6169773c2516';
+  var LISTES    = {
+    equipe:  'a21b962a-0987-48b9-a519-9e30b98efbec',
+    audits:  'fb669de2-4d64-49c7-a1cb-50a3b7ed79dc',
+    actions: 'aa10c625-373c-4d14-859a-3b468470cc3f'
+  };
+  var itemsUrl = function (l) {
+    return 'https://graph.microsoft.com/v1.0/sites/' + SITE_ID + '/lists/' + LISTES[l] + '/items';
+  };
+  var V2 = 'https://audit5s.sce-apps.sartorius.com/';
 
-    var restant = 5;
-    var compte = document.getElementById('compte');
+  // ══ Aiguillage — le fragment d'authentification AVANT tout le reste ══
+  var params = new URLSearchParams(location.search);
+  var MIGRATION = params.get('migration') === '1';
+  var RETOUR_AUTH = /[#&](code=|error=|state=|id_token=)/.test(location.hash);
+
+  if (!MIGRATION && !RETOUR_AUTH) {
+    var url = V2 + (location.search || '') + (location.hash || '');
+    document.getElementById('lien-v2').href = url;
+    document.getElementById('redirection').hidden = false;
+    var reste = 5, elt = document.getElementById('compte-a-rebours');
     var tic = setInterval(function () {
-      restant--;
-      if (restant <= 0) {
-        clearInterval(tic);
-        compte.textContent = 'Redirection…';
-        // `replace` et non `assign` : le bouton Précédent ne doit pas ramener
-        // sur cette page, sinon l'utilisateur boucle.
-        window.location.replace(url);
-        return;
-      }
-      compte.textContent = 'Redirection automatique dans ' + restant + ' seconde'
-        + (restant > 1 ? 's' : '') + '…';
+      if (--reste <= 0) { clearInterval(tic); elt.textContent = 'Redirection…'; location.replace(url); return; }
+      elt.textContent = 'Redirection automatique dans ' + reste + ' seconde' + (reste > 1 ? 's' : '') + '…';
     }, 1000);
-  })();
+    return;
+  }
+
+  document.getElementById('outil').hidden = false;
+
+  // ══ Journal ══
+  var journal = document.getElementById('journal');
+  var lignes = [];
+  function log(txt, type) {
+    var h = new Date().toTimeString().slice(0, 8);
+    lignes.push('[' + h + '] ' + txt);
+    var span = document.createElement('span');
+    span.className = type ? 'j-' + type : '';
+    span.textContent = '[' + h + '] ' + txt + '\n';
+    journal.appendChild(span);
+    journal.scrollTop = journal.scrollHeight;
+  }
+  document.getElementById('btn-copier').onclick = function () {
+    navigator.clipboard.writeText(lignes.join('\n')).then(function () { log('journal copié', 'info'); });
+  };
+
+  // ══ MSAL ══
+  // ⚠️ La variable ne peut PAS s'appeler `msal` : `var` est hissé et masquerait
+  // l'objet global du même nom exposé par le CDN — `msal.PublicClientApplication`
+  // serait alors lu sur `undefined`.
+  var app = new msal.PublicClientApplication({
+    auth: {
+      clientId: CLIENT_ID, authority: AUTHORITY, redirectUri: REDIRECT,
+      postLogoutRedirectUri: REDIRECT,
+      // true : au retour, MSAL nous ramène sur l'URL qui portait ?migration=1.
+      navigateToLoginRequestUrl: true
+    },
+    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: true }
+  });
+
+  var compte = null;
+  function majCompte() {
+    var e = document.getElementById('compte-connecte');
+    if (compte) { e.textContent = compte.username; e.className = 'etat ok';
+                  document.getElementById('btn-connexion').textContent = 'Se déconnecter'; }
+    else { e.textContent = 'non connecté'; e.className = 'etat ko'; }
+    majBoutons();
+  }
+
+  app.handleRedirectPromise().then(function (r) {
+    if (r && r.account) { compte = r.account; log('authentifié — ' + r.account.username, 'ok'); }
+    else {
+      var tous = app.getAllAccounts();
+      if (tous.length) { compte = tous[0]; log('session retrouvée — ' + compte.username, 'ok'); }
+      else log('pas de session — cliquer « Se connecter »', 'info');
+    }
+    majCompte();
+  }).catch(function (e) { log('échec authentification : ' + e.message, 'ko'); });
+
+  document.getElementById('btn-connexion').onclick = function () {
+    if (compte) { app.logoutRedirect(); return; }
+    // Redirect et jamais popup : COOP fait échouer la popup en `user_cancelled`.
+    app.loginRedirect({ scopes: SCOPES });
+  };
+
+  function jeton() {
+    return app.acquireTokenSilent({ scopes: SCOPES, account: compte })
+      .then(function (r) { return r.accessToken; })
+      .catch(function () { return app.acquireTokenRedirect({ scopes: SCOPES, account: compte }); });
+  }
+
+  // ══ Graph — retry sur 429 et 5xx, comme graphClient.ts ══
+  function graph(url, options, essai) {
+    options = options || {}; essai = essai || 1;
+    return jeton().then(function (t) {
+      var h = Object.assign({ Authorization: 'Bearer ' + t }, options.headers || {});
+      if (options.body && !h['Content-Type']) h['Content-Type'] = 'application/json';
+      return fetch(url, Object.assign({}, options, { headers: h }));
+    }).then(function (rep) {
+      if (rep.status === 429 || rep.status >= 500) {
+        if (essai >= 3) throw new Error('HTTP ' + rep.status + ' après 3 tentatives');
+        var attente = (parseInt(rep.headers.get('Retry-After'), 10) || essai * 2) * 1000;
+        log('  HTTP ' + rep.status + ', nouvelle tentative dans ' + (attente / 1000) + ' s', 'info');
+        return new Promise(function (r) { setTimeout(r, attente); })
+          .then(function () { return graph(url, options, essai + 1); });
+      }
+      if (rep.status === 204) return null;
+      return rep.text().then(function (txt) {
+        var corps = txt ? JSON.parse(txt) : null;
+        if (!rep.ok) {
+          throw new Error('HTTP ' + rep.status + ' — ' +
+            ((corps && corps.error && corps.error.message) || txt.slice(0, 200)));
+        }
+        return corps;
+      });
+    });
+  }
+
+  /** Pagine `@odata.nextLink` jusqu'au bout. */
+  function graphTout(url) {
+    var acc = [];
+    function suite(u) {
+      return graph(u).then(function (d) {
+        acc = acc.concat((d && d.value) || []);
+        return d && d['@odata.nextLink'] ? suite(d['@odata.nextLink']) : acc;
+      });
+    }
+    return suite(url);
+  }
+
+  // ══ Résolution des personnes ══
+  //
+  // L'Excel écrit « Delavault Guillaume », SharePoint stocke « Delavault,
+  // Guillaume ». Une comparaison stricte échouerait sur TOUS les noms : on
+  // compare des ENSEMBLES de mots, sans accents ni ponctuation.
+  function cleNom(s) {
+    return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(/\s+/)
+      .filter(Boolean).sort().join(' ');
+  }
+
+  var annuaire = null;   // clé de nom → { lookupId, nom, email }
+  function chargerAnnuaire() {
+    if (annuaire) return Promise.resolve(annuaire);
+    annuaire = {};
+    var uUsers = 'https://graph.microsoft.com/v1.0/sites/' + SITE_ID +
+      "/lists('User%20Information%20List')/items?$select=id&$expand=fields($select=EMail,Title)&$top=500";
+    var uEquipe = itemsUrl('equipe') + '?$expand=fields($select=Title,Nom,NomLookupId,Email)&$top=200';
+
+    return Promise.all([graphTout(uUsers), graphTout(uEquipe)]).then(function (res) {
+      var parEmail = {};
+      res[0].forEach(function (it) {
+        var f = it.fields || {}, id = parseInt(it.id, 10);
+        var e = { lookupId: id, nom: f.Title || '', email: f.EMail || '' };
+        if (f.EMail) parEmail[f.EMail.toLowerCase()] = e;
+        if (f.Title) annuaire[cleNom(f.Title)] = e;
+      });
+      // Equipe5S sert de pont : son `Nom` est la personne, son `Email` fait le
+      // lien avec la User Information List quand les libellés diffèrent.
+      res[1].forEach(function (it) {
+        var f = it.fields || {};
+        var nom = typeof f.Nom === 'string' ? f.Nom : (f.Nom && f.Nom.LookupValue) || '';
+        var email = (f.Email || '').toLowerCase();
+        var cible = (email && parEmail[email]) ||
+                    (f.NomLookupId ? { lookupId: f.NomLookupId, nom: nom, email: f.Email || '' } : null);
+        if (nom && cible && !annuaire[cleNom(nom)]) annuaire[cleNom(nom)] = cible;
+      });
+      log('annuaire : ' + Object.keys(annuaire).length + ' personnes', 'info');
+      return annuaire;
+    });
+  }
+  function resoudre(nom) { return annuaire[cleNom(nom)] || null; }
+
+  // ══ État ══
+  var donnees = null, sauvegardeFaite = false, simulationFaite = false, purgeFaite = false;
+
+  function majBoutons() {
+    var pret = !!compte;
+    document.getElementById('btn-sauvegarde').disabled = !(pret && donnees);
+    document.getElementById('btn-simulation').disabled = !(pret && donnees);
+    document.getElementById('btn-purge').disabled =
+      !(pret && donnees && sauvegardeFaite && simulationFaite &&
+        document.getElementById('confirmation').value.trim().toUpperCase() === 'PURGER');
+    document.getElementById('btn-import').disabled = !(pret && donnees && purgeFaite);
+  }
+  document.getElementById('confirmation').oninput = majBoutons;
+
+  // ══ Étape 1 — fichier ══
+  document.getElementById('fichier').onchange = function (ev) {
+    var f = ev.target.files[0];
+    if (!f) return;
+    f.text().then(function (txt) {
+      donnees = JSON.parse(txt.replace(/^﻿/, ''));
+      var nbPhotos = donnees.actions.reduce(function (n, a) { return n + ((a.photos && a.photos.length) || 0); }, 0);
+      document.getElementById('etat-fichier').textContent =
+        donnees.audits.length + ' audits, ' + donnees.actions.length + ' actions, ' + nbPhotos + ' photos';
+      document.getElementById('etat-fichier').className = 'etat ok';
+      document.getElementById('e1').classList.add('faite');
+      log('fichier chargé — ' + donnees.audits.length + ' audits, ' + donnees.actions.length +
+          ' actions, ' + nbPhotos + ' photos', 'ok');
+      majBoutons();
+    }).catch(function (e) {
+      document.getElementById('etat-fichier').textContent = 'illisible : ' + e.message;
+      document.getElementById('etat-fichier').className = 'etat ko';
+      log('fichier illisible : ' + e.message, 'ko');
+    });
+  };
+
+  // ══ Étape 2 — sauvegarde ══
+  document.getElementById('btn-sauvegarde').onclick = function () {
+    var b = this; b.disabled = true;
+    var e = document.getElementById('etat-sauvegarde');
+    e.textContent = 'lecture…'; e.className = 'etat';
+    log('sauvegarde des deux listes…', 'info');
+
+    Promise.all([
+      graphTout(itemsUrl('audits') + '?$expand=fields&$top=200'),
+      graphTout(itemsUrl('actions') + '?$expand=fields&$top=200')
+    ]).then(function (r) {
+      var contenu = { sauvegardeLe: new Date().toISOString(), audits: r[0], actions: r[1] };
+      var blob = new Blob([JSON.stringify(contenu, null, 2)], { type: 'application/json' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'sauvegarde-5s-' + new Date().toISOString().slice(0, 16).replace(/[:T]/g, '') + '.json';
+      a.click();
+      sauvegardeFaite = true;
+      e.textContent = r[0].length + ' audits et ' + r[1].length + ' actions sauvegardés';
+      e.className = 'etat ok';
+      document.getElementById('e2').classList.add('faite');
+      log('sauvegarde : ' + r[0].length + ' audits, ' + r[1].length + ' actions → fichier téléchargé', 'ok');
+      majBoutons();
+    }).catch(function (err) {
+      e.textContent = err.message; e.className = 'etat ko';
+      log('sauvegarde échouée : ' + err.message, 'ko');
+      b.disabled = false;
+    });
+  };
+
+  // ══ Étape 3 — simulation ══
+  document.getElementById('btn-simulation').onclick = function () {
+    var b = this; b.disabled = true;
+    var e = document.getElementById('etat-simulation');
+    e.textContent = 'analyse…'; e.className = 'etat';
+    log('simulation — aucune écriture', 'info');
+
+    chargerAnnuaire().then(function () {
+      var noms = {};
+      donnees.audits.forEach(function (a) { noms[a.auditeur] = 1; });
+      donnees.actions.forEach(function (a) { if (a.responsable) noms[a.responsable] = 1; });
+
+      var html = '<table><tr><th>Personne</th><th>Rôle</th><th>Résolution</th></tr>';
+      var manquants = 0;
+      Object.keys(noms).sort().forEach(function (n) {
+        var r = resoudre(n);
+        if (!r) manquants++;
+        html += '<tr><td>' + n + '</td><td>' +
+          (donnees.audits.some(function (a) { return a.auditeur === n; }) ? 'auditeur ' : '') +
+          (donnees.actions.some(function (a) { return a.responsable === n; }) ? 'responsable' : '') +
+          '</td><td>' + (r ? '<span class="ok">' + (r.email || r.nom) + '</span>'
+                            : '<span class="ko">non trouvé — colonne personne vide</span>') + '</td></tr>';
+      });
+      html += '</table>';
+      document.getElementById('table-personnes').innerHTML = html;
+
+      return Promise.all([
+        graphTout(itemsUrl('audits') + '?$select=id&$top=200'),
+        graphTout(itemsUrl('actions') + '?$select=id&$top=200')
+      ]).then(function (r) {
+        var nbPhotos = donnees.actions.reduce(function (n, a) { return n + ((a.photos && a.photos.length) || 0); }, 0);
+        log('à SUPPRIMER : ' + r[0].length + ' audits, ' + r[1].length + ' actions', 'info');
+        log('à CRÉER     : ' + donnees.audits.length + ' audits, ' + donnees.actions.length +
+            ' actions, ' + nbPhotos + ' photos', 'info');
+        log('personnes non résolues : ' + manquants, manquants ? 'ko' : 'ok');
+        simulationFaite = true;
+        e.textContent = '−' + (r[0].length + r[1].length) + ' items, +' +
+                        (donnees.audits.length + donnees.actions.length) + ' items, ' +
+                        manquants + ' personne(s) non résolue(s)';
+        e.className = manquants ? 'etat ko' : 'etat ok';
+        document.getElementById('e3').classList.add('faite');
+        majBoutons();
+      });
+    }).catch(function (err) {
+      e.textContent = err.message; e.className = 'etat ko';
+      log('simulation échouée : ' + err.message, 'ko');
+    }).then(function () { b.disabled = false; });
+  };
+
+  /** Exécute `taches` par paquets de `n`, en rapportant l'avancement. */
+  function parPaquets(taches, n, surAvancement) {
+    var faits = 0, resultats = [];
+    function paquet(i) {
+      if (i >= taches.length) return Promise.resolve(resultats);
+      var lot = taches.slice(i, i + n);
+      return Promise.all(lot.map(function (t) {
+        return t().then(function (r) { resultats.push(r); return r; },
+                        function (e) { resultats.push({ erreur: e }); return null; })
+          .then(function (r) { surAvancement(++faits, taches.length); return r; });
+      })).then(function () { return paquet(i + n); });
+    }
+    return paquet(0);
+  }
+
+  // ══ Étape 4 — purge ══
+  document.getElementById('btn-purge').onclick = function () {
+    var b = this; b.disabled = true;
+    var e = document.getElementById('etat-purge'), barre = document.getElementById('barre-purge');
+    log('PURGE — suppression de tous les items', 'ko');
+
+    Promise.all([
+      graphTout(itemsUrl('actions') + '?$select=id&$top=200'),
+      graphTout(itemsUrl('audits') + '?$select=id&$top=200')
+    ]).then(function (r) {
+      // Actions d'abord : elles pointent les audits par colonne de recherche.
+      var taches = [];
+      r[0].forEach(function (it) { taches.push(function () { return graph(itemsUrl('actions') + '/' + it.id, { method: 'DELETE' }); }); });
+      r[1].forEach(function (it) { taches.push(function () { return graph(itemsUrl('audits') + '/' + it.id, { method: 'DELETE' }); }); });
+      if (!taches.length) { log('rien à supprimer', 'info'); return []; }
+      e.textContent = '0 / ' + taches.length;
+      return parPaquets(taches, 3, function (f, t) {
+        e.textContent = f + ' / ' + t;
+        barre.style.width = (f / t * 100) + '%';
+      });
+    }).then(function (res) {
+      var ko = res.filter(function (x) { return x && x.erreur; }).length;
+      purgeFaite = true;
+      e.textContent = 'terminé' + (ko ? ' — ' + ko + ' échec(s)' : '');
+      e.className = ko ? 'etat ko' : 'etat ok';
+      document.getElementById('e4').classList.add('faite');
+      log('purge terminée' + (ko ? ' avec ' + ko + ' échec(s)' : ''), ko ? 'ko' : 'ok');
+      majBoutons();
+    }).catch(function (err) {
+      e.textContent = err.message; e.className = 'etat ko';
+      log('purge échouée : ' + err.message, 'ko');
+      b.disabled = false;
+    });
+  };
+
+  // ══ Étape 5 — import ══
+  document.getElementById('btn-import').onclick = function () {
+    var b = this; b.disabled = true;
+    var e = document.getElementById('etat-import'), barre = document.getElementById('barre-import');
+    var idsAudit = {};   // auditId → id d'item SharePoint
+
+    var total = donnees.audits.length + donnees.actions.length;
+    var faits = 0;
+    function avancer() { barre.style.width = (++faits / total * 100) + '%'; e.textContent = faits + ' / ' + total; }
+
+    log('import — ' + donnees.audits.length + ' audits', 'info');
+
+    chargerAnnuaire().then(function () {
+      // — 1. audits —
+      var taches = donnees.audits.map(function (a) {
+        return function () {
+          var p = resoudre(a.auditeur);
+          var f = {
+            Title: a.auditId, Date: a.date,
+            AuditeurEmail: (p && p.email) || a.auditeur,
+            Zone: a.zone, Niveau: String(a.niveau),
+            ScoreTotal: a.scoreTotal, ScorePct: a.scorePct,
+            Commentaire: a.commentaire || ''
+          };
+          Object.keys(a.scores).forEach(function (k) { f[k] = a.scores[k]; });
+          if (p) f.AuditeurLookupId = p.lookupId;
+          return graph(itemsUrl('audits'), { method: 'POST', body: JSON.stringify({ fields: f }) })
+            .then(function (r) { idsAudit[a.auditId] = r.id; avancer(); return r; },
+                  function (err) { log('audit ' + a.auditId + ' : ' + err.message, 'ko'); avancer(); throw err; });
+        };
+      });
+      return parPaquets(taches, 3, function () {});
+    }).then(function (r) {
+      var ko = r.filter(function (x) { return x && x.erreur; }).length;
+      log(Object.keys(idsAudit).length + ' audits créés' + (ko ? ', ' + ko + ' échec(s)' : ''), ko ? 'ko' : 'ok');
+      log('import — ' + donnees.actions.length + ' actions', 'info');
+
+      // — 2. actions —
+      var taches = donnees.actions.map(function (a) {
+        return function () {
+          var p = a.responsable ? resoudre(a.responsable) : null;
+          var f = {
+            Title: a.actionId, Date: a.dateCreation, Zone: a.zone, Secteur: a.secteur,
+            TypeAction: a.type, Description: a.description, Statut: a.statut
+          };
+          if (a.critere) f['Crit_x00e8_re'] = a.critere;
+          if (a.dateCloture) f.DateCloture = a.dateCloture;
+          if (a.commentaireCloture) f.CommentaireCloture = a.commentaireCloture;
+          if (p) f.ResponsableLookupId = p.lookupId;
+          // La colonne de recherche veut l'ID D'ITEM de l'audit, pas son Title.
+          if (a.auditId && idsAudit[a.auditId]) f.AuditRefLookupId = parseInt(idsAudit[a.auditId], 10);
+          return graph(itemsUrl('actions'), { method: 'POST', body: JSON.stringify({ fields: f }) })
+            .then(function (r) { a._itemId = r.id; avancer(); return r; },
+                  function (err) { log('action ' + a.actionId + ' : ' + err.message, 'ko'); avancer(); throw err; });
+        };
+      });
+      return parPaquets(taches, 3, function () {});
+    }).then(function (r) {
+      var ko = r.filter(function (x) { return x && x.erreur; }).length;
+      log((donnees.actions.length - ko) + ' actions créées' + (ko ? ', ' + ko + ' échec(s)' : ''), ko ? 'ko' : 'ok');
+
+      // — 3. photos —
+      // Même emplacement que la V2 : bibliothèque « Documents » du site, sous
+      // Lists/Actions5S/Attachments/{itemId}/. Ce ne sont PAS des pièces jointes
+      // SharePoint — Graph ne sait pas en écrire — mais c'est là que
+      // `getActionPhotos()` va les chercher.
+      var taches = [];
+      donnees.actions.forEach(function (a) {
+        if (!a._itemId || !a.photos) return;
+        a.photos.forEach(function (dataUrl, i) {
+          taches.push(function () {
+            var b64 = dataUrl.split(',')[1];
+            if (!b64) return Promise.resolve();
+            var bin = atob(b64), oct = new Uint8Array(bin.length);
+            for (var k = 0; k < bin.length; k++) oct[k] = bin.charCodeAt(k);
+            var nom = 'photo_' + (a.critere || 'historique') + '_' + (i + 1) + '.jpg';
+            var url = 'https://graph.microsoft.com/v1.0/sites/' + SITE_ID +
+              '/drive/root:/Lists/Actions5S/Attachments/' + a._itemId + '/' + encodeURIComponent(nom) + ':/content';
+            return graph(url, { method: 'PUT', body: new Blob([oct], { type: 'image/jpeg' }),
+                                headers: { 'Content-Type': 'image/jpeg' } })
+              .catch(function (err) { log('photo ' + a.actionId + ' : ' + err.message, 'ko'); throw err; });
+          });
+        });
+      });
+      if (!taches.length) return [];
+      log('import — ' + taches.length + ' photos', 'info');
+      e.textContent = 'photos…';
+      return parPaquets(taches, 2, function (f, t) { e.textContent = 'photos ' + f + ' / ' + t; });
+    }).then(function (r) {
+      var ko = r.filter(function (x) { return x && x.erreur; }).length;
+      log((r.length - ko) + ' photos envoyées' + (ko ? ', ' + ko + ' échec(s)' : ''), ko ? 'ko' : 'ok');
+      log('IMPORT TERMINÉ', 'ok');
+      e.textContent = 'terminé'; e.className = 'etat ok';
+      document.getElementById('e5').classList.add('faite');
+    }).catch(function (err) {
+      e.textContent = err.message; e.className = 'etat ko';
+      log('import interrompu : ' + err.message, 'ko');
+      b.disabled = false;
+    });
+  };
+})();
 </script>
 </body>
 </html>
